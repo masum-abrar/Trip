@@ -10,7 +10,7 @@ import Reviews from "./components/Reviews";
 
 export default function Home() {
   return (
-   <div className="bg-[#FCF0DC] h-full">
+   <div className="bg-white h-full">
    <div className=" z-50">  
    <Navbar  />
    </div >

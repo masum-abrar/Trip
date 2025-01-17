@@ -52,7 +52,7 @@ const AllMovies = () => {
         {movies.map((movie) => (
           <div
             key={movie.id}
-            className="relative bg-[#FEFBF5] shadow-md rounded-lg p-4 w-full h-[400px] group overflow-hidden transition-all duration-300"
+            className="relative bg-white shadow-md rounded-lg p-4 w-full h-[400px] group overflow-hidden transition-all duration-300"
           >
             {/* Movie Image */}
             <img

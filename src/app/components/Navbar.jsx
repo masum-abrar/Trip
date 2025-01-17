@@ -52,7 +52,7 @@ const Navbar = () => {
   return (
     <div className="container max-w-5xl mx-auto ">
       {/* Navbar */}
-      <div className="navbar bg-[#FCF0DC] text-white px-4 ">
+      <div className="navbar bg-white text-white px-4 ">
         {/* Navbar Start */}
         <div className="navbar-start flex items-center">
         <button

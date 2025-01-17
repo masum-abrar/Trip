@@ -73,7 +73,7 @@ const Category = () => {
         {/* Division Dropdown */}
         <h1 className='text-black'>Browse By :</h1>
         <select
-          className="bg-[#FEFBF5] text-black rounded-md p-2 w-full md:w-auto"
+          className="bg-black text-white rounded-md p-2 w-full md:w-auto"
           value={division}
           onChange={handleDivisionChange}
         >
@@ -87,7 +87,7 @@ const Category = () => {
 
         {/* District Dropdown */}
         <select
-          className="bg-[#FEFBF5] text-black rounded-md p-2 w-full md:w-auto"
+          className="bg-black text-white rounded-md p-2 w-full md:w-auto"
           value={district}
           onChange={handleDistrictChange}
           disabled={!division}
@@ -103,7 +103,7 @@ const Category = () => {
 
         {/* Subdistrict Dropdown */}
         <select
-          className="bg-[#FEFBF5] text-black rounded-md p-2 w-full md:w-auto"
+          className="bg-black text-white rounded-md p-2 w-full md:w-auto"
           value={subdistrict}
           onChange={handleSubdistrictChange}
           disabled={!district}
@@ -121,7 +121,7 @@ const Category = () => {
 
         {/* Place Dropdown */}
         <select
-          className="bg-[#FEFBF5] text-black rounded-md p-2 w-full md:w-auto"
+          className="bg-black text-white rounded-md p-2 w-full md:w-auto"
           value={place}
           onChange={handlePlaceChange}
           disabled={!subdistrict}
@@ -142,7 +142,7 @@ const Category = () => {
         <input
           type="text"
           placeholder="Search..."
-          className="bg-[#FEFBF5] text-black rounded-md p-2 w-full md:w-auto outline-none"
+          className="bg-black text-white rounded-md p-2 w-full md:w-auto outline-none"
         />
       </div>
     </div>

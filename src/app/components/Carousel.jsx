@@ -18,7 +18,7 @@ const Carousel = () => {
     {
       id: 2,
       image:
-        'https://i.ibb.co.com/vV3tVNQ/Whats-App-Image-2025-01-16-at-1-02-14-PM.jpg',
+        'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg',
       title: 'Coxs Bazar',
       description:
         'Coxs Bazar Beach The beach in Coxs Bazar is the main attraction of the town with an unbroken length of 150 km (93 mi) also termed the longest natural unbroken sea beach" in the world.',
@@ -63,18 +63,19 @@ const Carousel = () => {
 
                 {/* Search Bar */}
                 <div className="absolute bottom-16 sm:bottom-24 md:bottom-28 lg:bottom-32 w-full max-w-[90%] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px] px-4">
-                  <div className="relative w-full">
-                    <input
-                      type="text"
-                      placeholder="Search destination , hotels"
-                      className="w-full py-3 pl-4 pr-16 bg-transparent border border-white rounded-2xl text-white placeholder-white focus:outline-none backdrop-blur-md text-sm sm:text-base"
-                    />
-                    {/* Search Button */}
-                    <button className="absolute right-3 top-1/2 transform -translate-y-1/2 py-2 px-4 sm:px-6 bg-white text-gray-800 rounded-full text-sm sm:text-base hover:bg-gray-200 transition duration-300">
-                      Search
-                    </button>
-                  </div>
-                </div>
+  <div className="relative w-full">
+    <input
+      type="text"
+      placeholder="Search destination, hotels"
+      className="w-full py-3 pl-4 pr-16 bg-[#FCF0DC]  backdrop-blur-lg border border-gray-300 rounded-2xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base"
+    />
+    {/* Search Button */}
+    <button className="absolute right-3 top-1/2 transform -translate-y-1/2 py-2 px-4 sm:px-6 bg-black text-white rounded-full text-sm sm:text-base hover:bg-gray-900 transition duration-300">
+      Search
+    </button>
+  </div>
+</div>
+
               </div>
             </div>
           </SwiperSlide>
