@@ -3,7 +3,7 @@ import { FaInstagram, FaGithub, FaTwitter, FaFacebook, FaTiktok, FaYoutube } fro
 
 const Footer = () => {
   return (
-    <footer className="bg-[#14181c] text-gray-400 text-sm py-6 mt-16">
+    <footer className="bg-[#443F38] text-white text-sm py-6 mt-16">
       <div className="container mx-auto px-4">
         {/* Top Section: Links */}
         <div className="flex justify-between items-center flex-wrap">
@@ -44,7 +44,7 @@ const Footer = () => {
           </div>
 
           {/* Social Icons */}
-          <div className="flex gap-4 text-gray-400">
+          <div className="flex gap-4 text-white">
             <FaInstagram className="hover:text-white cursor-pointer" />
             <FaGithub className="hover:text-white cursor-pointer" />
             <FaTwitter className="hover:text-white cursor-pointer" />
@@ -55,9 +55,9 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-6 text-gray-500 text-xs">
+        <div className="mt-6 text-white text-xs">
           <p>
-            © Letterboxd Limited. Made by fans in Aotearoa New Zealand. Film
+            © TRIP Limited. Made by fans in Aotearoa New Zealand. Place
             data from TMDb. Mobile site.
           </p>
           <p className="mt-2">

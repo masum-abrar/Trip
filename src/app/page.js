@@ -23,15 +23,15 @@ export default function Home() {
    <div>
     <AllMovies/>
    </div>
-   {/* <div>
+   <div>
     <Banner/>
-   </div> */}
-   {/* <div>
+   </div>
+   <div>
     <Reviews/>
-   </div> */}
-   {/* <div>
+   </div>
+   <div>
     <PopularReviews/>
-   </div> */}
+   </div>
    <div >
     <Footer/>
    </div>

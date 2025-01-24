@@ -5,7 +5,7 @@ const PopularReviews = () => {
   const reviews = [
     {
       id: 1,
-      movieTitle: "Nosferatu",
+      movieTitle: "Sylhet",
       year: "2024",
       reviewer: "ziwe",
       stars: 4,
@@ -14,24 +14,24 @@ const PopularReviews = () => {
       reactions: 123,
       comments: 159,
       avatar: "https://a.ltrbxd.com/resized/avatar/upload/9/4/1/6/5/6/2/shard/avtr-0-48-0-48-crop.jpg?v=0c98965dc2",
-      image: "https://a.ltrbxd.com/resized/alternative-poster/1/0/6/6/9/1/9/p/i2xiUNiDCTwKmzXoHnyqi6IKKQy-0-150-0-225-crop.jpg?v=d45fca1fe6",
+      image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg",
     },
     {
       id: 2,
-      movieTitle: "The Velvet Underground",
+      movieTitle: "Saint Martin",
       year: "2021",
-      reviewer: "ischraib",
+      reviewer: "Rakib",
       stars: 5,
       likes: 4229,
       text: "A wonderfully accurate depiction of art and commerce colliding.",
       reactions: 245,
       comments: 159,
       avatar: "https://a.ltrbxd.com/resized/avatar/upload/1/6/4/9/8/2/8/0/shard/avtr-0-48-0-48-crop.jpg?v=f09b89dacb",
-      image: "https://a.ltrbxd.com/resized/film-poster/3/1/8/1/9/5/318195-deadpool-2-0-150-0-225-crop.jpg?v=b43b5ab190",
+      image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg",
     },
     {
       id: 2,
-      movieTitle: "The Velvet Underground",
+      movieTitle: "Coxs Bazar",
       year: "2021",
       reviewer: "ischraib",
       stars: 5,
@@ -40,15 +40,15 @@ const PopularReviews = () => {
       reactions: 245,
       comments: 159,
       avatar: "https://a.ltrbxd.com/resized/avatar/upload/9/4/1/6/5/6/2/shard/avtr-0-48-0-48-crop.jpg?v=0c98965dc2",
-      image: "https://a.ltrbxd.com/resized/film-poster/3/1/8/1/9/5/318195-deadpool-2-0-150-0-225-crop.jpg?v=b43b5ab190",
+      image: "https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg",
     },
   ];
 
   const crewPicks = [
-    { id: 1, name: "Pick 1", image: "https://a.ltrbxd.com/resized/alternative-poster/1/0/6/6/9/1/9/p/i2xiUNiDCTwKmzXoHnyqi6IKKQy-0-150-0-225-crop.jpg?v=d45fca1fe6" },
-    { id: 2, name: "Pick 2", image: "https://a.ltrbxd.com/resized/film-poster/3/3/7/0/3/6/337036-wicked-2024-0-150-0-225-crop.jpg?v=c519c37ff7" },
-    { id: 3, name: "Pick 3", image: "https://a.ltrbxd.com/resized/film-poster/6/1/7/4/4/3/617443-dune-part-two-0-150-0-225-crop.jpg?v=cc533700f8" },
-    { id: 4, name: "Pick 4", image: "https://a.ltrbxd.com/resized/film-poster/8/3/8/1/4/0/838140-the-substance-0-150-0-225-crop.jpg?v=ab9e1072f8" },
+    { id: 1, name: "Pick 1", image: "https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg" },
+    { id: 2, name: "Pick 2", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" },
+    { id: 3, name: "Pick 3", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg" },
+    { id: 4, name: "Pick 4", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" },
   ];
 
   const popularUsers = [
@@ -72,7 +72,7 @@ const PopularReviews = () => {
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="flex mb-6 bg-[#2c3440] p-4 rounded-lg shadow-lg"
+              className="flex mb-6 bg-[#FEFBF5] p-4 rounded-lg shadow-lg"
             >
             
               <div className="w-20 h-28">
@@ -85,9 +85,9 @@ const PopularReviews = () => {
              
               <div className="ml-4 flex flex-col justify-between">
                 <div>
-                  <h2 className="text-white font-bold text-lg">
+                  <h2 className="text-black font-bold text-lg">
                     {review.movieTitle}{" "}
-                    <span className="text-gray-400">{review.year}</span>
+                    {/* <span className="text-gray-400">{review.year}</span> */}
                   </h2>
                   <div className="flex items-center text-gray-400 text-sm">
                     <img
@@ -101,12 +101,12 @@ const PopularReviews = () => {
                     ⭐ {review.stars} &nbsp; ❤️ {review.reactions} &nbsp; 🗨️{" "}
                     {review.comments}
                   </p>
-                  <p className="text-white mt-2">{review.text}</p>
+                  <p className="text-black mt-2">{review.text}</p>
                 </div>
-                <div className="flex items-center text-gray-400 text-sm mt-2">
+                <div className="flex items-center text-black text-sm mt-2">
                   <FaHeart className="text-blue-500 mr-1" />
                   Like review &nbsp; • &nbsp;
-                  <span className="text-white">{review.likes} likes</span>
+                  <span className="text-black">{review.likes} likes</span>
                 </div>
               </div>
             </div>
@@ -141,7 +141,7 @@ const PopularReviews = () => {
             {popularUsers.map((user) => (
   <div
     key={user.id}
-    className="flex flex-col bg-[#2c3440] p-3 rounded-lg mb-2"
+    className="flex flex-col bg-[#FEFBF5] p-3 rounded-lg mb-2"
   >
     {/* Reviewer Details */}
     <div className="flex items-center justify-between">
@@ -151,13 +151,13 @@ const PopularReviews = () => {
           alt={user.name}
           className="w-8 h-8 rounded-full mr-2"
         />
-        <p className="text-white">{user.name}</p>
+        <p className="text-black">{user.name}</p>
       </div>
-      <FaPlus className="text-gray-400 ml-2 cursor-pointer" />
+      <FaPlus className="text-black ml-2 cursor-pointer" />
     </div>
 
     {/* Likes (Next Line) */}
-    <div className="text-gray-400 text-sm mt-2">{user.likes}</div>
+    <div className="text-black text-sm mt-2">{user.likes}</div>
   </div>
 ))}
 
