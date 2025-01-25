@@ -33,7 +33,7 @@ const PopularPost = () => {
       text: 'A tropical paradise with crystal-clear water. Ideal for snorkeling and relaxation.',
       image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg',
       location: 'Saint Martin Island',
-      category: ['Beach', 'Relaxation', 'Water Activities'],
+      category: ['Beach', 'Relaxation', 'Activities'],
       likes: '120k',
       views: '300k',
       reviews: 4.7,
@@ -46,7 +46,7 @@ const PopularPost = () => {
       text: 'A tropical paradise with crystal-clear water. Ideal for snorkeling and relaxation.',
       image: 'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg',
       location: 'Sajek Valley',
-      category: ['Beach', 'Relaxation', 'Water Activities'],
+      category: ['Beach', 'Relaxation', 'Activities'],
       likes: '120k',
       views: '300k',
       reviews: 4.7,
@@ -59,7 +59,7 @@ const PopularPost = () => {
       text: 'A tropical paradise with crystal-clear water. Ideal for snorkeling and relaxation.',
       image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg',
       location: 'Saint Martin Island',
-      category: ['Beach', 'Relaxation', 'Water Activities'],
+      category: ['Beach', 'Relaxation', 'Activities'],
       likes: '120k',
       views: '300k',
       reviews: 4.7,
@@ -72,7 +72,7 @@ const PopularPost = () => {
       text: 'A tropical paradise with crystal-clear water. Ideal for snorkeling and relaxation.',
       image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg',
       location: 'Saint Martin Island',
-      category: ['Beach', 'Relaxation', 'Water Activities'],
+      category: ['Beach', 'Relaxation', 'Activities'],
       likes: '120k',
       views: '300k',
       reviews: 4.7,
@@ -85,7 +85,7 @@ const PopularPost = () => {
       text: 'A tropical paradise with crystal-clear water. Ideal for snorkeling and relaxation.',
       image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg',
       location: 'Saint Martin Island',
-      category: ['Beach', 'Relaxation', 'Water Activities'],
+      category: ['Beach', 'Relaxation', 'Activities'],
       likes: '120k',
       views: '300k',
       reviews: 4.7,
@@ -117,7 +117,7 @@ const PopularPost = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl py-8">
+    <div className="container mx-auto max-w-6xl py-8 p-2">
       <h2 className="text-2xl text-black mb-6">Popular Posts</h2>
       <Slider {...settings}>
         {posts.map((post) => (
