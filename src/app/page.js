@@ -4,6 +4,8 @@ import Carousel from "./components/Carousel";
 import Category from "./components/Category";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import CommunitySlider from "./components/NewPost";
+import NewPost from "./components/NewPost";
 import PopularReviews from "./components/PopularReviews";
 import Reviews from "./components/Reviews";
 
@@ -29,6 +31,9 @@ export default function Home() {
    <div>
     <Reviews/>
    </div>
+   <div> 
+   <CommunitySlider/>
+     </div>
    <div>
     <PopularReviews/>
    </div>
