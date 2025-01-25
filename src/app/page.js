@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import CommunitySlider from "./components/NewPost";
 import NewPost from "./components/NewPost";
+import PopularPost from "./components/PopularPost";
 import PopularReviews from "./components/PopularReviews";
 import Reviews from "./components/Reviews";
 
@@ -26,14 +27,18 @@ export default function Home() {
     <AllMovies/>
    </div>
    <div>
+    <PopularPost/>
+   </div>
+   <div> 
+   <CommunitySlider/>
+     </div>
+   <div>
     <Banner/>
    </div>
    <div>
     <Reviews/>
    </div>
-   <div> 
-   <CommunitySlider/>
-     </div>
+   
    <div>
     <PopularReviews/>
    </div>

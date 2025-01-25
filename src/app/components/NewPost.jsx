@@ -1,15 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Slider from 'react-slick';
-import { FaHeart, FaEye, FaEllipsisH } from 'react-icons/fa';
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaHeart, FaEye, FaEllipsisH, FaStar,FaShareAlt } from 'react-icons/fa';
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const CommunitySlider = () => {
-  // Sample data for posts
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const posts = [
     {
       id: 1,
@@ -20,6 +21,7 @@ const CommunitySlider = () => {
       image: 'https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg',
       likes: '330k',
       views: '540k',
+      reviews: 4.5,
     },
     {
       id: 2,
@@ -30,6 +32,7 @@ const CommunitySlider = () => {
       image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg',
       likes: '120k',
       views: '300k',
+      reviews: 4.7,
     },
     {
       id: 3,
@@ -37,9 +40,10 @@ const CommunitySlider = () => {
       avatar: 'https://a.ltrbxd.com/resized/avatar/upload/1/6/4/9/8/2/8/0/shard/avtr-0-48-0-48-crop.jpg?v=f09b89dacb',
       heading: 'Explore Sylhet',
       text: 'Dive into the beauty of tea gardens and serene rivers in Sylhet. A must-see destination.',
-      image: '', // Post without an image
+      image: '',
       likes: '90k',
       views: '150k',
+      reviews: 4.2,
     },
     {
       id: 4,
@@ -50,16 +54,15 @@ const CommunitySlider = () => {
       image: 'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg',
       likes: '400k',
       views: '750k',
+      reviews: 4.8,
     },
-    // Add more posts as needed
   ];
 
-  // Slider settings
   const settings = {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 4, // Show 4 cards at a time
+    slidesToShow: 4,
     slidesToScroll: 1,
     responsive: [
       { breakpoint: 1024, settings: { slidesToShow: 3 } },
@@ -68,14 +71,26 @@ const CommunitySlider = () => {
     ],
   };
 
+  const openModal = (post) => {
+    setSelectedPost(post);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedPost(null);
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="container mx-auto max-w-6xl py-8">
-      <h2 className="text-2xl  mb-6 ">New Posts</h2>
+      <h2 className="text-2xl text-black mb-6">New Posts</h2>
       <Slider {...settings}>
         {posts.map((post) => (
           <div key={post.id} className="p-2">
-            <div className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-[380px]">
-              {/* User Info */}
+            <div
+              className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-[380px] hover:shadow-xl transition-shadow cursor-pointer"
+              onClick={() => openModal(post)}
+            >
               <div className="flex items-center p-4 border-b border-gray-200">
                 {post.avatar ? (
                   <img
@@ -91,10 +106,9 @@ const CommunitySlider = () => {
                   </div>
                 )}
                 <h4 className="ml-3 text-sm font-medium text-gray-800">{post.user}</h4>
-                {/* <span className='ml-[88px]'> <BsThreeDotsVertical />
-                </span> */}
+                <button className="ml-auto text-blue-500 font-semibold">Follow</button>
+              
               </div>
-              {/* Image Section */}
               {post.image && (
                 <img
                   src={post.image}
@@ -102,13 +116,11 @@ const CommunitySlider = () => {
                   className="w-full h-[150px] object-cover"
                 />
               )}
-              {/* Content Section */}
               <div className="p-4 flex flex-col justify-between flex-grow">
                 <div>
-                  <h4 className="text-lg font-semibold">{post.heading}</h4>
+                  <h4 className="text-lg font-semibold text-black">{post.heading}</h4>
                   <p className="text-sm text-gray-600 mt-2 line-clamp-3">{post.text}</p>
                 </div>
-                {/* Footer Icons */}
                 <div className="flex justify-between items-center mt-4 text-gray-600">
                   <div className="flex space-x-4">
                     <div className="flex items-center space-x-1">
@@ -119,18 +131,90 @@ const CommunitySlider = () => {
                       <FaEye className="cursor-pointer" />
                       <span className="text-sm">{post.views}</span>
                     </div>
-                    <div className='flex items-center space-x-1'>
-                    <FaEllipsisH className="cursor-pointer" />
-                    <span className="text-sm">{post.views}</span>
-                    </div>
+                  
+                    {/* <div className="flex items-center space-x-1">
+                    <FaEllipsisH className="ml-auto text-gray-500" />
+                      <span className="text-sm">{post.views}</span>
+                    </div> */}
+                    <div className="flex items-center space-x-1">
+                    <FaShareAlt className="cursor-pointer text-gray-600" />
+                    <span className="cursor-pointer text-gray-600">Save</span>
                   </div>
-                 
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         ))}
       </Slider>
+
+      {isModalOpen && selectedPost && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">{selectedPost.heading}</h2>
+              <button
+                onClick={closeModal}
+                className="text-gray-500 hover:text-black text-xl"
+              >
+                &times;
+              </button>
+            </div>
+            {selectedPost.image && (
+              <img
+                src={selectedPost.image}
+                alt={selectedPost.heading}
+                className="w-full h-64 object-cover mb-4 rounded-lg"
+              />
+            )}
+            <div className="flex items-center mb-4">
+              {selectedPost.avatar ? (
+                <img
+                  src={selectedPost.avatar}
+                  alt={selectedPost.user}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-bold text-gray-500">
+                    {selectedPost.user[0]}
+                  </span>
+                </div>
+              )}
+              <h4 className="ml-3 text-lg font-medium">{selectedPost.user}</h4>
+              <FaEllipsisH className="ml-auto text-gray-500" />
+            </div>
+            <p className="text-gray-700 mb-4">{selectedPost.text}</p>
+            <div className="flex justify-between items-center mt-4">
+              <div className="flex space-x-4">
+                <div className="flex items-center space-x-1">
+                  <FaHeart className="cursor-pointer text-red-500" />
+                  <span className="text-sm">{selectedPost.likes}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <FaEye className="cursor-pointer text-blue-500" />
+                  <span className="text-sm">{selectedPost.views}</span>
+                </div>
+              </div>
+              <div className="flex items-center">
+                {[...Array(5)].map((_, index) => (
+                  <FaStar
+                    key={index}
+                    className={`text-yellow-500 ${index < Math.round(selectedPost.reviews) ? '' : 'text-gray-300'}`}
+                  />
+                ))}
+                <span className="ml-2 text-sm text-gray-600">({selectedPost.reviews})</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
