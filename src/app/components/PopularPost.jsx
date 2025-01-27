@@ -225,7 +225,7 @@ const PopularPost = () => {
 
               {/* Rating Section */}
               <div className="flex items-center mb-4">
-                <h4 className="text-lg font-bold mr-2">Rating:</h4>
+                <h4 className="text-lg font-bold mr-2 text-black">Rating:</h4>
                 <div className="flex items-center">
                   {[...Array(5)].map((_, index) => (
                     <FaStar
@@ -245,7 +245,7 @@ const PopularPost = () => {
 
               {/* Liked By Section */}
               <div className="mb-4">
-  <h4 className="text-lg font-bold mb-2">Liked By:</h4>
+  <h4 className="text-lg font-bold mb-2 text-black">Liked By:</h4>
   <div className="flex -space-x-4">
     {selectedPost.likedBy.map((user, index) => (
       <div

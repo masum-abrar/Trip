@@ -253,7 +253,7 @@ const CommunitySlider = () => {
             </div>
             </div>
             
-            <p className="text-gray-700 mb-4">{selectedPost.text}</p>
+            <p className="text-black mb-4">{selectedPost.text}</p>
             <div className="flex justify-between items-center mt-4">
               <div className="flex space-x-4">
                 <div className="flex items-center space-x-1">
@@ -276,7 +276,7 @@ const CommunitySlider = () => {
               </div>
               
             </div>
-            <h4 className="text-lg font-bold mb-2 mt-4">Liked By:</h4>
+            <h4 className="text-lg font-bold mb-2 mt-4 text-black">Liked By:</h4>
   <div className="flex -space-x-4">
     {selectedPost.likedBy.map((user, index) => (
       <div
