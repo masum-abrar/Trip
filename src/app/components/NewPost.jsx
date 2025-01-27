@@ -22,6 +22,19 @@ const CommunitySlider = () => {
       likes: '330k',
       views: '540k',
       reviews: 4.5,
+      district: 'Chattogram',
+      subdistrict: 'Saint Martin',
+      postDate: '2024-11-20',
+      likedBy: [
+        {
+          name: 'Amina',
+          avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+        },
+        {
+          name: 'Shakil',
+          avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+        },
+      ],
     },
     {
       id: 2,
@@ -33,6 +46,19 @@ const CommunitySlider = () => {
       likes: '120k',
       views: '300k',
       reviews: 4.7,
+      district: 'Chattogram',
+      subdistrict: 'Saint Martin',
+      postDate: '2024-11-20',
+      likedBy: [
+        {
+          name: 'Amina',
+          avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+        },
+        {
+          name: 'Shakil',
+          avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+        },
+      ],
     },
     {
       id: 3,
@@ -44,6 +70,19 @@ const CommunitySlider = () => {
       likes: '90k',
       views: '150k',
       reviews: 4.2,
+      district: 'Chattogram',
+      subdistrict: 'Saint Martin',
+      postDate: '2024-11-20',
+      likedBy: [
+        {
+          name: 'Amina',
+          avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+        },
+        {
+          name: 'Shakil',
+          avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+        },
+      ],
     },
     {
       id: 4,
@@ -55,6 +94,19 @@ const CommunitySlider = () => {
       likes: '400k',
       views: '750k',
       reviews: 4.8,
+      district: 'Chattogram',
+      subdistrict: 'Saint Martin',
+      postDate: '2024-11-20',
+      likedBy: [
+        {
+          name: 'Amina',
+          avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+        },
+        {
+          name: 'Shakil',
+          avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+        },
+      ],
     },
   ];
 
@@ -158,7 +210,7 @@ const CommunitySlider = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">{selectedPost.heading}</h2>
+              <h2 className="text-xl font-bold text-black">{selectedPost.heading}</h2>
               <button
                 onClick={closeModal}
                 className="text-gray-500 hover:text-black text-xl"
@@ -172,7 +224,9 @@ const CommunitySlider = () => {
                 alt={selectedPost.heading}
                 className="w-full h-64 object-cover mb-4 rounded-lg"
               />
+             
             )}
+            
             <div className="flex items-center mb-4">
               {selectedPost.avatar ? (
                 <img
@@ -187,9 +241,18 @@ const CommunitySlider = () => {
                   </span>
                 </div>
               )}
-              <h4 className="ml-3 text-lg font-medium">{selectedPost.user}</h4>
-              <FaEllipsisH className="ml-auto text-gray-500" />
+              
+              <div className='ml-4'>
+              <h4 className="text-lg font-bold text-black">{selectedPost.user}</h4>
+              <p className="text-sm text-gray-500">
+                {selectedPost.district}, {selectedPost.subdistrict}
+              </p>
+              <p className="text-sm text-gray-400">
+                Posted on: {selectedPost.postDate}
+              </p>
             </div>
+            </div>
+            
             <p className="text-gray-700 mb-4">{selectedPost.text}</p>
             <div className="flex justify-between items-center mt-4">
               <div className="flex space-x-4">
@@ -211,7 +274,28 @@ const CommunitySlider = () => {
                 ))}
                 <span className="ml-2 text-sm text-gray-600">({selectedPost.reviews})</span>
               </div>
+              
             </div>
+            <h4 className="text-lg font-bold mb-2 mt-4">Liked By:</h4>
+  <div className="flex -space-x-4">
+    {selectedPost.likedBy.map((user, index) => (
+      <div
+        key={index}
+        className="relative group w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md"
+        title={user.name}
+      >
+        <img
+          src={user.avatar}
+          alt={user.name}
+          className="w-full h-full object-cover"
+        />
+        {/* Tooltip */}
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 bg-gray-900 text-white text-xs font-medium px-2 py-1 rounded-lg shadow-md">
+          {user.name}
+        </div>
+      </div>
+    ))}
+  </div>
           </div>
         </div>
       )}
