@@ -258,11 +258,11 @@ const CommunitySlider = () => {
               <div className="flex space-x-4">
                 <div className="flex items-center space-x-1">
                   <FaHeart className="cursor-pointer text-red-500" />
-                  <span className="text-sm">{selectedPost.likes}</span>
+                  <span className="text-sm text-black">{selectedPost.likes}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <FaEye className="cursor-pointer text-blue-500" />
-                  <span className="text-sm">{selectedPost.views}</span>
+                  <span className="text-sm text-black">{selectedPost.views}</span>
                 </div>
               </div>
               <div className="flex items-center">

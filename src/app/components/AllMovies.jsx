@@ -52,7 +52,7 @@ const AllMovies = () => {
         {movies.map((movie) => (
           <div
             key={movie.id}
-            className="relative bg-white shadow-md rounded-lg p-4 w-full h-[400px] group overflow-hidden transition-all duration-300"
+            className="relative bg-white shadow-md rounded-lg p-4 w-full group overflow-hidden transition-all duration-300"
           >
             {/* Movie Image */}
             <img
@@ -66,7 +66,7 @@ const AllMovies = () => {
             </div>
 
             {/* Overlay with Movie Info */}
-            <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 sm:top-40">
+            <div className="absolute top-0 left-0 w-full h-[60%] flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 sm:top-40">
               <div className="lg:flex justify-center gap-4 bg-stone-900 p-2 rounded-lg transform group-hover:scale-90 sm:group-hover:scale-100 transition-transform duration-300">
                 <div className="lg:flex items-center text-white text-sm group-hover:text-xs sm:group-hover:text-sm">
                   <FaEye className="mr-1 group-hover:text-xs sm:group-hover:text-sm" />
