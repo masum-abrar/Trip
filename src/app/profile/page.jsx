@@ -353,32 +353,49 @@ const ProfilePage = () => {
 {activeTab === 'list' && (
  <div className="p-6 w-full">
  {/* Header */}
- <div className="flex justify-between items-center mb-4 w-full">
-   <h2 className="text-3xl font-bold text-gray-800">Best Places for Camping</h2>
+ <div className="flex  justify-between items-center mb-4 w-full">
+   <h2 className="text-xl lg:text-3xl font-bold text-gray-800">Best Places for Camping</h2>
    <button
      onClick={() => setIsModalOpen(true)}
-     className="bg-[#8cc163] text-white px-6 py-2 rounded-lg hover:bg-[#8fe44d]">
+     className="bg-[#8cc163] text-white px-3 lg:px-6 py-2 rounded-lg hover:bg-[#8fe44d]">
      Add Spot
    </button>
  </div>
 
  {/* First Row - Best Camping Spots */}
- <Swiper slidesPerView={5} spaceBetween={16}  className="w-full">
-   {spots1.map((spot, index) => (
-     <SwiperSlide key={index} className="w-[250px]">
-       <a href={spot.image} target="_blank" rel="noopener noreferrer">
-         <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
-           <img src={spot.image} alt={spot.name} className="w-full h-full object-cover" />
-         </div>
-         <p className="text-center mt-2 font-medium">{spot.name}</p>
-       </a>
-     </SwiperSlide>
-   ))}
- </Swiper>
+ <Swiper
+  spaceBetween={16}
+  breakpoints={{
+    320: { slidesPerView: 1 }, // 1 slide on small screens (mobile)
+    480: { slidesPerView: 2 }, // 2 slides on small tablets
+    768: { slidesPerView: 3 }, // 3 slides on tablets
+    1024: { slidesPerView: 4 }, // 4 slides on desktops
+    1280: { slidesPerView: 5 }, // 5 slides on larger screens
+  }}
+  className="w-full"
+>
+  {spots1.map((spot, index) => (
+    <SwiperSlide key={index} className="w-[250px]">
+      <a href={spot.image} target="_blank" rel="noopener noreferrer">
+        <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+          <img src={spot.image} alt={spot.name} className="w-full h-full object-cover" />
+        </div>
+        <p className="text-center mt-2 font-medium">{spot.name}</p>
+      </a>
+    </SwiperSlide>
+  ))}
+</Swiper>
+
 
  {/* Second Row - Adventure Camping */}
- <h2 className="text-3xl font-bold text-gray-800 mt-8"> Top Adventure Spots</h2>
- <Swiper slidesPerView={5} spaceBetween={16}  className="w-full mt-4">
+ <h2 className="text-xl lg:text-3xl font-bold text-gray-800 mt-8"> Top Adventure Spots</h2>
+ <Swiper slidesPerView={5} spaceBetween={16}  breakpoints={{
+    320: { slidesPerView: 1 }, // 1 slide on small screens (mobile)
+    480: { slidesPerView: 2 }, // 2 slides on small tablets
+    768: { slidesPerView: 3 }, // 3 slides on tablets
+    1024: { slidesPerView: 4 }, // 4 slides on desktops
+    1280: { slidesPerView: 5 }, // 5 slides on larger screens
+  }} className="w-full mt-4">
    {spots2.map((spot, index) => (
      <SwiperSlide key={index} className="w-[250px]">
        <a href={spot.image} target="_blank" rel="noopener noreferrer">
