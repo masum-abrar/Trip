@@ -2,6 +2,13 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { Swiper, SwiperSlide } from "swiper/react";
+import  { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+
+// Initialize SwiperCore to prevent Next.js issues
+
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('profile'); // State to track the active tab
@@ -9,6 +16,36 @@ const ProfilePage = () => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const spots1 = [
+    { name: "St. Martin & Chera Dwip", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" },
+    { name: "Shahpori Island", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8uhJykGZFXCpVsg2LanJDFG9JUWJvf2YOkA&s" },
+    { name: "ThanchiBandarban", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6jR47t5ZChiuOqnYRDbSwhxZCXy730nIACA&s" },
+    { name: "Nafakhum Waterfall", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3i781vXTkIc1p9dKWStDovqK10WgCUngI_w&s" },
+    { name: "Boga Lake", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGBcxMV7NTTXVwVyzmBkMAmjl98Af62bm7cg&s" },
+    { name: "Sajek Valley", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwMYfRyMfHfqDgZKMaN9Cpj_Oh-7p943OXnQ&s" },
+    { name: "Kuakata Sea Beach", image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0a/a9/8b/44/sea-beach.jpg?w=900&h=-1&s=1" },
+    { name: "Ratargul Swamp Forest", image: "https://www.travelmate.com.bd/wp-content/uploads/2019/07/Ratargul-2.jpg" },
+    { name: "Lawachara National Park", image: "https://source.unsplash.com/600x400/?jungle,forest" },
+    { name: "Tanguar Haor", image: "https://source.unsplash.com/600x400/?haor,river" },
+  ];
+  
+
+  // Second Category: Top Adventure Spots
+  const spots2 = [
+    { name: "Saint Martin's Island", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJdc6c_s_wrlJABb7pNAIjWYPR8YYNtJbuog&s" },
+    { name: "Keokradong", image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/18/32/94/best-view-of-keokradong.jpg?w=1200&h=-1&s=1" },
+    { name: "Amiakhum Waterfall", image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/77/22/14/amiakhum.jpg?w=900&h=500&s=1" },
+    { name: "Himchari National Park", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltGRoSqSjk5aJz4fNvFp5l0MgYdLjoBsnfA&s" },
+    { name: "Madhabkunda Waterfall", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTo71rsffwGMdqcqzMRoU24AdzpLIv6oh8pug&s" },
+    { name: "Nijhum Dwip", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGQKTQkUYbNzdbnsLxPAJw26kkaZgoY8Lh6w&s" },
+    { name: "Remakri Falls", image: "https://source.unsplash.com/600x400/?jungle,river" },
+    { name: "Satchari National Park", image: "https://source.unsplash.com/600x400/?forest,camping" },
+    { name: "Bandarban Hill Tracks", image: "https://source.unsplash.com/600x400/?hiking,adventure" },
+    { name: "Jaflong", image: "https://source.unsplash.com/600x400/?river,mountains" },
+  ];
+  
 
   return (
     <div className="bg-white text-gray-900 min-h-screen">
@@ -99,6 +136,14 @@ const ProfilePage = () => {
             </li>
             <li
               className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
+                activeTab === 'list' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
+              }`}
+              onClick={() => handleTabClick('list')}
+            >
+              Your List
+            </li>
+            <li
+              className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                 activeTab === 'bucket' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
               }`}
               onClick={() => handleTabClick('bucket')}
@@ -117,7 +162,7 @@ const ProfilePage = () => {
         </div>
 
         {/* Content Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1  gap-8">
           <div className="lg:col-span-2">
             {/* Profile Section */}
             {activeTab === 'profile' && (
@@ -304,7 +349,81 @@ const ProfilePage = () => {
     </div>
   </div>
 )}
+{/* List Section */}
+{activeTab === 'list' && (
+ <div className="p-6 w-full">
+ {/* Header */}
+ <div className="flex justify-between items-center mb-4 w-full">
+   <h2 className="text-3xl font-bold text-gray-800">Best Places for Camping</h2>
+   <button
+     onClick={() => setIsModalOpen(true)}
+     className="bg-[#8cc163] text-white px-6 py-2 rounded-lg hover:bg-[#8fe44d]">
+     Add Spot
+   </button>
+ </div>
 
+ {/* First Row - Best Camping Spots */}
+ <Swiper slidesPerView={5} spaceBetween={16}  className="w-full">
+   {spots1.map((spot, index) => (
+     <SwiperSlide key={index} className="w-[250px]">
+       <a href={spot.image} target="_blank" rel="noopener noreferrer">
+         <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+           <img src={spot.image} alt={spot.name} className="w-full h-full object-cover" />
+         </div>
+         <p className="text-center mt-2 font-medium">{spot.name}</p>
+       </a>
+     </SwiperSlide>
+   ))}
+ </Swiper>
+
+ {/* Second Row - Adventure Camping */}
+ <h2 className="text-3xl font-bold text-gray-800 mt-8"> Top Adventure Spots</h2>
+ <Swiper slidesPerView={5} spaceBetween={16}  className="w-full mt-4">
+   {spots2.map((spot, index) => (
+     <SwiperSlide key={index} className="w-[250px]">
+       <a href={spot.image} target="_blank" rel="noopener noreferrer">
+         <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+           <img src={spot.image} alt={spot.name} className="w-full h-full object-cover" />
+         </div>
+         <p className="text-center mt-2 font-medium">{spot.name}</p>
+       </a>
+     </SwiperSlide>
+   ))}
+ </Swiper>
+
+ {/* Modal */}
+ {isModalOpen && (
+   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+     <div className="bg-white p-8 rounded-lg w-[600px]">
+       <h2 className="text-2xl font-bold mb-4">Add New Camping Spot</h2>
+       <form>
+         <label className="block mb-2">Spot Name:</label>
+         <input type="text" className="w-full border px-3 py-2 rounded mb-3" placeholder="Enter spot name" />
+
+         <label className="block mb-2">Image URL:</label>
+         <input type="text" className="w-full border px-3 py-2 rounded mb-3" placeholder="Enter image URL" />
+
+         <label className="block mb-2">Description:</label>
+         <textarea className="w-full border px-3 py-2 rounded mb-3" placeholder="Enter description"></textarea>
+
+         <div className="flex justify-end gap-2 mt-3">
+           <button
+             type="button"
+             onClick={() => setIsModalOpen(false)}
+             className="px-4 py-2 bg-gray-300 rounded"
+           >
+             Cancel
+           </button>
+           <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+             Save Spot
+           </button>
+         </div>
+       </form>
+     </div>
+   </div>
+ )}
+</div>
+)}
 
           </div>
 
