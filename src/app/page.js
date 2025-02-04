@@ -15,7 +15,7 @@ import Test from "./components/Test";
 export default function Home() {
   return (
    <div className="bg-white h-full">
-   {/* <div className=" z-50">  
+   <div className=" z-50">  
    <Navbar  />
    </div >
    <div className="z-0">
@@ -39,27 +39,15 @@ export default function Home() {
    <div>
     <Reviews/>
    </div>
- 
+   {/* <div>
+    <Test/>
+   </div> */}
    <div>
     <PopularReviews/>
    </div>
    <div >
     <Footer/>
-   </div> */}
-
-
-
-
-
-
-
-   <div>
-    <Test/>
    </div>
    </div>
-
-
-
-
   );
 }
