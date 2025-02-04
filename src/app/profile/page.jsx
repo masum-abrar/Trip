@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import  { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { FaPlus } from "react-icons/fa";
 
 // Initialize SwiperCore to prevent Next.js issues
 
@@ -352,14 +353,23 @@ const ProfilePage = () => {
 {/* List Section */}
 {activeTab === 'list' && (
  <div className="p-6 w-full">
+ <button 
+  onClick={() => setIsModalOpen(true)}
+ className="bg-[#8cc163] text-white px-3 lg:px-6 py-2 rounded-lg ml-[100px] lg:ml-[85%] mb-10 flex items-center gap-2 hover:bg-[#8fe44d]">
+  <FaPlus /> {/* Icon here */}
+  Add to List
+</button>
  {/* Header */}
  <div className="flex  justify-between items-center mb-4 w-full">
-   <h2 className="text-xl lg:text-3xl font-bold text-gray-800">Best Places for Camping</h2>
+  
+   <h2 className="text-lg lg:text-3xl font-bold text-gray-800">Best Places for Camping</h2>
    <button
-     onClick={() => setIsModalOpen(true)}
-     className="bg-[#8cc163] text-white px-3 lg:px-6 py-2 rounded-lg hover:bg-[#8fe44d]">
-     Add Spot
-   </button>
+ 
+  className="bg-[#8cc163] text-white px-2 lg:px-6 py-1 lg:py-2 rounded-lg flex items-center gap-2 hover:bg-[#8fe44d]"
+>
+<FaPlus /> {/* Icon here */}
+  Add Spot
+</button>
  </div>
 
  {/* First Row - Best Camping Spots */}
@@ -388,7 +398,18 @@ const ProfilePage = () => {
 
 
  {/* Second Row - Adventure Camping */}
- <h2 className="text-xl lg:text-3xl font-bold text-gray-800 mt-8"> Top Adventure Spots</h2>
+<div className="flex  justify-between items-center mb-4 w-full mt-12">
+  
+   <h2 className="text-xl lg:text-3xl font-bold text-gray-800 ">Top Adventure Spots</h2>
+   <button
+  onClick={() => setIsModalOpen(true)}
+  className="bg-[#8cc163] text-white px-2 lg:px-6 py-1 lg:py-2 rounded-lg flex items-center gap-2 hover:bg-[#8fe44d]"
+>
+<FaPlus /> {/* Icon here */}
+  Add Spot
+</button>
+ </div>
+
  <Swiper slidesPerView={5} spaceBetween={16}  breakpoints={{
     320: { slidesPerView: 1 }, // 1 slide on small screens (mobile)
     480: { slidesPerView: 2 }, // 2 slides on small tablets
@@ -414,14 +435,23 @@ const ProfilePage = () => {
      <div className="bg-white p-8 rounded-lg w-[600px]">
        <h2 className="text-2xl font-bold mb-4">Add New Camping Spot</h2>
        <form>
-         <label className="block mb-2">Spot Name:</label>
-         <input type="text" className="w-full border px-3 py-2 rounded mb-3" placeholder="Enter spot name" />
+         <label className="block mb-2">Title:</label>
+         <input type="text" className="w-full border px-3 py-2 rounded mb-3 bg-white" placeholder="Enter Title" />
 
-         <label className="block mb-2">Image URL:</label>
-         <input type="text" className="w-full border px-3 py-2 rounded mb-3" placeholder="Enter image URL" />
+         <label className="block mb-2">Image:</label>
+         <input type="file" className="w-full border px-3 py-2 rounded mb-3  bg-white" placeholder="Enter image" />
 
          <label className="block mb-2">Description:</label>
-         <textarea className="w-full border px-3 py-2 rounded mb-3" placeholder="Enter description"></textarea>
+         <textarea className="w-full border px-3 py-2 rounded mb-3 bg-white" placeholder="Enter description"></textarea>
+
+         <label className="block mb-2">Places:</label>
+<select className="w-full border px-3 py-2 rounded mb-3 bg-white">
+  <option value="">Select a Place</option>
+  <option value="coxsbazar">Cox's Bazar</option>
+  <option value="saintmartin">Saint Martin</option>
+  <option value="sajek">Sajek</option>
+</select>
+
 
          <div className="flex justify-end gap-2 mt-3">
            <button
@@ -431,7 +461,7 @@ const ProfilePage = () => {
            >
              Cancel
            </button>
-           <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+           <button type="submit" className="px-4 py-2 bg-[#8cc163] text-white rounded">
              Save Spot
            </button>
          </div>
