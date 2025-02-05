@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Slider from 'react-slick';
-import { FaHeart, FaEye, FaStar } from 'react-icons/fa';
+import { FaHeart, FaEye, FaStar ,FaList,FaPlus } from 'react-icons/fa';
 import { FiMoreVertical } from 'react-icons/fi';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -10,7 +10,10 @@ import 'slick-carousel/slick/slick-theme.css';
 const PopularPost = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [followedUsers, setFollowedUsers] = useState([]); // Array to store followed users
+  const [followedUsers, setFollowedUsers] = useState([]);
+   const [isListModalOpen, setIsListModalOpen] = useState(false);
+  const [newListTitle, setNewListTitle] = useState('');
+    const [showNewListInput, setShowNewListInput] = useState(false); // Array to store followed users
 
   const posts = [
     {
@@ -66,6 +69,11 @@ const PopularPost = () => {
       ],
     },
   ];
+    const [userLists, setUserLists] = useState([
+      { id: 1, title: 'Must Visit Places', spots: [] },
+      { id: 2, title: 'Weekend Getaways', spots: [] },
+      { id: 3, title: 'Beach Destinations', spots: [] }
+    ]);
 
   const settings = {
     dots: true,
@@ -88,6 +96,40 @@ const PopularPost = () => {
   const closeModal = () => {
     setSelectedPost(null);
     setIsModalOpen(false);
+  };
+  const closeListModal = () => {
+    setIsListModalOpen(false);
+    setShowNewListInput(false);
+    setNewListTitle('');
+  };
+  const openListModal = () => {
+    setIsListModalOpen(true);
+  };
+  const createNewList = () => {
+    if (newListTitle.trim()) {
+      const newList = {
+        id: userLists.length + 1,
+        title: newListTitle,
+        spots: [selectedPost]
+      };
+      setUserLists([...userLists, newList]);
+      setNewListTitle('');
+      setShowNewListInput(false);
+      closeListModal();
+    }
+  };
+
+  const addToExistingList = (listId) => {
+    setUserLists(userLists.map(list => {
+      if (list.id === listId) {
+        return {
+          ...list,
+          spots: [...list.spots, selectedPost]
+        };
+      }
+      return list;
+    }));
+    closeListModal();
   };
 
   const toggleFollow = (username) => {
@@ -168,7 +210,7 @@ const PopularPost = () => {
 
       {isModalOpen && selectedPost && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-x-hidden"
           onClick={closeModal}
         >
           <div
@@ -245,6 +287,7 @@ const PopularPost = () => {
 
               {/* Liked By Section */}
               <div className="mb-4">
+                
   <h4 className="text-lg font-bold mb-2 text-black">Liked By:</h4>
   <div className="flex -space-x-4">
     {selectedPost.likedBy.map((user, index) => (
@@ -262,17 +305,104 @@ const PopularPost = () => {
         <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 bg-gray-900 text-white text-xs font-medium px-2 py-1 rounded-lg shadow-md">
           {user.name}
         </div>
+        
       </div>
+      
     ))}
+    
   </div>
+  
 </div>
-
-
+ <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openListModal();
+                  }}
+                  className="flex items-center space-x-2 bg-[#8cc163] text-white px-4 py-2 rounded-lg hover:bg-[#4a6337] transition-colors"
+                >
+                  <FaList />
+                  <span>Add to List</span>
+                </button>
+ 
              
             </div>
+         
           </div>
+          
         </div>
+      
       )}
+       {isListModalOpen && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                onClick={closeListModal}
+              >
+                <div
+                  className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-black">Add to List</h2>
+                    <button
+                      onClick={closeListModal}
+                      className="text-gray-500 hover:text-black text-xl"
+                    >
+                      &times;
+                    </button>
+                  </div>
+      
+                  <div className="space-y-4">
+                    {userLists.map((list) => (
+                      <button
+                        key={list.id}
+                        onClick={() => addToExistingList(list.id)}
+                        className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors flex justify-between items-center"
+                      >
+                        <span className="font-medium text-gray-800">{list.title}</span>
+                        <span className="text-sm text-gray-500">
+                          {list.spots.length} spots
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+      
+                  {!showNewListInput ? (
+                    <button
+                      onClick={() => setShowNewListInput(true)}
+                      className="mt-4 w-full flex items-center justify-center space-x-2 p-3 rounded-lg border-2 border-dashed border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-colors"
+                    >
+                      <FaPlus />
+                      <span>Create New List</span>
+                    </button>
+                  ) : (
+                    <div className="mt-4 space-y-2">
+                      <input
+                        type="text"
+                        value={newListTitle}
+                        onChange={(e) => setNewListTitle(e.target.value)}
+                        placeholder="Enter list title"
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        autoFocus
+                      />
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={createNewList}
+                          className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          Create
+                        </button>
+                        <button
+                          onClick={() => setShowNewListInput(false)}
+                          className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
     </div>
   );
 };

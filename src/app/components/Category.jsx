@@ -69,7 +69,7 @@ const Category = () => {
 
   return (
     <div className=" p-6 container max-w-[1120px] mx-auto mt-5">
-      <div className="flex flex-wrap md:flex-nowrap items-center gap-4">
+      <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-4">
         {/* Division Dropdown */}
         <h1 className='text-black'>Browse By :</h1>
         <select
@@ -102,7 +102,7 @@ const Category = () => {
         </select>
 
         {/* Subdistrict Dropdown */}
-        <select
+        {/* <select
           className="bg-[#FCF0DC] text-black rounded-md p-2 w-full md:w-auto"
           value={subdistrict}
           onChange={handleSubdistrictChange}
@@ -117,7 +117,7 @@ const Category = () => {
                 </option>
               )
             )}
-        </select>
+        </select> */}
 
         {/* Place Dropdown */}
         <select

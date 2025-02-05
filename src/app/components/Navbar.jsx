@@ -1,38 +1,40 @@
-'use client';
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { IoSearchOutline } from 'react-icons/io5';
-import { FaPlus } from 'react-icons/fa6';
-import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
-import { FiUser } from 'react-icons/fi';
-import logo from '../../../public/Final_logo.png';
-import Link from 'next/link';
+"use client";
+import React, { useState } from "react";
+import Image from "next/image";
+import { IoSearchOutline } from "react-icons/io5";
+import { FaPlus } from "react-icons/fa6";
+import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
+import { FiUser } from "react-icons/fi";
+import logo from "../../../public/Final_logo.png";
+import Link from "next/link";
 
 const Navbar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
+  const [searchInput, setSearchInput] = useState("");
   const [selectedMovie, setSelectedMovie] = useState(null);
 
   const movieSuggestions = [
     {
-      name: 'Deadpool',
-      image: 'https://a.ltrbxd.com/resized/alternative-poster/1/0/6/6/9/1/9/p/i2xiUNiDCTwKmzXoHnyqi6IKKQy-0-150-0-225-crop.jpg?v=d45fca1fe6',
+      name: "Deadpool",
+      image:
+        "https://a.ltrbxd.com/resized/alternative-poster/1/0/6/6/9/1/9/p/i2xiUNiDCTwKmzXoHnyqi6IKKQy-0-150-0-225-crop.jpg?v=d45fca1fe6",
     },
     {
-      name: 'Squid Game',
-      image: 'https://a.ltrbxd.com/resized/film-poster/4/7/8/4/2/8/478428-the-brutalist-0-300-0-450-crop.jpg?v=e23890665e',
+      name: "Squid Game",
+      image:
+        "https://a.ltrbxd.com/resized/film-poster/4/7/8/4/2/8/478428-the-brutalist-0-300-0-450-crop.jpg?v=e23890665e",
     },
-    { name: 'Final Destination', image: '/final-destination.jpg' },
-    { name: 'Inception', image: '/inception.jpg' },
-    { name: 'The Dark Knight', image: '/dark-knight.jpg' },
+    { name: "Final Destination", image: "/final-destination.jpg" },
+    { name: "Inception", image: "/inception.jpg" },
+    { name: "The Dark Knight", image: "/dark-knight.jpg" },
   ];
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setSearchInput('');
+    setSearchInput("");
     setSelectedMovie(null);
   };
 
@@ -42,7 +44,7 @@ const Navbar = () => {
 
   const selectMovie = (movie) => {
     setSelectedMovie(movie);
-    setSearchInput('');
+    setSearchInput("");
   };
 
   return (
@@ -75,9 +77,11 @@ const Navbar = () => {
             <li>
               <a className="text-black hover:text-gray-600">Communities</a>
             </li>
-            <li>
-              <a className="text-black hover:text-gray-600">Message</a>
-            </li>
+            <Link href="/list">
+              <li>
+                <a className="text-black hover:text-gray-600"> List</a>
+              </li>
+            </Link>
             <li>
               <a className="text-black hover:text-gray-600">Notification</a>
             </li>
@@ -125,11 +129,11 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="bg-white text-black lg:hidden p-4 space-y-4">
           <ul className="space-y-2">
-<Link  href="profile">
-<li>
-              <a className="text-black hover:text-gray-600">PROFILE</a>
-            </li>
-</Link>
+            <Link href="profile">
+              <li>
+                <a className="text-black hover:text-gray-600">PROFILE</a>
+              </li>
+            </Link>
             <li>
               <a className="text-black hover:text-gray-600"> PLACES</a>
             </li>
@@ -139,11 +143,6 @@ const Navbar = () => {
             <li>
               <a className="text-black hover:text-gray-600">COMMUNITIES</a>
             </li>
-            <Link  href="/">
-<li>
-              <a className="text-black hover:text-gray-600"> HOME</a>
-            </li>
-</Link>
           </ul>
           <button
             onClick={openModal}

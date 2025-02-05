@@ -66,7 +66,7 @@ const Carousel = () => {
   <div className="relative w-full">
     <input
       type="text"
-      placeholder="Search destination, hotels"
+      placeholder="Search destination, places"
       className="w-full py-3 pl-4 pr-16 bg-[#FCF0DC]  backdrop-blur-lg border border-gray-300 rounded-2xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base"
     />
     {/* Search Button */}
