@@ -5,6 +5,7 @@ import { MapPin, Star, User, Trees, Mountain, Sunrise } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import Link from 'next/link';
 function App() {
   const sections = [
     {
@@ -138,11 +139,14 @@ function App() {
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
               
-                <h2 className="text-xl lg:text-3xl  font-bold text-gray-900">{section.title}</h2>
+              <Link href={`/list/${encodeURIComponent(section.title)}`}>
+  <h2 className="text-xl lg:text-3xl font-bold text-gray-900">{section.title}</h2>
+</Link>
+
               </div>
               <div className="flex items-center space-x-3">
                 <span className="text-gray-700">{section.userName}</span>
-                <div className="w-10 h-10 rounded-full overflow-hidden "> 
+                <div className="w-10 h-10 rounded-full overflow-hidden ml-5 "> 
           <img 
             src={section.userAvatar} 
             alt={section.userName} 
