@@ -170,7 +170,7 @@ const PopularReviews = () => {
             <hr className="border-t border-gray-400 mb-6" />
             <h1 className="text-gray-400">
                 Help Keep Letterboard Up To Date
-                Find Out How to Add or Edit a Flim
+                Find Out How to Add or Edit a Place
             </h1>
            
           </div>

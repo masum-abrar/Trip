@@ -177,7 +177,7 @@ const Page = ({ params }) => {
                 {/* Spots Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
                     {section.spots.map(spot => (
-                        <div key={spot.id} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transition transform duration-300">
+                        <div key={spot.id} className=" rounded-lg overflow-hidden shadow-lg hover:scale-105 transition transform duration-300">
                             <Image 
                                 src={spot.image} 
                                 alt={spot.name} 
@@ -185,10 +185,10 @@ const Page = ({ params }) => {
                                 height={300} 
                                 className="w-full h-40 object-cover"
                             />
-                            {/* <div className="p-4 text-white">
+                            <div className="p-4 text-black bg-white bg-opacity-10">
                                 <h3 className="font-semibold text-xl">{spot.name}</h3>
-                                <p className="text-sm text-gray-300">{spot.location}</p>
-                            </div> */}
+                                {/* <p className="text-sm text-gray-300">{spot.location}</p> */}
+                            </div>
                         </div>
                     ))}
                 </div>

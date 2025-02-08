@@ -92,7 +92,7 @@ const Navbar = () => {
         <div className="navbar-end hidden lg:flex items-center gap-4">
           {/* <IoSearchOutline className="text-2xl text-black" /> */}
           <button
-            onClick={openModal}
+            // onClick={openModal}
             className="btn px-8 bg-[#8cc163] text-white font-bold rounded-xl hover:bg-[#008f1a]"
           >
             <FaPlus className="mr-2" />
@@ -137,9 +137,11 @@ const Navbar = () => {
             <li>
               <a className="text-black hover:text-gray-600"> PLACES</a>
             </li>
-            <li>
-              <a className="text-black hover:text-gray-600">LISTS</a>
-            </li>
+            <Link href="/list">
+              <li>
+                <a className="text-black hover:text-gray-600"> LIST</a>
+              </li>
+            </Link>
             <li>
               <a className="text-black hover:text-gray-600">COMMUNITIES</a>
             </li>
