@@ -433,24 +433,24 @@ const ProfilePage = () => {
  {isModalOpen && (
    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
      <div className="bg-white p-8 rounded-lg w-[600px]">
-       <h2 className="text-2xl font-bold mb-4">Add New Camping Spot</h2>
+       <h2 className="text-2xl font-bold mb-4">Add New List</h2>
        <form>
          <label className="block mb-2">Title:</label>
          <input type="text" className="w-full border px-3 py-2 rounded mb-3 bg-white" placeholder="Enter Title" />
 
-         <label className="block mb-2">Image:</label>
-         <input type="file" className="w-full border px-3 py-2 rounded mb-3  bg-white" placeholder="Enter image" />
+         {/* <label className="block mb-2">Image:</label>
+         <input type="file" className="w-full border px-3 py-2 rounded mb-3  bg-white" placeholder="Enter image" /> */}
 
          <label className="block mb-2">Description:</label>
          <textarea className="w-full border px-3 py-2 rounded mb-3 bg-white" placeholder="Enter description"></textarea>
 
-         <label className="block mb-2">Places:</label>
+         {/* <label className="block mb-2">Places:</label>
 <select className="w-full border px-3 py-2 rounded mb-3 bg-white">
   <option value="">Select a Place</option>
   <option value="coxsbazar">Cox's Bazar</option>
   <option value="saintmartin">Saint Martin</option>
   <option value="sajek">Sajek</option>
-</select>
+</select> */}
 
 
          <div className="flex justify-end gap-2 mt-3">

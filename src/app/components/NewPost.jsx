@@ -386,7 +386,7 @@ const CommunitySlider = () => {
             {!showNewListInput ? (
               <button
                 onClick={() => setShowNewListInput(true)}
-                className="mt-4 w-full flex items-center justify-center space-x-2 p-3 rounded-lg border-2 border-dashed border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-colors"
+                className="mt-4 w-full flex items-center justify-center space-x-2 p-3 rounded-lg border-2 border-dashed border-gray-300 text-gray-600 hover:border-[#8cc163] hover:text-[#8cc163] transition-colors"
               >
                 <FaPlus />
                 <span>Create New List</span>
@@ -398,13 +398,19 @@ const CommunitySlider = () => {
                   value={newListTitle}
                   onChange={(e) => setNewListTitle(e.target.value)}
                   placeholder="Enter list title"
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8cc163] focus:border-blue-500 outline-none"
                   autoFocus
                 />
+                  <input 
+                      type="text"
+                      placeholder='Enter list description'
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8cc163] focus:border-[#8cc163] outline-none"
+                      autoFocus
+                       />
                 <div className="flex space-x-2">
                   <button
                     onClick={createNewList}
-                    className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                    className="flex-1 bg-[#8cc163] text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                   >
                     Create
                   </button>

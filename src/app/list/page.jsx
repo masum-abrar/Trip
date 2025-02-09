@@ -51,8 +51,8 @@ function App() {
         }
       ],
       comments: [
-        { id: 1, user: "Tanvir", text: "Sundarbans was a thrilling experience!" , userAvatar: "https://a.ltrbxd.com/resized/avatar/upload/9/4/1/6/5/6/2/shard/avtr-0-48-0-48-crop.jpg?v=0c98965dc2", },
-        { id: 2, user: "Lamia", text: "Cox's Bazar sunsets are unforgettable!" , userAvatar: "https://a.ltrbxd.com/resized/avatar/upload/9/4/1/6/5/6/2/shard/avtr-0-48-0-48-crop.jpg?v=0c98965dc2",}
+        { id: 1, user: "Tanvir", text: "Sundarbans was a thrilling experience!" , userAvatar: "https://a.ltrbxd.com/resized/avatar/upload/1/0/5/4/4/6/4/5/shard/avtr-0-32-0-32-crop.jpg?v=7a65c3aaf9", },
+        { id: 2, user: "Lamia", text: "Cox's Bazar sunsets are unforgettable!" , userAvatar: "https://a.ltrbxd.com/resized/avatar/upload/2/8/1/8/8/8/4/shard/avtr-0-32-0-32-crop.jpg?v=ea8982a291",}
       ]
     },
     {
