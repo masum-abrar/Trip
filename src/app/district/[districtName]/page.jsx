@@ -194,9 +194,9 @@ const DistrictPage = ({ params }) => {
                   <div key={comment.id} className="ml-4 mt-2 bg-gray-100 p-2 rounded-md">
                     <div className="flex items-center gap-2">
                       <FaUserCircle className="text-xl text-black" />
-                      <p className="font-medium">{comment.user}</p>
+                      <p className="font-medium text-black">{comment.user}</p>
                     </div>
-                    <p>{comment.text}</p>
+                    <p className='text-black'>{comment.text}</p>
                     
                     <button onClick={() => handleReplyToggle(post.id, comment.id)} className="text-blue-500 text-sm">Reply</button>
 
@@ -236,7 +236,7 @@ const DistrictPage = ({ params }) => {
                     value={post.newComment}
                     onChange={(e) => setPosts(posts.map(p => p.id === post.id ? { ...p, newComment: e.target.value } : p))}
                     placeholder="Write a comment..."
-                    className="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
+                    className="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-400 bg-white"
                   />
                   <button onClick={() => handleComment(post.id)} className="bg-[#8cc163] text-white px-4 py-1 rounded-md">
                     Comment
