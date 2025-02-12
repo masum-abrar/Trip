@@ -193,7 +193,7 @@ const DistrictPage = ({ params }) => {
                 {post.comments.slice(0, post.showAllComments ? post.comments.length : 2).map(comment => (
                   <div key={comment.id} className="ml-4 mt-2 bg-gray-100 p-2 rounded-md">
                     <div className="flex items-center gap-2">
-                      <FaUserCircle className="text-xl text-gray-500" />
+                      <FaUserCircle className="text-xl text-black" />
                       <p className="font-medium">{comment.user}</p>
                     </div>
                     <p>{comment.text}</p>
