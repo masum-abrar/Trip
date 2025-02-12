@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 
 import React, { useState } from 'react';
 import Slider from 'react-slick';
@@ -56,7 +57,7 @@ const CommunitySlider = () => {
       likes: '120k',
       views: '300k',
       reviews: 4.7,
-      district: 'Chattogram',
+      district: 'Dhaka',
       subdistrict: 'Saint Martin',
       postDate: '2024-11-20',
       likedBy: [
@@ -132,7 +133,10 @@ const CommunitySlider = () => {
       { breakpoint: 480, settings: { slidesToShow: 1 } },
     ],
   };
-
+  const handleDistrictClick = (e) => {
+    e.stopPropagation(); // Prevent modal from opening
+    // console.log(`District: ${post.district}`);
+  };
   const openModal = (post) => {
     setSelectedPost(post);
     setIsModalOpen(true);
@@ -187,7 +191,7 @@ const CommunitySlider = () => {
         {posts.map((post) => (
           <div key={post.id} className="p-2">
             <div
-              className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-[380px] hover:shadow-xl transition-shadow cursor-pointer"
+              className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-[420px] hover:shadow-xl transition-shadow cursor-pointer"
               onClick={() => openModal(post)}
             >
               <div className="flex items-center p-4 border-b border-gray-200">
@@ -217,6 +221,14 @@ const CommunitySlider = () => {
               <div className="p-4 flex flex-col justify-between flex-grow">
                 <div>
                   <h4 className="text-lg font-semibold text-black">{post.heading}</h4>
+                  <Link href={`/district/${post.district}`}>
+                  <span
+          onClick={handleDistrictClick}
+          className="inline-block bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full mt-1 cursor-pointer hover:bg-blue-200"
+        >
+          {post.district}
+        </span>
+        </Link>
                   <p className="text-sm text-gray-600 mt-2 line-clamp-3">{post.text}</p>
                 </div>
                 <div className="flex justify-between items-center mt-4 text-gray-600">
