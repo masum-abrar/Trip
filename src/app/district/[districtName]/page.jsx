@@ -216,7 +216,7 @@ const DistrictPage = ({ params }) => {
         <select
           value={newPost.place}
           onChange={(e) => setNewPost({ ...newPost, place: e.target.value })}
-          className="border bg-white p-2 rounded-md focus:ring-2 focus:ring-blue-400"
+          className="border bg-white p-2 text-black rounded-md focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select Place</option>
           <option value="Beach">Beach</option>
