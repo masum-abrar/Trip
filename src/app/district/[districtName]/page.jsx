@@ -197,7 +197,7 @@ const DistrictPage = ({ params }) => {
           />
         </label>
 
-        {/* Preview Selected Images */}
+        {/* Preview Selected Images
         <div className="mt-3 grid grid-cols-3 gap-2">
           {newPost.images.map((image, index) => (
             <div key={index} className="relative">
@@ -210,7 +210,7 @@ const DistrictPage = ({ params }) => {
               </button>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Place Selection */}
         <select
@@ -228,7 +228,22 @@ const DistrictPage = ({ params }) => {
           Post
         </button>
       </div>
+        {/* Preview Selected Images */}
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {newPost.images.map((image, index) => (
+            <div key={index} className="relative">
+              <img src={image} alt={`Selected ${index}`} className="w-full h-20 object-cover rounded-md" />
+              <button 
+                onClick={() => removeImage(index)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
     </div>
+    
 
     {/* Posts Display */}
     {posts.map((post) => (
