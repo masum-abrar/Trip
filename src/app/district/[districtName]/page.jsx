@@ -178,7 +178,7 @@ const DistrictPage = ({ params }) => {
     {/* Post Input Section */}
     <div className="bg-white shadow-md rounded-xl p-4">
       <textarea
-        className="w-full p-3 border bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className="w-full p-3 border text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
         placeholder="What's on your mind?"
         value={newPost.text}
         onChange={(e) => setNewPost({ ...newPost, text: e.target.value })}
@@ -355,7 +355,7 @@ const DistrictPage = ({ params }) => {
             value={post.newComment}
             onChange={(e) => setPosts(posts.map(p => p.id === post.id ? { ...p, newComment: e.target.value } : p))}
             placeholder="Write a comment..."
-            className="flex-1 w-36 p-2 border rounded-md focus:ring-2 focus:ring-blue-400 bg-white"
+            className="flex-1 w-36 p-2 border rounded-md text-black focus:ring-2 focus:ring-blue-400 bg-white"
           />
           <button onClick={() => handleComment(post.id)} className="bg-[#8cc163] text-white px-4 py-1 rounded-md">
             Comment
