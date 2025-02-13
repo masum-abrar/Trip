@@ -129,6 +129,11 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="bg-white text-black lg:hidden p-4 space-y-4">
           <ul className="space-y-2">
+          <Link href="/">
+              <li>
+                <a className="text-black hover:text-gray-600">Home</a>
+              </li>
+            </Link>
             <Link href="profile">
               <li>
                 <a className="text-black hover:text-gray-600">PROFILE</a>

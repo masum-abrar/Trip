@@ -1,5 +1,5 @@
 'use client';
-
+import Link from 'next/link';
 import React, { useState } from 'react';
 import Slider from 'react-slick';
 import { FaHeart, FaEye, FaStar ,FaList,FaPlus } from 'react-icons/fa';
@@ -51,7 +51,7 @@ const PopularPost = () => {
       text: 'A tropical paradise with crystal-clear water. Ideal for snorkeling and relaxation.',
       image:
         'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg',
-      district: 'Chattogram',
+      district: 'Dhaka',
       subdistrict: 'Saint Martin',
       likes: '120k',
       views: '300k',
@@ -87,7 +87,10 @@ const PopularPost = () => {
       { breakpoint: 480, settings: { slidesToShow: 1 } },
     ],
   };
-
+  const handleDistrictClick = (e) => {
+    e.stopPropagation(); // Prevent modal from opening
+    // console.log(`District: ${post.district}`);
+  };
   const openModal = (post) => {
     setSelectedPost(post);
     setIsModalOpen(true);
@@ -161,9 +164,14 @@ const PopularPost = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
                 <div className="absolute bottom-2 left-2 text-white">
                   <h4 className="text-lg font-bold">{post.heading}</h4>
-                  <p className="text-sm">
-                    {post.district}, {post.subdistrict}
-                  </p>
+                  <Link href={`/district/${post.district}`}>
+                  <span
+          onClick={handleDistrictClick}
+          className="inline-block bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full mt-1 cursor-pointer hover:bg-blue-200"
+        >
+          {post.district}
+        </span>
+        </Link>
                 </div>
               </div>
               <div className="p-4">

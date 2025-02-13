@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { FaImage, FaRegHeart, FaHeart, FaUserCircle, FaPaperPlane } from 'react-icons/fa';
 import Navbar from "@/app/components/Navbar";
 import EventSection from '@/app/components/EventSection';
+import PlacesTabSection from '@/app/components/PlacesTabSection';
 
 const DistrictPage = ({ params }) => {
   const districtName = params.districtName;
@@ -313,9 +314,12 @@ const DistrictPage = ({ params }) => {
         <p className="mt-2 text-gray-800">{post.text}</p>
 
         {/* Like Button */}
-        <button onClick={() => toggleLike(post.id)} className="flex items-center gap-1 mt-2 text-black">
-          {post.liked ? <FaHeart className="text-red-500" /> : <FaRegHeart />} {post.likes}
-        </button>
+        <button onClick={() => toggleLike(post.id)} className="flex items-center justify-between w-full mt-2 text-black">
+  <div className="flex items-center gap-1">
+    {post.liked ? <FaHeart className="text-red-500" /> : <FaRegHeart />} {post.likes}
+  </div>
+  <span className="ml-auto">{post.comments.length} Comments</span>
+</button>
 
         {/* Comments Section */}
         {post.comments.slice(0, post.showAllComments ? post.comments.length : 2).map(comment => (
@@ -387,6 +391,14 @@ const DistrictPage = ({ params }) => {
           <EventSection/>
           </div>
         )}
+        {PlacesTabSection}
+        {
+          activeTab === 'Places' && (
+           <div>
+            <PlacesTabSection/>
+             </div>
+          )
+        }
       </div>
     </div>
   );

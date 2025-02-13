@@ -157,8 +157,8 @@ const Page = ({ params }) => {
                                 height={300} 
                                 className="w-full h-40 object-cover"
                             />
-                            <div className="p-4 text-black bg-white bg-opacity-10">
-                                <h3 className="font-semibold text-xl">{spot.name}</h3>
+                            <div className="p-3 text-black bg-white bg-opacity-10">
+                                <h3 className="font-semibold text-lg">{spot.name}</h3>
                                 {/* <p className="text-sm text-gray-300">{spot.location}</p> */}
                             </div>
                         </div>
