@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaUserCircle, FaReply, FaStar,FaPaperPlane } from "react-icons/fa";
+import { FaUserCircle, FaReply, FaStar,FaPaperPlane ,FaImage} from "react-icons/fa";
 
 const places = [
   {
@@ -123,7 +123,16 @@ const PlacesTabSection = () => {
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
               />
-              <input type="file" multiple accept="image/*" className="mt-2 bg-white"  onChange={handleImageChange}  />
+             <label className="cursor-pointer">
+                  <FaImage className="ml-[45%] text-xl text-gray-600 hover:text-blue-500" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                </label>
               <div className="flex gap-2 mt-2">
                 {reviewImages.map((img, index) => (
                   <img key={index} src={URL.createObjectURL(img)} alt="review" className="w-16 h-16 rounded-md" />
