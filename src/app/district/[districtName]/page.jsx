@@ -156,9 +156,14 @@ const DistrictPage = ({ params }) => {
 
       <div className="relative w-full h-64">
         <img src="https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" alt="District" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <h1 className="text-4xl font-bold text-white">{districtName.charAt(0).toUpperCase() + districtName.slice(1)}</h1>
-        </div>
+        {districtName && (
+  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <h1 className="text-4xl font-bold text-white">
+      {districtName.charAt(0).toUpperCase() + districtName.slice(1)}
+    </h1>
+  </div>
+)}
+
       </div>
 
       <div className="flex justify-center mt-4">

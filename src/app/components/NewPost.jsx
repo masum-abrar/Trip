@@ -186,7 +186,12 @@ const CommunitySlider = () => {
 
   return (
     <div className="container mx-auto max-w-6xl py-8 p-2">
-      <h2 className="text-2xl text-black mb-6">New Posts</h2>
+    <div className="flex justify-between items-center "> 
+    <h2 className="text-2xl text-black mb-6">New Posts</h2>
+    <Link href={`/district/${posts.district}`}>
+    See more...
+    </Link>
+    </div>
       <Slider {...settings}>
         {posts.map((post) => (
           <div key={post.id} className="p-2">
