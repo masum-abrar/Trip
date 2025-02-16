@@ -189,7 +189,7 @@ const CommunitySlider = () => {
     <div className="flex justify-between items-center "> 
     <h2 className="text-2xl text-black mb-6">New Posts</h2>
     <Link href="/Communities" className='text-black mb-6'>
-    See more...
+    See more
     </Link>
     </div>
       <Slider {...settings}>

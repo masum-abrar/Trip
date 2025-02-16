@@ -149,9 +149,11 @@ const Navbar = () => {
                 <a className="text-black hover:text-gray-600"> LIST</a>
               </li>
             </Link>
-            <li>
-              <a className="text-black hover:text-gray-600">COMMUNITIES</a>
+            <Link href="/Communities">
+           <li>
+              <a className="text-black hover:text-gray-600">Communities</a>
             </li>
+           </Link>
           </ul>
           <button
             onClick={openModal}
