@@ -188,7 +188,7 @@ const CommunitySlider = () => {
     <div className="container mx-auto max-w-6xl py-8 p-2">
     <div className="flex justify-between items-center "> 
     <h2 className="text-2xl text-black mb-6">New Posts</h2>
-    <Link href={`/district/${posts.district}`}>
+    <Link href="/Communities">
     See more...
     </Link>
     </div>

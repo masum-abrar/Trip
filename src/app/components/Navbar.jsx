@@ -74,9 +74,11 @@ const Navbar = () => {
             <li>
               <a className="text-black hover:text-gray-600">Menu</a>
             </li>
-            <li>
+           <Link href="/Communities">
+           <li>
               <a className="text-black hover:text-gray-600">Communities</a>
             </li>
+           </Link>
             <Link href="/list">
               <li>
                 <a className="text-black hover:text-gray-600"> List</a>
