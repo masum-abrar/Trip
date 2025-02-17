@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FaImage, FaRegHeart, FaHeart, FaUserCircle, FaPaperPlane, FaCalendarAlt } from 'react-icons/fa';
 
-const EventSection = () => {
+const EventTabSection = ({ hidePlaceSelection }) => {
 
   const [showAllImages, setShowAllImages] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -211,15 +211,18 @@ const EventSection = () => {
     </label>
 
     {/* Place Selection */}
-    <select
-      value={newPost.place}
-      onChange={(e) => setNewPost({ ...newPost, place: e.target.value })}
-      className="border bg-white p-2 text-black rounded-md focus:ring-2 focus:ring-blue-400"
-    >
-      <option value="">Select Place</option>
-      <option value="Beach">Beach</option>
-      <option value="Hill">Hill</option>
-    </select>
+  {/* Conditionally render the select dropdown */}
+  {!hidePlaceSelection && (
+        <select
+          value={newPost.place}
+          onChange={(e) => setNewPost({ ...newPost, place: e.target.value })}
+          className="border bg-white p-2 text-black rounded-md focus:ring-2 focus:ring-blue-400"
+        >
+          <option value="">Select Place</option>
+          <option value="Beach">Beach</option>
+          <option value="Hill">Hill</option>
+        </select>
+      )}
      {/* Post Button */}
   <button onClick={handlePost} className="bg-[#8cc163] text-white px-6 py-2 rounded-lg hover:bg-[#39c252] ">
     Post
@@ -406,4 +409,4 @@ const EventSection = () => {
   )
 }
 
-export default EventSection
+export default EventTabSection

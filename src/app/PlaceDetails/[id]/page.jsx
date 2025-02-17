@@ -3,6 +3,9 @@ import Navbar from "@/app/components/Navbar";
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@mui/material"; // Using Material UI for Modal
 import { FaStar, FaRegStar } from "react-icons/fa"; // Star rating icons
+import DiscussTabSection from "@/app/components/DiscussionTabSection";
+import EventTabSection from "@/app/components/EventTabSection";
+import ReviewsTabSection from "@/app/components/ReviewsTabSection";
 
 const places = [
   { id: 1, title: "Sylhet", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
@@ -154,8 +157,8 @@ const PlaceDetails = ({ params }) => {
         </DialogContent>
       </Dialog>
 
-      {/* <div className="flex justify-center mt-4">
-        {['Discussion', 'Events', 'Places'].map((tab) => (
+      <div className="flex justify-center mt-10">
+        {['Discussion', 'Events', 'Reviews'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -164,7 +167,23 @@ const PlaceDetails = ({ params }) => {
             {tab}
           </button>
         ))}
-      </div> */}
+      </div>
+
+      {activeTab === 'Events' && (
+         <div className="max-w-3xl mx-auto mt-6">
+        <EventTabSection hidePlaceSelection={true} />
+          </div>
+        )}
+         {activeTab === 'Discussion' && (
+         <div className="max-w-3xl mx-auto mt-6">
+        <DiscussTabSection hidePlaceSelection={true} />
+          </div>
+        )}
+         {activeTab === 'Reviews' && (
+         <div className="max-w-3xl mx-auto mt-6">
+       <ReviewsTabSection/>
+          </div>
+        )}
     </div>
   );
 };
