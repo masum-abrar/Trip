@@ -83,7 +83,7 @@ const PlaceDetails = ({ params }) => {
     { icon: "📌", text: "Add to Bucket List" },
     { icon: "📂", text: "Add to List" },
     { icon: "⭐", text: "Add to Favorite Place" },
-    { icon: "🚶", text: "Visitor" },
+    { icon: "🚶", text: "12k Visitor" },
     { icon: "✅", text: "Visited" },
   ].map((button, index) => (
     <button
