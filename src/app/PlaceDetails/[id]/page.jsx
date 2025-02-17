@@ -34,7 +34,7 @@ const PlaceDetails = ({ params }) => {
   }
 
   return (
-    <div className="">
+    <div className="bg-white">
       {/* Navbar */}
       <div className="shadow-lg w-full">
         <Navbar />
