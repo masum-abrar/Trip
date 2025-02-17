@@ -4,8 +4,9 @@ import { FaEye, FaEllipsisH, FaHeart } from 'react-icons/fa';
 import Slider from 'react-slick'; 
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
+import Link from 'next/link';
 
-const AllMovies = () => {
+const AllPlaces = () => {
   const movies = [
     { id: 1, title: 'Sylhet', image: 'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg', eyeCount: '990k', dotCount: '194k', heartCount: '366k' },
     { id: 2, title: 'Saint Martin', image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg', eyeCount: '890k', dotCount: '134k', heartCount: '456k' },
@@ -48,8 +49,9 @@ const AllMovies = () => {
       <hr className="bg-gray-400 mb-6" />
 
       {/* Card Slider */}
-      <Slider {...settings}>
+    <Slider {...settings}>
         {movies.map((movie) => (
+           <Link href={`/PlaceDetails/${movie.id}`}> 
           <div
             key={movie.id}
             className="relative bg-white shadow-md rounded-lg p-4 w-full group overflow-hidden transition-all duration-300"
@@ -99,10 +101,12 @@ const AllMovies = () => {
               </div>
             </div>
           </div>
+          </Link>
         ))}
       </Slider>
+ 
     </div>
   );
 };
 
-export default AllMovies;
+export default  AllPlaces;

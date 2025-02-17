@@ -1,4 +1,5 @@
-import AllMovies from "./components/AllMovies";
+import AllPlaces from "./components/AllMovies";
+
 import Banner from "./components/Banner";
 import Carousel from "./components/Carousel";
 import Category from "./components/Category";
@@ -25,7 +26,7 @@ export default function Home() {
     <Category/>
    </div>
    <div>
-    <AllMovies/>
+    < AllPlaces/>
    </div>
    <div>
     <PopularPost/>

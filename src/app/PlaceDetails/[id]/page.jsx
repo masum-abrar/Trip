@@ -1,0 +1,172 @@
+'use client'
+import Navbar from "@/app/components/Navbar";
+import React, { useState } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@mui/material"; // Using Material UI for Modal
+import { FaStar, FaRegStar } from "react-icons/fa"; // Star rating icons
+
+const places = [
+  { id: 1, title: "Sylhet", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
+  { id: 2, title: "Saint Martin", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
+  { id: 3, title: "Coxs Bazar", image: "https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg", eyeCount: "750k", dotCount: "294k", heartCount: "266k" },
+  { id: 4, title: "Coxs Bazar", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg", eyeCount: "620k", dotCount: "394k", heartCount: "166k" },
+];
+
+const PlaceDetails = ({ params }) => {
+  const placeId = parseInt(params.id, 10);
+  const place = places.find((p) => p.id === placeId);
+
+  // State for Modal & Rating
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
+  const [privacy, setPrivacy] = useState("Public");
+
+  // State for Active Tab
+  const [activeTab, setActiveTab] = useState('Discussion');
+  
+
+  if (!place) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <h1 className="text-2xl font-bold text-red-500">Place not found!</h1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="">
+      {/* Navbar */}
+      <div className="shadow-lg w-full">
+        <Navbar />
+      </div>
+
+      {/* Place Details Section */}
+      <div className=" flex flex-col items-center justify-center pt-12 p-6">
+      {/* <h1 className="hidden">{place.title}</h1>  */}
+      <div className="relative w-full max-w-6xl mx-auto group">
+  {/* Background Image with Overlay */}
+  <div className="relative w-full h-[400px] overflow-hidden rounded-lg shadow-lg">
+    <img
+      src={place.image}
+      alt={place.title}
+      className="w-full h-full object-cover"
+    />
+    {/* Gradient Overlay (Hidden on Hover) */}
+    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 opacity-100 group-hover:opacity-0"></div>
+
+    {/* Place Name & Stats Overlay */}
+    <div className="absolute bottom-6 left-6 text-white transition-opacity duration-300 group-hover:text-gray-900">
+      <h1 className="text-3xl md:text-4xl font-extrabold">{place.title}</h1>
+      <div className="flex space-x-4 mt-2 text-lg font-medium">
+        <span className="flex items-center space-x-1">
+          👁 <span>{place.eyeCount}</span>
+        </span>
+        <span className="flex items-center space-x-1">
+          💬 <span>{place.dotCount}</span>
+        </span>
+        <span className="flex items-center space-x-1">
+          ❤️ <span>{place.heartCount}</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+        {/* Buttons Section */}
+        <div className="flex flex-wrap gap-3 mt-6">
+  {[
+    { icon: "📖", text: "Add to Diary", onClick: () => setModalOpen(true) },
+    { icon: "📌", text: "Add to Bucket List" },
+    { icon: "📂", text: "Add to List" },
+    { icon: "⭐", text: "Add to Favorite Place" },
+    { icon: "🚶", text: "Visitor" },
+    { icon: "✅", text: "Visited" },
+  ].map((button, index) => (
+    <button
+      key={index}
+      onClick={button.onClick} // Add the onClick handler here
+      className="relative px-6 py-2 text-sm font-medium rounded-full border border-gray-300 text-gray-800 shadow-lg transition-all duration-300 overflow-hidden group"
+    >
+      {/* Default Text */}
+      <span className="relative z-10 flex items-center gap-2 transition-colors duration-300 group-hover:text-white">
+        {button.icon} {button.text}
+      </span>
+
+      {/* Gradient Hover Background Effect */}
+      <span className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-900 left-0 w-full h-full scale-0 origin-center transition-transform duration-300 ease-in-out group-hover:scale-100"></span>
+    </button>
+  ))}
+</div>
+
+
+
+
+
+      </div>
+
+      {/* Modal for Adding to Diary */}
+      <Dialog className=" max-w-[500px] mx-auto p-6" open={isModalOpen} onClose={() => setModalOpen(false)}>
+
+        <DialogTitle className="text-center font-bold text-gray-900">📖 Add to Diary</DialogTitle>
+        <DialogContent className=" lg:w-[350px]">
+          {/* Star Rating */}
+          <div className="flex justify-center my-3">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span key={star} onClick={() => setRating(star)} className="cursor-pointer text-yellow-500 text-2xl">
+                {rating >= star ? <FaStar /> : <FaRegStar />}
+              </span>
+            ))}
+          </div>
+
+          {/* Review Input */}
+          <textarea
+            className="w-full p-2 border rounded-md mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Write your review..."
+            value={review}
+            onChange={(e) => setReview(e.target.value)}
+          ></textarea>
+
+          {/* Privacy Options */}
+          <div className="mt-3">
+      <label className="font-semibold text-gray-800">Privacy:</label>
+      <div className="relative mt-1">
+        <select
+          className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white text-gray-800"
+          value={privacy}
+          onChange={(e) => setPrivacy(e.target.value)}
+        >
+          <option value="Public">🌍 Public</option>
+          <option value="Private">🔒 Private</option>
+        </select>
+      </div>
+    </div>
+
+          {/* Save & Cancel Buttons */}
+          <div className="flex justify-end mt-4">
+            <button onClick={() => setModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+              Cancel
+            </button>
+            <button className="px-4 py-2 ml-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340]">
+              Save
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* <div className="flex justify-center mt-4">
+        {['Discussion', 'Events', 'Places'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-6 py-2 mx-2 rounded-full transition-all duration-300 ${activeTab === tab ? 'bg-[#8cc163] text-white' : 'bg-gray-200 text-gray-700'}`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div> */}
+    </div>
+  );
+};
+
+export default PlaceDetails;
