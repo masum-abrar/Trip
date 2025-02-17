@@ -121,7 +121,7 @@ const PlaceDetails = ({ params }) => {
 
           {/* Review Input */}
           <textarea
-            className="w-full p-2 border rounded-md mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border rounded-md mt-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Write your review..."
             value={review}
             onChange={(e) => setReview(e.target.value)}
