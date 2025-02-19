@@ -143,9 +143,6 @@ const Navbar = () => {
                 <a className="text-black hover:text-gray-600">PROFILE</a>
               </li>
             </Link>
-            <li>
-              <a className="text-black hover:text-gray-600"> PLACES</a>
-            </li>
             <Link href="/list">
               <li>
                 <a className="text-black hover:text-gray-600"> LIST</a>
@@ -156,6 +153,11 @@ const Navbar = () => {
               <a className="text-black hover:text-gray-600">Communities</a>
             </li>
            </Link>
+           <Link href="/notification">
+              <li>
+                <a className="text-black hover:text-gray-600">Notification</a>
+              </li>
+            </Link>
           </ul>
           <button
             onClick={openModal}
