@@ -7,6 +7,9 @@ import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
 import logo from "../../../public/Final_logo.png";
 import Link from "next/link";
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
+
 
 const Navbar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,7 +17,11 @@ const Navbar = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [selectedMovie, setSelectedMovie] = useState(null);
-
+  const [isOpen, setIsOpen] = useState(false);
+  const districts = [
+    "Dhaka", "Chattogram", "Khulna", "Rajshahi", "Barishal", "Sylhet", "Rangpur", "Mymensingh", 
+    "Comilla", "Narayanganj", "Jessore", "Bogura", "Cox's Bazar", "Feni", "Tangail"
+  ];
   const movieSuggestions = [
     {
       name: "Deadpool",
@@ -74,11 +81,40 @@ const Navbar = () => {
             <li>
               <a className="text-black hover:text-gray-600">Menu</a>
             </li>
-           <Link href="/Communities">
-           <li>
-              <a className="text-black hover:text-gray-600">Communities</a>
-            </li>
-           </Link>
+            <li 
+      className="relative group list-none"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      {/* Main Menu Item */}
+      <button className="flex items-center gap-1 text-black hover:text-gray-600 px-4 py-2 transition-all">
+        Communities <ChevronDown size={16} />
+      </button>
+
+      {/* Dropdown Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.ul
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="absolute left-0 mt-2 w-56 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-hidden z-50"
+          >
+            {districts.map((district, index) => (
+              <li key={index}>
+                <Link
+                  href={`/district/${district.toLowerCase()}`}
+                  className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
+                >
+                  {district}
+                </Link>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </li>
             <Link href="/list">
               <li>
                 <a className="text-black hover:text-gray-600"> List</a>
@@ -148,11 +184,40 @@ const Navbar = () => {
                 <a className="text-black hover:text-gray-600"> LIST</a>
               </li>
             </Link>
-            <Link href="/Communities">
-           <li>
-              <a className="text-black hover:text-gray-600">Communities</a>
-            </li>
-           </Link>
+            <li 
+      className="relative group list-none"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      {/* Main Menu Item */}
+      <button className="flex items-center gap-1 text-black hover:text-gray-600 px-4 py-2 transition-all">
+        Communities <ChevronDown size={16} />
+      </button>
+
+      {/* Dropdown Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.ul
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="absolute left-0 mt-2 w-56 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-hidden z-50"
+          >
+            {districts.map((district, index) => (
+              <li key={index}>
+                <Link
+                  href={`/district/${district.toLowerCase()}`}
+                  className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
+                >
+                  {district}
+                </Link>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </li>
            <Link href="/notification">
               <li>
                 <a className="text-black hover:text-gray-600">Notification</a>
