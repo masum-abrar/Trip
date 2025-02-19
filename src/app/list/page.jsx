@@ -1,7 +1,8 @@
 'use client';
 import React from 'react';
 import Slider from 'react-slick';
-import { MapPin, Star, User, Trees, Mountain, Sunrise } from 'lucide-react';
+import { MapPin, Star, User, Trees, Mountain, Sunrise, Heart } from 'lucide-react';
+import { useState } from "react";
 import Navbar from '../components/Navbar';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -11,7 +12,13 @@ import Image from 'next/image';
 function App() {
   const [newComment, setNewComment] = React.useState("");
   const [comments, setComments] = React.useState([]);
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(120); // Default likes count
 
+  const handleLike = () => {
+    setLiked(!liked);
+    setLikes(liked ? likes - 1 : likes + 1);
+  };
   
   const sections = [
     {
@@ -115,11 +122,13 @@ function App() {
               <div className="flex items-center space-x-3">
                 <span className="text-gray-700">{section.userName}</span>
                 <div className="w-10 h-10 rounded-full overflow-hidden ml-5 "> 
-          <img 
+        <Link href="/profile">
+        <img 
             src={section.userAvatar} 
             alt={section.userName} 
             className="w-full h-full object-cover"
           />
+        </Link>
         </div>
               </div>
             </div>
@@ -151,7 +160,16 @@ function App() {
   </Slider>
 </div>
 
-          
+<button 
+      onClick={handleLike} 
+      className="flex items-center gap-2 bg-white border border-gray-300 hover:border-red-400 transition-all px-4 py-2 rounded-full shadow-sm hover:shadow-md"
+    >
+      <Heart
+        size={20}
+        className={`transition-all ${liked ? "text-red-500 fill-red-500 scale-110" : "text-gray-500"}`}
+      />
+      <span className="text-gray-700 font-medium">{likes}</span>
+    </button>      
 <p className="text-gray-600 max-w-6xl">{section.description}</p>
 
 {/* Comments Section */}

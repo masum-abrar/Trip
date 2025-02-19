@@ -84,9 +84,11 @@ const Navbar = () => {
                 <a className="text-black hover:text-gray-600"> List</a>
               </li>
             </Link>
-            <li>
-              <a className="text-black hover:text-gray-600">Notification</a>
-            </li>
+            <Link href="/notification">
+              <li>
+                <a className="text-black hover:text-gray-600">Notification</a>
+              </li>
+            </Link>
           </ul>
         </div>
 

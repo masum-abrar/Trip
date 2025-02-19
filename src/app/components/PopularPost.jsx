@@ -145,7 +145,7 @@ const PopularPost = () => {
 
   return (
     <div className="container mx-auto max-w-6xl py-8 p-2">
-      <h2 className="text-2xl text-black mb-6">Popular Posts</h2>
+      <h2 className="text-2xl text-black mb-6">New Posts From Friends</h2>
       <Slider {...settings}>
         {posts.map((post) => (
           <div key={post.id} className="p-2">
@@ -324,12 +324,12 @@ const PopularPost = () => {
  <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    openListModal();
+                    // openListModal();
                   }}
                   className="flex items-center space-x-2 bg-[#8cc163] text-white px-4 py-2 rounded-lg hover:bg-[#4a6337] transition-colors"
                 >
                   <FaList />
-                  <span>Add to List</span>
+                  <span>Add to Bucket List</span>
                 </button>
  
              
