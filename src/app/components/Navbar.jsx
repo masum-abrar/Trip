@@ -9,9 +9,12 @@ import logo from "../../../public/Final_logo.png";
 import Link from "next/link";
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { usePathname } from "next/navigation";
 
 
-const Navbar = () => {
+const Navbar = ({ href, children }) => {
+  const pathname = usePathname();
+  const isActive = pathname === href;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -72,75 +75,105 @@ const Navbar = () => {
 
         {/* Navbar Center - Large Screens */}
         <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1 space-x-4">
-            <Link href="/">
-              <li>
-                <a className="text-black hover:text-gray-600">Home</a>
-              </li>
+        <nav className="">
+      <div className="navbar-center hidden lg:flex">
+        <ul className="menu menu-horizontal px-1 space-x-4 flex items-center">
+          {/* Nav Link Component */}
+          {[
+            { name: "Home", href: "/" },
+            { name: "List", href: "/list" },
+            { name: "Notification", href: "/notification" },
+          ].map((item) => (
+            <li key={item.href} className="relative list-none">
+            <Link
+              href={item.href}
+              className={`block px-4 py-2 text-base font-medium transition-all duration-300 rounded-md ${
+                pathname === item.href
+                  ? "text-[#8cc163] font-semibold relative after:content-[''] after:absolute after:left-1/2 after:bottom-0 after:w-2/3 after:h-[3px] after:bg-[#8cc163] after:rounded-full after:-translate-x-1/2 after:transition-all after:duration-300 after:ease-in-out after:scale-x-100 "
+                  : "text-black hover:text-[#8cc163] after:scale-x-0 hover:after:scale-x-100"
+              }`}
+            >
+              {item.name}
             </Link>
-            <li>
-              <a className="text-black hover:text-gray-600">Menu</a>
-            </li>
-            <li 
-      className="relative group list-none"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-    >
-      {/* Main Menu Item */}
-      <button className="flex items-center gap-1 text-black hover:text-gray-600 px-4 py-2 transition-all">
-        Communities <ChevronDown size={16} />
-      </button>
+          </li>
+          
+          ))}
 
-      {/* Dropdown Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.ul
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="absolute left-0 mt-2 w-56 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-hidden z-50"
+          {/* Communities Dropdown */}
+          <li
+            className="relative group list-none"
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
           >
-            {districts.map((district, index) => (
-              <li key={index}>
-                <Link
-                  href={`/district/${district.toLowerCase()}`}
-                  className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
+            <button
+              className={`flex items-center gap-1 px-4 py-2 text-lg font-medium transition-all rounded-md ${
+                pathname.includes("/district/")
+                  ? "text-[#8cc163] font-semibold relative after:content-[''] after:absolute after:left-1/2 after:bottom-0 after:w-2/3 after:h-[3px] after:bg-[#8cc163] after:rounded-full after:-translate-x-1/2 after:transition-all after:duration-300 after:ease-in-out after:scale-x-100 "
+                  : "text-gray-800 hover:text-[#8cc163]"
+              }`}
+            >
+              Communities <ChevronDown size={16} />
+            </button>
+
+            {/* Dropdown Menu */}
+            <AnimatePresence>
+              {isOpen && (
+                <motion.ul
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="absolute left-0 mt-3 w-56 h-96 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
                 >
-                  {district}
-                </Link>
-              </li>
-            ))}
-          </motion.ul>
-        )}
-      </AnimatePresence>
-    </li>
-            <Link href="/list">
-              <li>
-                <a className="text-black hover:text-gray-600"> List</a>
-              </li>
-            </Link>
-            <Link href="/notification">
-              <li>
-                <a className="text-black hover:text-gray-600">Notification</a>
-              </li>
-            </Link>
-          </ul>
+                  {districts.map((district, index) => (
+                    <li key={index}>
+                      <Link
+                        href={`/district/${district.toLowerCase()}`}
+                        className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
+                      >
+                        {district}
+                      </Link>
+                    </li>
+                  ))}
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </li>
+        </ul>
+      </div>
+    </nav>
         </div>
 
         {/* Navbar End */}
         <div className="navbar-end hidden lg:flex items-center gap-4">
           {/* <IoSearchOutline className="text-2xl text-black" /> */}
-          <button
-            // onClick={openModal}
-            className="btn px-8 bg-[#8cc163] text-white font-bold rounded-xl hover:bg-[#008f1a]"
-          >
-            <FaPlus className="mr-2" />
-            LOG
-          </button>
+          <div className="flex space-x-4">
+  {/* Login Button */}
+  <button className="relative style px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
+  {/* Running Border Effect */}
+  <span className="absolute inset-0 border-2 border-[#8cc163] rounded-lg animate-border-run"></span>
+
+  {/* Background Fill on Hover */}
+  <span className="absolute inset-0 bg-[#8cc163] scale-x-0 origin-left transition-transform duration-300 ease-out group-hover:scale-x-100"></span>
+
+  {/* Text Effect */}
+  <span className="relative z-10 group-hover:text-white transition-all duration-300 style">Login</span>
+</button>
+
+
+
+
+
+  {/* Signup Button */}
+  <button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]">
+    Sign Up
+</button>
+
+</div>
+
 
           {/* User Icon and Dropdown */}
-          <div className="relative">
+          {/* <div className="relative">
             <FiUser
               className="text-2xl text-black cursor-pointer"
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -161,14 +194,14 @@ const Navbar = () => {
                 </ul>
               </div>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
 
       {/* Dropdown Menu for Small Devices */}
       {isMenuOpen && (
-        <div className="bg-white text-black lg:hidden p-4 space-y-4">
-          <ul className="space-y-2">
+        <div className="bg-white text-black lg:hidden p-4 space-y-2">
+          <ul className="space-y-1">
           <Link href="/">
               <li>
                 <a className="text-black hover:text-gray-600">Home</a>
@@ -190,7 +223,7 @@ const Navbar = () => {
       onMouseLeave={() => setIsOpen(false)}
     >
       {/* Main Menu Item */}
-      <button className="flex items-center gap-1 text-black hover:text-gray-600 px-4 py-2 transition-all">
+      <button className="flex items-center gap-1 ml-0 text-black hover:text-gray-600   transition-all">
         Communities <ChevronDown size={16} />
       </button>
 
@@ -224,13 +257,19 @@ const Navbar = () => {
               </li>
             </Link>
           </ul>
-          <button
-            onClick={openModal}
-            className="btn w-full bg-[#8cc163] text-white font-bold py-2 rounded-lg hover:bg-[#008f1a]"
-          >
-            <FaPlus className="mr-2" />
-            LOG
-          </button>
+          <div className="flex space-x-4">
+  {/* Login Button */}
+  <button className="relative px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
+  <span className="absolute inset-0 bg-[#8cc163] scale-x-0 origin-left transition-transform duration-300 ease-out group-hover:scale-x-100"></span>
+  <span className="relative z-10 group-hover:text-white transition-all duration-300">Login</span>
+</button>
+
+
+  {/* Signup Button */}
+  <button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110">
+    Sign Up
+  </button>
+</div>
         </div>
       )}
 

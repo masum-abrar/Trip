@@ -44,7 +44,7 @@ const AllPlaces = () => {
       {/* Section Header */}
       <div className="flex justify-between text-black mb-12">
         <h1 className="text-lg font-bold">POPULAR PLACES THIS WEEK</h1>
-        <p className="cursor-pointer hover:underline">More</p>
+       <Link href="/Communities"> <a className="text-sm font-semibold text-black">more..</a></Link>
       </div>
       <hr className="bg-gray-400 mb-6" />
 

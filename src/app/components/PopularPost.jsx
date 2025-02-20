@@ -175,15 +175,20 @@ const PopularPost = () => {
                 </div>
               </div>
               <div className="p-4">
-                <div className="flex items-center mb-2">
-                  <img
+                <div className="flex items-center mb-2" onClick={handleDistrictClick} >
+                 <Link href='/profile'>
+                 <img
                     src={post.avatar}
                     alt={post.user}
                     className="w-8 h-8 rounded-full object-cover"
                   />
-                  <h4 className="ml-3 text-sm font-medium text-gray-800">
+                 </Link>
+                 <Link href='/profile'>
+                 <h4 className="ml-3 text-sm font-medium text-gray-800">
                     {post.user}
                   </h4>
+                 </Link>
+                
                   <FiMoreVertical className="ml-auto text-gray-500" />
                 </div>
                 <div className="flex justify-between items-center text-gray-600">

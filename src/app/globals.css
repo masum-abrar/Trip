@@ -27,3 +27,35 @@ body {
 .slick-list {
   margin: 0 -8px;  /* Prevent extra space on the edges */
 }
+.style
+  {
+    .animate-border-run {
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      border: 2px solid transparent;
+      border-image: linear-gradient(90deg, #8cc163, #008f1a, #8cc163);
+      border-image-slice: 1;
+      animation: border-move 2s linear infinite;
+    }
+
+    @keyframes border-move {
+      0% {
+        border-image-source: linear-gradient(0deg, #8cc163, #008f1a, #8cc163);
+      }
+      25% {
+        border-image-source: linear-gradient(90deg, #8cc163, #008f1a, #8cc163);
+      }
+      50% {
+        border-image-source: linear-gradient(180deg, #8cc163, #008f1a, #8cc163);
+      }
+      75% {
+        border-image-source: linear-gradient(270deg, #8cc163, #008f1a, #8cc163);
+      }
+      100% {
+        border-image-source: linear-gradient(360deg, #8cc163, #008f1a, #8cc163);
+      }
+    }
+  }

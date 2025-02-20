@@ -133,7 +133,7 @@ const PopularReviews = () => {
           </div>
 
          
-          <div>
+          {/* <div>
             <h2 className="text-lg font-bold text-gray-400 mb-4">
               POPULAR REVIEWERS
             </h2>
@@ -143,7 +143,7 @@ const PopularReviews = () => {
     key={user.id}
     className="flex flex-col bg-[#FEFBF5] p-3 rounded-lg mb-2"
   >
-    {/* Reviewer Details */}
+   
     <div className="flex items-center justify-between">
       <div className="flex items-center">
         <img
@@ -156,14 +156,14 @@ const PopularReviews = () => {
       <FaPlus className="text-black ml-2 cursor-pointer" />
     </div>
 
-    {/* Likes (Next Line) */}
+
     <div className="text-black text-sm mt-2">{user.likes}</div>
   </div>
 ))}
 
-          </div>
+          </div> */}
 
-          <div className="top-10 bottom-20">
+          {/* <div className="top-10 bottom-20">
           <h2 className="text-lg font-bold text-gray-400 mb-4 capitalize">
              Can't find a flim?
             </h2>
@@ -173,7 +173,7 @@ const PopularReviews = () => {
                 Find Out How to Add or Edit a Place
             </h1>
            
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

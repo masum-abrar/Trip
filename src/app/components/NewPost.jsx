@@ -199,21 +199,23 @@ const CommunitySlider = () => {
               className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-[420px] hover:shadow-xl transition-shadow cursor-pointer"
               onClick={() => openModal(post)}
             >
-              <div className="flex items-center p-4 border-b border-gray-200">
+              <div className="flex items-center p-4 border-b border-gray-200 " onClick={handleDistrictClick}>
                 {post.avatar ? (
+                 <Link href='/profile'>
                   <img
                     src={post.avatar}
                     alt={post.user}
                     className="w-8 h-8 rounded-full object-cover"
                   />
+                  </Link>
                 ) : (
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center" >
                     <span className="text-xs font-bold text-gray-500">
                       {post.user[0]}
                     </span>
                   </div>
                 )}
-                <h4 className="ml-3 text-sm font-medium text-gray-800">{post.user}</h4>
+              <Link href='/profile'>  <h4 className="ml-3 text-sm font-medium text-gray-800">{post.user}</h4></Link>
                 <button className="ml-auto text-blue-500 font-semibold">Follow</button>
               </div>
               {post.image && (
