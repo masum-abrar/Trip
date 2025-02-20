@@ -28,7 +28,7 @@ const Post = ({ post }) => {
 
   return (
   <div>
-    <div className="shadow-lg w-full">
+    <div className="shadow-lg w-full bg-white">
         <Navbar />
       </div>
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-4">
@@ -93,7 +93,7 @@ const Post = ({ post }) => {
          <input
            type="text"
            placeholder="Write a comment..."
-           className="flex-1 p-2 border rounded-l-lg"
+           className="flex-1 p-2 border rounded-l-lg bg-white"
            value={newComment}
            onChange={(e) => setNewComment(e.target.value)}
          />
