@@ -235,7 +235,7 @@ const Navbar = ({ href, children }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="absolute left-0 mt-2 w-56 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-hidden z-50"
+            className="absolute left-0 mt-2 w-56 h-80 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
           >
             {districts.map((district, index) => (
               <li key={index}>
