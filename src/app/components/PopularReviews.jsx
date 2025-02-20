@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import { FaHeart, FaComment, FaPlus } from "react-icons/fa";
 
@@ -70,6 +71,7 @@ const PopularReviews = () => {
           </div>
           <hr className="border-t border-gray-400 mb-6" />
           {reviews.map((review) => (
+          <Link href={`/AllPost/${review.id}`}>
             <div
               key={review.id}
               className="flex mb-6 bg-[#FEFBF5] p-4 rounded-lg shadow-lg"
@@ -89,7 +91,8 @@ const PopularReviews = () => {
                     {review.movieTitle}{" "}
                     {/* <span className="text-gray-400">{review.year}</span> */}
                   </h2>
-                  <div className="flex items-center text-gray-400 text-sm">
+                <Link href='/profile'>
+                <div className="flex items-center text-gray-400 text-sm">
                     <img
                       src={review.avatar}
                       alt={review.reviewer}
@@ -97,6 +100,7 @@ const PopularReviews = () => {
                     />
                     <span>{review.reviewer}</span>
                   </div>
+                </Link>
                   <p className="text-gray-400 text-sm mt-2">
                     ⭐ {review.stars} &nbsp; ❤️ {review.reactions} &nbsp; 🗨️{" "}
                     {review.comments}
@@ -110,6 +114,7 @@ const PopularReviews = () => {
                 </div>
               </div>
             </div>
+          </Link>
           ))}
         </div>
 
