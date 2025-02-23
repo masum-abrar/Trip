@@ -210,7 +210,7 @@ const CommunitySlider = () => {
   };
 
   return (
-   <div>
+   <div className='bg-white'>
     <div className='shadow-md'>
         <Navbar/>
     </div>
