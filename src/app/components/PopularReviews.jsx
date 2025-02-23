@@ -11,7 +11,7 @@ const PopularReviews = () => {
       reviewer: "ziwe",
       stars: 4,
       likes: 1023,
-      text: "The dangers of a little crush",
+      text: "The dangers of a little crush of art and commerce colliding",
       reactions: 123,
       comments: 159,
       avatar: "https://a.ltrbxd.com/resized/avatar/upload/9/4/1/6/5/6/2/shard/avtr-0-48-0-48-crop.jpg?v=0c98965dc2",
@@ -62,26 +62,27 @@ const PopularReviews = () => {
   return (
     <div className="container max-w-5xl mx-auto mt-20 p-3">
       {/* Main Section */}
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="">
         {/* Popular Reviews Section */}
-        <div className="w-full lg:w-2/3">
+        <div className="w-full ">
           <div className="flex justify-between text-gray-400 mb-4">
             <h1 className="text-lg font-bold">POPULAR REVIEWS THIS WEEK</h1>
             <p className="cursor-pointer hover:underline">More</p>
           </div>
           <hr className="border-t border-gray-400 mb-6" />
-          {reviews.map((review) => (
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ">
+       {reviews.map((review) => (
           <Link href={`/AllPost/${review.id}`}>
             <div
               key={review.id}
-              className="flex mb-6 bg-[#FEFBF5] p-4 rounded-lg shadow-lg"
+              className=" w-96 lg:w-80 h-[425px] lg:h-[400px] p-3 rounded-lg shadow-lg mb-4 "
             >
             
-              <div className="w-20 h-28">
+              <div className="mb-4">
                 <img
                   src={review.image}
                   alt={review.movieTitle}
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-96 rounded-lg"
                 />
               </div>
              
@@ -98,7 +99,7 @@ const PopularReviews = () => {
                       alt={review.reviewer}
                       className="w-6 h-6 rounded-full mr-2"
                     />
-                    <span>{review.reviewer}</span>
+                    <span className="text-black">{review.reviewer}</span>
                   </div>
                 </Link>
                   <p className="text-gray-400 text-sm mt-2">
@@ -116,70 +117,11 @@ const PopularReviews = () => {
             </div>
           </Link>
           ))}
+       </div>
         </div>
 
      
-        <div className="w-full lg:w-1/3">
-          {/* Crew Picks */}
-          <div className="mb-8">
-            <h2 className="text-lg font-bold text-gray-400 mb-4">CREW PICKS</h2>
-            <hr className="border-t border-gray-400 mb-6" />
-            <div className="grid grid-cols-2 gap-4">
-              {crewPicks.map((pick) => (
-                <div key={pick.id} className="w-full h-40">
-                  <img
-                    src={pick.image}
-                    alt={pick.name}
-                    className="w-full h-full object-cover rounded-lg shadow-lg"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-         
-          {/* <div>
-            <h2 className="text-lg font-bold text-gray-400 mb-4">
-              POPULAR REVIEWERS
-            </h2>
-            <hr className="border-t border-gray-400 mb-6" />
-            {popularUsers.map((user) => (
-  <div
-    key={user.id}
-    className="flex flex-col bg-[#FEFBF5] p-3 rounded-lg mb-2"
-  >
-   
-    <div className="flex items-center justify-between">
-      <div className="flex items-center">
-        <img
-          src={user.avatar}
-          alt={user.name}
-          className="w-8 h-8 rounded-full mr-2"
-        />
-        <p className="text-black">{user.name}</p>
-      </div>
-      <FaPlus className="text-black ml-2 cursor-pointer" />
-    </div>
-
-
-    <div className="text-black text-sm mt-2">{user.likes}</div>
-  </div>
-))}
-
-          </div> */}
-
-          {/* <div className="top-10 bottom-20">
-          <h2 className="text-lg font-bold text-gray-400 mb-4 capitalize">
-             Can't find a flim?
-            </h2>
-            <hr className="border-t border-gray-400 mb-6" />
-            <h1 className="text-gray-400">
-                Help Keep Letterboard Up To Date
-                Find Out How to Add or Edit a Place
-            </h1>
-           
-          </div> */}
-        </div>
+       
       </div>
     </div>
   );
