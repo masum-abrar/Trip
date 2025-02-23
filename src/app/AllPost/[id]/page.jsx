@@ -27,7 +27,7 @@ const Post = ({ post }) => {
   };
 
   return (
-  <div>
+  <div className="bg-white">
     <div className="shadow-md w-full bg-white">
         <Navbar />
       </div>
