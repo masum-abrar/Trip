@@ -28,7 +28,7 @@ const Post = ({ post }) => {
 
   return (
   <div>
-    <div className="shadow-lg w-full bg-white">
+    <div className="shadow-md w-full bg-white">
         <Navbar />
       </div>
    <div className="p-3 bg-white">

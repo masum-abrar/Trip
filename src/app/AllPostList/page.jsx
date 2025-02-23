@@ -7,6 +7,7 @@ import { FaHeart, FaEye, FaEllipsisH, FaStar, FaShareAlt, FaList, FaPlus } from 
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import Navbar from '../components/Navbar';
 
 const CommunitySlider = () => {
   const [selectedPost, setSelectedPost] = useState(null);
@@ -119,6 +120,30 @@ const CommunitySlider = () => {
         },
       ],
     },
+    {
+        id: 5,
+        user: 'Abir khan',
+        avatar: 'https://a.ltrbxd.com/resized/avatar/upload/1/6/4/9/8/2/8/0/shard/avtr-0-48-0-48-crop.jpg?v=f09b89dacb',
+        heading: 'Saint Martin Island',
+        text: 'A tropical paradise with crystal-clear water. Ideal for snorkeling and relaxation.',
+        image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg',
+        likes: '120k',
+        views: '300k',
+        reviews: 4.7,
+        district: 'Dhaka',
+        subdistrict: 'Saint Martin',
+        postDate: '2024-11-20',
+        likedBy: [
+          {
+            name: 'Amina',
+            avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+          },
+          {
+            name: 'Shakil',
+            avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+          },
+        ],
+      },
   ];
 
   const settings = {
@@ -185,15 +210,20 @@ const CommunitySlider = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl py-8 p-2">
-    <div className="flex justify-between items-center "> 
-    <h2 className="text-2xl text-black mb-6">New Posts</h2>
-    <Link href="/AllPostList" className='text-black mb-6'>
-    See more
-    </Link>
+   <div>
+    <div className='shadow-md'>
+        <Navbar/>
     </div>
-      <Slider {...settings}>
-        {posts.map((post) => (
+     <div className="container mx-auto max-w-6xl py-8 p-2">
+    <div className="flex justify-between items-center "> 
+    {/* <h2 className="text-2xl text-black mb-6">New Posts</h2>
+    <Link href="/Communities" className='text-black mb-6'>
+    See more
+    </Link> */}
+    </div>
+     
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+      {posts.map((post) => (
           <div key={post.id} className="p-2">
             <div
               className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-[420px] hover:shadow-xl transition-shadow cursor-pointer"
@@ -258,7 +288,8 @@ const CommunitySlider = () => {
             </div>
           </div>
         ))}
-      </Slider>
+      </div>
+     
 
       {isModalOpen && selectedPost && (
         <div
@@ -446,6 +477,7 @@ const CommunitySlider = () => {
         </div>
       )}
     </div>
+   </div>
   );
 };
 
