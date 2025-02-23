@@ -31,7 +31,8 @@ const Post = ({ post }) => {
     <div className="shadow-lg w-full bg-white">
         <Navbar />
       </div>
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-4">
+   <div className="p-3 bg-white">
+   <div className="max-w-2xl mx-auto p-6 m-4 bg-white rounded-lg shadow-lg mt-4">
        
        {/* Post Header */}
        <div className="flex items-center space-x-3 mb-4">
@@ -99,12 +100,13 @@ const Post = ({ post }) => {
          />
          <button
            onClick={addComment}
-           className="px-4 bg-green-500 text-white rounded-r-lg"
+           className="px-4 bg-[#8cc163]  text-white rounded-r-lg"
          >
            Post
          </button>
        </div>
      </div>
+   </div>
   </div>
   );
 };
