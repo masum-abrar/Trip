@@ -61,7 +61,7 @@ const PlaceDetails = ({ params }) => {
     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 opacity-100 group-hover:opacity-0"></div>
 
     {/* Place Name & Stats Overlay */}
-    <div className="absolute bottom-6 left-6 text-white transition-opacity duration-300 group-hover:text-black">
+    <div className="absolute bottom-6 left-6 text-white transition-opacity duration-300 ">
       <h1 className="text-3xl md:text-4xl font-extrabold">{place.title}</h1>
       <h1 className="text-base font-normal mt-2"> {place.subDistict}</h1>
       <div className="flex space-x-4 mt-2 text-lg font-medium">
