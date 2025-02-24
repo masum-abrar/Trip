@@ -66,7 +66,7 @@ const PopularReviews = () => {
         {/* Popular Reviews Section */}
         <div className="w-full ">
           <div className="flex justify-between text-gray-400 mb-4">
-            <h1 className="text-lg font-bold">POPULAR REVIEWS THIS WEEK</h1>
+            <h1 className="text-sm lg:text-lg font-bold">POPULAR REVIEWS THIS WEEK</h1>
             <p className="cursor-pointer hover:underline">More</p>
           </div>
           <hr className="border-t border-gray-400 mb-6" />
@@ -75,7 +75,7 @@ const PopularReviews = () => {
           <Link href={`/AllPost/${review.id}`}>
             <div
               key={review.id}
-              className=" w-96 lg:w-80 h-[425px] lg:h-[400px] p-3 rounded-lg shadow-lg mb-4 "
+              className=" w-72 lg:w-80 h-[425px] lg:h-[400px] p-3 rounded-lg shadow-lg mb-4 "
             >
             
               <div className="mb-4">
