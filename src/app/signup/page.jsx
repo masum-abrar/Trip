@@ -96,12 +96,12 @@ const SignUpPage = () => {
             {/* Form Fields */}
             {isSignUp ? (
               <>
-               <input type="text" placeholder="Full Name" className="w-full p-2 border rounded mb-4 bg-[#FCF0DC]" />
-      <input type="email" placeholder="Email" className="w-full p-2 border rounded mb-4 bg-[#FCF0DC]" />
+               <input type="text" placeholder="Full Name" className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black" />
+      <input type="email" placeholder="Email" className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black" />
 
       {/* District Dropdown */}
       <select 
-        className="w-full p-2 border rounded mb-4 bg-[#FCF0DC]"
+        className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
         value={district} 
         onChange={(e) => {
           setDistrict(e.target.value);
@@ -117,7 +117,7 @@ const SignUpPage = () => {
 
       {/* Sub-District Dropdown */}
       <select 
-        className="w-full p-2 border rounded mb-4 bg-[#FCF0DC]"
+        className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
         value={subDistrict} 
         onChange={(e) => {
           setSubDistrict(e.target.value);
@@ -133,7 +133,7 @@ const SignUpPage = () => {
 
       {/* City Dropdown */}
       <select 
-        className="w-full p-2 border rounded mb-4 bg-[#FCF0DC]"
+        className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
         value={city} 
         onChange={(e) => setCity(e.target.value)}
         disabled={!subDistrict}
@@ -156,7 +156,7 @@ const SignUpPage = () => {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border rounded mb-4 bg-[#FCF0DC]"
+            className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
           />
           {/* Send OTP Button */}
           <button onClick={handleSendOtp} className="w-full p-2 bg-[#8cc163] text-white rounded">
@@ -171,7 +171,7 @@ const SignUpPage = () => {
             placeholder="Enter OTP"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
-            className="w-full p-2 border rounded mb-4 bg-[#FCF0DC]"
+            className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
           />
           {/* Verify OTP Button */}
           <button onClick={handleVerifyOtp} className="w-full p-2 bg-[#8cc163] text-white rounded">
