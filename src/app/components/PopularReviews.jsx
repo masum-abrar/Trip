@@ -75,7 +75,7 @@ const PopularReviews = () => {
           <Link href={`/AllPost/${review.id}`}>
             <div
               key={review.id}
-              className=" w-72 lg:w-80 h-[425px] lg:h-[400px] p-3 rounded-lg shadow-lg mb-4 "
+              className=" w-full lg:w-80 h-[425px] lg:h-[400px] p-3 rounded-lg shadow-lg mb-4 "
             >
             
               <div className="mb-4">
