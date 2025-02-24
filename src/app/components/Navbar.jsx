@@ -149,7 +149,8 @@ const Navbar = ({ href, children }) => {
           {/* <IoSearchOutline className="text-2xl text-black" /> */}
           <div className="flex space-x-4">
   {/* Login Button */}
-  <button className="relative style px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
+<Link href='login'>
+<button className="relative style px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
   {/* Running Border Effect */}
   <span className="absolute inset-0 border-2 border-[#8cc163] rounded-lg animate-border-run"></span>
 
@@ -159,15 +160,18 @@ const Navbar = ({ href, children }) => {
   {/* Text Effect */}
   <span className="relative z-10 group-hover:text-white transition-all duration-300 style">Login</span>
 </button>
+</Link>
 
 
 
 
 
   {/* Signup Button */}
-  <button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]">
+<Link href="/signup">
+<button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]">
     Sign Up
 </button>
+</Link>
 
 </div>
 
@@ -259,16 +263,26 @@ const Navbar = ({ href, children }) => {
           </ul>
           <div className="flex space-x-4">
   {/* Login Button */}
-  <button className="relative px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
+  <Link href='login'>
+<button className="relative style px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
+  {/* Running Border Effect */}
+  <span className="absolute inset-0 border-2 border-[#8cc163] rounded-lg animate-border-run"></span>
+
+  {/* Background Fill on Hover */}
   <span className="absolute inset-0 bg-[#8cc163] scale-x-0 origin-left transition-transform duration-300 ease-out group-hover:scale-x-100"></span>
-  <span className="relative z-10 group-hover:text-white transition-all duration-300">Login</span>
+
+  {/* Text Effect */}
+  <span className="relative z-10 group-hover:text-white transition-all duration-300 style">Login</span>
 </button>
+</Link>
 
 
   {/* Signup Button */}
-  <button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110">
+  <Link href="/signup">
+<button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]">
     Sign Up
-  </button>
+</button>
+</Link>
 </div>
         </div>
       )}
