@@ -6,6 +6,7 @@ import Navbar from "@/app/components/Navbar";
 import EventTabSection from '@/app/components/EventTabSection';
 import PlacesTabSection from '@/app/components/PlacesTabSection';
 import DiscussTabSection from '@/app/components/DiscussionTabSection';
+import PlaceTabSec from '@/app/components/PlaceTabSec';
 
 const DistrictPage = ({ params }) => {
   const districtName = params.districtName;
@@ -107,7 +108,8 @@ const DistrictPage = ({ params }) => {
         {
           activeTab === 'Places' && (
            <div>
-            <PlacesTabSection/>
+            {/* <PlacesTabSection/> */}
+            <PlaceTabSec/>
              </div>
           )
         }
