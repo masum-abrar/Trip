@@ -124,11 +124,11 @@ const Category = () => {
           className="bg-[#FCF0DC] text-black rounded-md p-2 w-full md:w-auto"
           value={place}
           onChange={handlePlaceChange}
-          disabled={!subdistrict}
+          disabled={!district}
         >
           <option value="">Select Place</option>
-          {subdistrict &&
-            data[division].districts[district].subdistricts[subdistrict].map(
+          {district &&
+            data[division].districts[district].map(
               (plc) => (
                 <option key={plc} value={plc}>
                   {plc}
@@ -138,12 +138,15 @@ const Category = () => {
         </select>
 
         {/* Search Box */}
-        <h1  className='text-black'>Search Place:</h1>
+        {/* <h1  className='text-black'>Search Place:</h1>
         <input
           type="text"
           placeholder="Search..."
           className="bg-[#FCF0DC] text-black rounded-md p-2 w-full md:w-auto outline-none"
-        />
+        /> */}
+        <button className=" right-3 py-1.5 lg:px-10 px-8 bg-[#8cc163] text-white rounded-md text-sm sm:text-base hover:bg-gray-900 transition duration-300">
+          Search
+        </button>
       </div>
     </div>
   );

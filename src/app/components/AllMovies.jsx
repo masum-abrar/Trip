@@ -8,10 +8,10 @@ import Link from 'next/link';
 
 const AllPlaces = () => {
   const movies = [
-    { id: 1, title: 'Sylhet', image: 'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg', eyeCount: '990k', dotCount: '194k', heartCount: '366k' },
-    { id: 2, title: 'Saint Martin', image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg', eyeCount: '890k', dotCount: '134k', heartCount: '456k' },
-    { id: 3, title: 'Coxs Bazar ', image: 'https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg', eyeCount: '750k', dotCount: '294k', heartCount: '266k' },
-    { id: 4, title: 'Coxs Bazar', image: 'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg', eyeCount: '620k', dotCount: '394k', heartCount: '166k' },
+    { id: 1, title: 'Jaflong', district: "Chittagong", image: 'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg', eyeCount: '990k', dotCount: '194k', heartCount: '366k' },
+    { id: 2, title: 'Saint Martin', district: "CoxsBazar", image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg', eyeCount: '890k', dotCount: '134k', heartCount: '456k' },
+    { id: 3, title: 'Inani', district: "CoxsBazar", image: 'https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg', eyeCount: '750k', dotCount: '294k', heartCount: '266k' },
+    { id: 4, title: 'SadaPathor', district: "Sylhet",image: 'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg', eyeCount: '620k', dotCount: '394k', heartCount: '166k' },
   ];
 
   const settings = {

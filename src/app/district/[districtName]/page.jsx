@@ -71,7 +71,11 @@ const DistrictPage = ({ params }) => {
     <h1 className="text-4xl font-bold text-white">
       {districtName.charAt(0).toUpperCase() + districtName.slice(1)}
     </h1>
+    <button className="bg-[#8cc163] text-white px-10 lg:px-8  py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform hover:scale-110 hover:bg-[#6fb936] hover:shadow-lg">
+    Join
+  </button>
   </div>
+  
 )}
 
       </div>

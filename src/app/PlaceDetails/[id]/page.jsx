@@ -6,12 +6,13 @@ import { FaStar, FaRegStar,FaImage } from "react-icons/fa"; // Star rating icons
 import DiscussTabSection from "@/app/components/DiscussionTabSection";
 import EventTabSection from "@/app/components/EventTabSection";
 import ReviewsTabSection from "@/app/components/ReviewsTabSection";
+import Link from "next/link";
 
 const places = [
-  { id: 1, title: "Sylhet",   subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
-  { id: 2, title: "Saint Martin", subDistict:"Teknaf", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
-  { id: 3, title: "Coxs Bazar", subDistict:"Ukhia",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg", eyeCount: "750k", dotCount: "294k", heartCount: "266k" },
-  { id: 4, title: "Coxs Bazar", subDistict:"Ukhia",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg", eyeCount: "620k", dotCount: "394k", heartCount: "166k" },
+  { id: 1, title: "Jaflong", district: "Sylhet",  subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
+  { id: 2, title: "Saint Martin", district: "CoxsBazar", subDistict:"Teknaf", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
+  { id: 3, title: "Inani", subDistict:"Ukhia", district: "Chittagong", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg", eyeCount: "750k", dotCount: "294k", heartCount: "266k" },
+  { id: 4, title: "Patuartek", subDistict:"Ukhia", district: "CoxsBazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg", eyeCount: "620k", dotCount: "394k", heartCount: "166k" },
 ];
 
 const PlaceDetails = ({ params }) => {
@@ -28,7 +29,7 @@ const PlaceDetails = ({ params }) => {
   const [date, setDate] = useState("");
 
   // State for Active Tab
-  const [activeTab, setActiveTab] = useState('Discussion');
+  const [activeTab, setActiveTab] = useState('Reviews');
   
 
   if (!place) {
@@ -126,6 +127,16 @@ const PlaceDetails = ({ params }) => {
   </button>
 </div>
 
+<div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
+ <Link href={`/district/${place.district.toLowerCase()}`}>
+ <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
+    {place.district} <span className="text-[#8cc163]">Community</span>
+  </h1>
+ </Link>
+  <button className="bg-[#8cc163] text-white px-12 lg:px-10  py-2  lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 transform hover:scale-110 hover:bg-[#6fb936] hover:shadow-lg">
+    Join
+  </button>
+</div>
 
     {/* <DescriptionBox description={place.description} /> */}
 
@@ -212,7 +223,7 @@ const PlaceDetails = ({ params }) => {
 
     
       <div className="flex justify-center mt-10">
-        {['Discussion', 'Events', 'Reviews'].map((tab) => (
+        {[ 'Reviews', 'Events', 'Discussion' ].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
