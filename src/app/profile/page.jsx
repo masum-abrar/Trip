@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -7,16 +7,20 @@ import  { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { FaPlus } from "react-icons/fa";
-
+import Cookies from "js-cookie";
 // Initialize SwiperCore to prevent Next.js issues
 
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('profile'); // State to track the active tab
-
+ const [userName, setUserName] = useState(null);
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
+    useEffect(() => {
+      const name = Cookies.get("userName");
+      if (name) setUserName(name);
+    }, []);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const spots1 = [
@@ -62,7 +66,7 @@ const ProfilePage = () => {
               <span className="text-2xl font-bold text-gray-600">R</span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Rakib</h1>
+              <h1 className="text-3xl font-bold">{userName}</h1>
               <p className="text-gray-500 text-sm mt-1">Traveler | Explorer | Nature Enthusiast</p> {/* Short Bio */}
               <button className="mt-2 px-4 py-2 bg-[#8cc163] text-white rounded hover:bg-green-500 text-sm">
                 Edit Profile

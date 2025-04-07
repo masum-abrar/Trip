@@ -1,28 +1,52 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import Cookies from "js-cookie";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [password, setPassword] = useState("");
 
-  const handleSendOtp = () => {
-    if (email.trim() === "") {
-      alert("Please enter your email!");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      toast.warn("Please fill in all fields.");
       return;
     }
-    setIsOtpSent(true);
-    console.log("OTP Sent to:", email);
-  };
 
-  const handleVerifyOtp = () => {
-    if (otp.trim() === "") {
-      alert("Please enter the OTP!");
-      return;
+    const payload = { email, password };
+
+    try {
+      const res = await fetch("https://parjatak-core.vercel.app/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      console.log("Login Response:", data);
+
+      if (res.ok) {
+        toast.success("Login successful!");
+
+        // Save user info in cookies
+        Cookies.set("userName", data?.data?.name || "Guest", { expires: 7 }); // store for 7 days
+        Cookies.set("userId", data?.data?.id || "", { expires: 7 });
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500);
+      } else {
+        toast.error(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Something went wrong");
     }
-    console.log("OTP Verified:", otp);
   };
 
   return (
@@ -45,35 +69,28 @@ const LoginPage = () => {
           <motion.div className="w-full md:w-1/2 p-8 flex flex-col items-center justify-center relative">
             <h2 className="text-2xl font-bold mb-6 text-black">Login</h2>
 
-            {!isOtpSent ? (
-              <>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
-                />
-                <button onClick={handleSendOtp} className="w-full p-2 bg-[#8cc163] text-white rounded">
-                  Send OTP
-                </button>
-              </>
-            ) : (
-              <>
-                <input
-                  type="text"
-                  placeholder="Enter OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
-                />
-                <button onClick={handleVerifyOtp} className="w-full p-2 bg-[#8cc163] text-white rounded">
-                  Login
-                </button>
-              </>
-            )}
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+            />
 
-            {/* Link to Signup Page */}
+            <button
+              onClick={handleLogin}
+              className="w-full p-2 bg-[#8cc163] text-white rounded"
+            >
+              Login
+            </button>
+
             <p className="mt-4 text-sm text-black">
               Don't have an account?{" "}
               <motion.span
@@ -87,6 +104,9 @@ const LoginPage = () => {
           </motion.div>
         </div>
       </motion.div>
+
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} />
     </div>
   );
 };

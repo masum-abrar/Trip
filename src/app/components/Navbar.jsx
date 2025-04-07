@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Image from "next/image";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
@@ -10,9 +10,10 @@ import Link from "next/link";
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { usePathname } from "next/navigation";
-
+import Cookies from "js-cookie";
 
 const Navbar = ({ href, children }) => {
+
   const pathname = usePathname();
   const isActive = pathname === href;
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,11 +21,14 @@ const Navbar = ({ href, children }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [userName, setUserName] = useState(null);
+   const [districts, setDistricts] = useState("");
+  
   const [isOpen, setIsOpen] = useState(false);
-  const districts = [
-    "Dhaka", "Chattogram", "Khulna", "Rajshahi", "Barishal", "Sylhet", "Rangpur", "Mymensingh", 
-    "Comilla", "Narayanganj", "Jessore", "Bogura", "Cox's Bazar", "Feni", "Tangail"
-  ];
+  // const districts = [
+  //   "Dhaka", "Chattogram", "Khulna", "Rajshahi", "Barishal", "Sylhet", "Rangpur", "Mymensingh", 
+  //   "Comilla", "Narayanganj", "Jessore", "Bogura", "Cox's Bazar", "Feni", "Tangail"
+  // ];
   const movieSuggestions = [
     {
       name: "Deadpool",
@@ -56,6 +60,33 @@ const Navbar = ({ href, children }) => {
     setSelectedMovie(movie);
     setSearchInput("");
   };
+  useEffect(() => {
+    const name = Cookies.get("userName");
+    if (name) setUserName(name);
+  }, []);
+
+  const handleLogout = () => {
+    Cookies.remove("userName");
+    Cookies.remove("userId");
+    // Add other cookies if needed
+    window.location.reload(); // Refresh to reflect logout
+  };
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      try {
+        const response = await fetch(
+          `https://parjatak-core.vercel.app/api/v1/customer/districts`
+        );
+        const data = await response.json();
+        setDistricts(data.data);
+      } catch (error) {
+        console.error("Failed to fetch districts:", error);
+      }
+    };
+  
+    fetchDistricts();
+  }, []); // empty dependency array to run only once
+  
 
   return (
     <div className="container max-w-5xl mx-auto">
@@ -101,193 +132,206 @@ const Navbar = ({ href, children }) => {
 
           {/* Communities Dropdown */}
           <li
-            className="relative group list-none"
-            onMouseEnter={() => setIsOpen(true)}
-            onMouseLeave={() => setIsOpen(false)}
-          >
-            <button
-              className={`flex items-center gap-1 px-4 py-2 text-lg font-medium transition-all rounded-md ${
-                pathname.includes("/district/")
-                  ? "text-[#8cc163] font-semibold relative after:content-[''] after:absolute after:left-1/2 after:bottom-0 after:w-2/3 after:h-[3px] after:bg-[#8cc163] after:rounded-full after:-translate-x-1/2 after:transition-all after:duration-300 after:ease-in-out after:scale-x-100 "
-                  : "text-gray-800 hover:text-[#8cc163]"
-              }`}
-            >
-              Communities <ChevronDown size={16} />
-            </button>
+  className="relative group list-none"
+  onMouseEnter={() => setIsOpen(true)}
+  onMouseLeave={() => setIsOpen(false)}
+>
+  <button
+    className={`flex items-center gap-1 px-4 py-2 text-lg font-medium transition-all rounded-md ${
+      pathname.includes("/district/")
+        ? "text-[#8cc163] font-semibold relative after:content-[''] after:absolute after:left-1/2 after:bottom-0 after:w-2/3 after:h-[3px] after:bg-[#8cc163] after:rounded-full after:-translate-x-1/2 after:transition-all after:duration-300 after:ease-in-out after:scale-x-100"
+        : "text-gray-800 hover:text-[#8cc163]"
+    }`}
+  >
+    Communities <ChevronDown size={16} />
+  </button>
 
-            {/* Dropdown Menu */}
-            <AnimatePresence>
-              {isOpen && (
-                <motion.ul
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="absolute left-0 mt-3 w-56 h-96 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
-                >
-                  {districts.map((district, index) => (
-                    <li key={index}>
-                      <Link
-                        href={`/district/${district.toLowerCase()}`}
-                        className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
-                      >
-                        {district}
-                      </Link>
-                    </li>
-                  ))}
-                </motion.ul>
-              )}
-            </AnimatePresence>
-          </li>
+  {/* Dropdown Menu */}
+  <AnimatePresence>
+    {isOpen && districts.length > 0 && (
+      <motion.ul
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="absolute left-0 mt-3 w-56 h-96 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
+      >
+      {districts.map((district, index) => (
+  <li key={district.id || index}>
+    <Link
+      href={`/district/${district.name.toLowerCase()}`}
+      className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
+    >
+      {district.name}
+    </Link>
+  </li>
+))}
+
+      </motion.ul>
+    )}
+  </AnimatePresence>
+</li>
+
         </ul>
       </div>
     </nav>
         </div>
 
         {/* Navbar End */}
-        <div className="navbar-end hidden lg:flex items-center gap-4">
-          {/* <IoSearchOutline className="text-2xl text-black" /> */}
-          <div className="flex space-x-4">
-  {/* Login Button */}
-<Link href='login'>
-<button className="relative style px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
-  {/* Running Border Effect */}
-  <span className="absolute inset-0 border-2 border-[#8cc163] rounded-lg animate-border-run"></span>
+        <div className="navbar-end flex items-center gap-4">
+  {/* Show login/signup only on large screens when not logged in */}
+  {!userName && (
+    <div className="hidden lg:flex space-x-4">
+      {/* Login Button */}
+      <Link href="/login">
+        <button className="relative px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
+          <span className="absolute inset-0 border-2 border-[#8cc163] rounded-lg animate-border-run"></span>
+          <span className="absolute inset-0 bg-[#8cc163] scale-x-0 origin-left transition-transform duration-300 ease-out group-hover:scale-x-100"></span>
+          <span className="relative z-10 group-hover:text-white transition-all duration-300">Login</span>
+        </button>
+      </Link>
 
-  {/* Background Fill on Hover */}
-  <span className="absolute inset-0 bg-[#8cc163] scale-x-0 origin-left transition-transform duration-300 ease-out group-hover:scale-x-100"></span>
+      {/* Signup Button */}
+      <Link href="/signup">
+        <button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]">
+          Sign Up
+        </button>
+      </Link>
+    </div>
+  )}
 
-  {/* Text Effect */}
-  <span className="relative z-10 group-hover:text-white transition-all duration-300 style">Login</span>
-</button>
-</Link>
+  {/* User icon shown on all screen sizes when logged in */}
+  {userName && (
+    <div className="flex items-center gap-2">
+      {/* Optional greeting for medium+ screens */}
+      <span className="text-black font-medium hidden md:inline">Hi, {userName}</span>
 
-
-
-
-
-  {/* Signup Button */}
-<Link href="/signup">
-<button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]">
-    Sign Up
-</button>
-</Link>
-
+      <div className="relative">
+        <FiUser
+          className="text-2xl text-black cursor-pointer"
+          onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+        />
+        {isUserMenuOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+            <ul className="py-2 text-black">
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                Hi, {userName}
+              </li>
+              <Link href="/profile">
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
+              </Link>
+              <Link href="/">
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Home</li>
+              </Link>
+              <li
+                onClick={handleLogout}
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600"
+              >
+                Logout
+              </li>
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
 </div>
 
-
-          {/* User Icon and Dropdown */}
-          {/* <div className="relative">
-            <FiUser
-              className="text-2xl text-black cursor-pointer"
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            />
-            {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
-                <ul className="py-2 text-black">
-                  <Link href="/profile">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      Profile
-                    </li>
-                  </Link>
-                  <Link href="/">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      Home
-                    </li>
-                  </Link>
-                </ul>
-              </div>
-            )}
-          </div> */}
-        </div>
       </div>
 
       {/* Dropdown Menu for Small Devices */}
       {isMenuOpen && (
-        <div className="bg-white text-black lg:hidden p-4 space-y-2">
-          <ul className="space-y-1">
-          <Link href="/">
-              <li>
-                <a className="text-black hover:text-gray-600">Home</a>
-              </li>
-            </Link>
-            <Link href="profile">
-              <li>
-                <a className="text-black hover:text-gray-600">PROFILE</a>
-              </li>
-            </Link>
-            <Link href="/list">
-              <li>
-                <a className="text-black hover:text-gray-600"> LIST</a>
-              </li>
-            </Link>
-            <li 
-      className="relative group list-none"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-    >
-      {/* Main Menu Item */}
-      <button className="flex items-center gap-1 ml-0 text-black hover:text-gray-600   transition-all">
-        Communities <ChevronDown size={16} />
-      </button>
+  <div className="bg-white text-black lg:hidden p-4 space-y-2">
+    <ul className="space-y-1">
+      <Link href="/">
+        <li>
+          <a className="text-black hover:text-gray-600">Home</a>
+        </li>
+      </Link>
+      <Link href="/profile">
+        <li>
+          <a className="text-black hover:text-gray-600">PROFILE</a>
+        </li>
+      </Link>
+      <Link href="/list">
+        <li>
+          <a className="text-black hover:text-gray-600">LIST</a>
+        </li>
+      </Link>
 
       {/* Dropdown Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.ul
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="absolute left-0 mt-2 w-56 h-80 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
-          >
-            {districts.map((district, index) => (
-              <li key={index}>
-                <Link
-                  href={`/district/${district.toLowerCase()}`}
-                  className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
-                >
-                  {district}
-                </Link>
-              </li>
-            ))}
-          </motion.ul>
-        )}
-      </AnimatePresence>
-    </li>
-           <Link href="/notification">
-              <li>
-                <a className="text-black hover:text-gray-600">Notification</a>
-              </li>
-            </Link>
-          </ul>
-          <div className="flex space-x-4">
-  {/* Login Button */}
-  <Link href='login'>
-<button className="relative style px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
-  {/* Running Border Effect */}
-  <span className="absolute inset-0 border-2 border-[#8cc163] rounded-lg animate-border-run"></span>
+      <li
+        className="relative group list-none"
+        onMouseEnter={() => setIsOpen(true)}
+        onMouseLeave={() => setIsOpen(false)}
+      >
+        <button className="flex items-center gap-1 ml-0 text-black hover:text-gray-600 transition-all">
+          Communities <ChevronDown size={16} />
+        </button>
 
-  {/* Background Fill on Hover */}
-  <span className="absolute inset-0 bg-[#8cc163] scale-x-0 origin-left transition-transform duration-300 ease-out group-hover:scale-x-100"></span>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.ul
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="absolute left-0 mt-2 w-56 h-80 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
+            >
+              {districts.map((district, index) => (
+                <li key={index}>
+                  <Link
+                    href={`/district/${district.toLowerCase()}`}
+                    className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
+                  >
+                    {district}
+                  </Link>
+                </li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
+      </li>
 
-  {/* Text Effect */}
-  <span className="relative z-10 group-hover:text-white transition-all duration-300 style">Login</span>
-</button>
-</Link>
+      <Link href="/notification">
+        <li>
+          <a className="text-black hover:text-gray-600">Notification</a>
+        </li>
+      </Link>
+    </ul>
 
+    {/* Auth Buttons */}
+    <div className="flex space-x-4">
+      {!userName ? (
+        <>
+          <Link href="/login">
+            <button className="relative px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
+              <span className="absolute inset-0 border-2 border-[#8cc163] rounded-lg animate-border-run"></span>
+              <span className="absolute inset-0 bg-[#8cc163] scale-x-0 origin-left transition-transform duration-300 ease-out group-hover:scale-x-100"></span>
+              <span className="relative z-10 group-hover:text-white transition-all duration-300">Login</span>
+            </button>
+          </Link>
 
-  {/* Signup Button */}
-  <Link href="/signup">
-<button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]">
-    Sign Up
-</button>
-</Link>
-</div>
-        </div>
+          <Link href="/signup">
+            <button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]">
+              Sign Up
+            </button>
+          </Link>
+        </>
+      ) : (
+        <button
+          onClick={handleLogout}
+          className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg transition-all duration-300 hover:brightness-110 hover:scale-105 hover:shadow-[0_0_10px_#8cc163]"
+        >
+          Logout
+        </button>
       )}
+    </div>
+  </div>
+)}
 
-      {/* Modal */}
+
+      {/* Modal
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
           <div className="bg-[#2c3440] rounded-lg p-6 w-full max-w-[700px] max-h-[90vh] overflow-y-auto shadow-lg">
@@ -349,7 +393,7 @@ const Navbar = ({ href, children }) => {
             )}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

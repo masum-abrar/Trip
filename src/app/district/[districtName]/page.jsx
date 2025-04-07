@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaImage, FaRegHeart, FaHeart, FaUserCircle, FaPaperPlane } from 'react-icons/fa';
 import Navbar from "@/app/components/Navbar";
 import EventTabSection from '@/app/components/EventTabSection';
@@ -10,9 +10,7 @@ import PlaceTabSec from '@/app/components/PlaceTabSec';
 
 const DistrictPage = ({ params }) => {
   const districtName = params.districtName;
-  // const [showAllImages, setShowAllImages] = useState(null);
-  // const [selectedImage, setSelectedImage] = useState(null);
-
+  const [community, setCommunity] = useState(null);
   const [activeTab, setActiveTab] = useState('Discussion');
   const [newPost, setNewPost] = useState({ text: '', images: [], place: '', subdistrict: '' });
   const [posts, setPosts] = useState([
@@ -22,7 +20,6 @@ const DistrictPage = ({ params }) => {
       text: "Beautiful sunset at the beach!",
       replies: [],
       images: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJdc6c_s_wrlJABb7pNAIjWYPR8YYNtJbuog&s"], // Change `image` to `images`
-
       place: "Beach",
       subdistrict: "North",
       likes: 2,
@@ -42,7 +39,6 @@ const DistrictPage = ({ params }) => {
       text: "Visited a historical site today!",
       replies: [],
       images: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJdc6c_s_wrlJABb7pNAIjWYPR8YYNtJbuog&s"], // Change `image` to `images`
-
       place: "Hill",
       subdistrict: "South",
       likes: 5,
@@ -57,7 +53,23 @@ const DistrictPage = ({ params }) => {
       showAllComments: false,
     },
   ]);
- 
+
+  // Fetch community data when districtName changes
+  useEffect(() => {
+    const fetchCommunity = async () => {
+      try {
+        const response = await fetch(`/api/v1/customer/districts/${districtName}`);
+        const data = await response.json();
+        setCommunity(data.data); // Assuming the API response has the `data` object containing community info
+      } catch (error) {
+        console.error('Failed to fetch community:', error);
+      }
+    };
+
+    if (districtName) {
+      fetchCommunity();
+    }
+  }, [districtName]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -67,18 +79,17 @@ const DistrictPage = ({ params }) => {
 
       <div className="relative w-full h-64">
         <img src="https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" alt="District" className="w-full h-full object-cover" />
-        {districtName && (
-  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <h1 className="text-4xl font-bold text-white">
-      {districtName.charAt(0).toUpperCase() + districtName.slice(1)}
-    </h1>
-    <button className="bg-[#8cc163] text-white px-10 lg:px-8  py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform hover:scale-110 hover:bg-[#6fb936] hover:shadow-lg">
-    Join
-  </button>
-  </div>
-  
-)}
-
+        {community && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <h1 className="text-4xl font-bold text-white">
+              {community.name.charAt(0).toUpperCase() + community.name.slice(1)}
+             
+            </h1>
+            <button className="bg-[#8cc163] text-white px-10 lg:px-8 py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform hover:scale-110 hover:bg-[#6fb936] hover:shadow-lg">
+              Join
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-center mt-4">
@@ -94,25 +105,21 @@ const DistrictPage = ({ params }) => {
       </div>
 
       <div className="p-4 max-w-[750px] mx-auto">
-      {activeTab === 'Discussion' && (
- <DiscussTabSection/>
-)}
+        {activeTab === 'Discussion' && (
+          <DiscussTabSection />
+        )}
 
-           {/* //Events Tab Started// */}
         {activeTab === 'Events' && (
-         <div>
-          <EventTabSection/>
+          <div>
+            <EventTabSection />
           </div>
         )}
-        {PlacesTabSection}
-        {
-          activeTab === 'Places' && (
-           <div>
-            {/* <PlacesTabSection/> */}
-            <PlaceTabSec/>
-             </div>
-          )
-        }
+
+        {activeTab === 'Places' && (
+          <div>
+            <PlaceTabSec />
+          </div>
+        )}
       </div>
     </div>
   );
