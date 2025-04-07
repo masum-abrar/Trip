@@ -261,37 +261,45 @@ const Navbar = ({ href, children }) => {
 
       {/* Dropdown Menu */}
       <li
-        className="relative group list-none"
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
-      >
-        <button className="flex items-center gap-1 ml-0 text-black hover:text-gray-600 transition-all">
-          Communities <ChevronDown size={16} />
-        </button>
+  className="relative group list-none"
+  onMouseEnter={() => setIsOpen(true)}
+  onMouseLeave={() => setIsOpen(false)}
+>
+  <button
+    className={`flex items-center gap-1  text-lg font-medium transition-all rounded-md ${
+      pathname.includes("/district/")
+        ? "text-[#8cc163] font-semibold relative after:content-[''] after:absolute after:left-1/2 after:bottom-0 after:w-2/3 after:h-[3px] after:bg-[#8cc163] after:rounded-full after:-translate-x-1/2 after:transition-all after:duration-300 after:ease-in-out after:scale-x-100"
+        : "text-gray-800 hover:text-[#8cc163]"
+    }`}
+  >
+    Communities <ChevronDown size={16} />
+  </button>
 
-        <AnimatePresence>
-          {isOpen && (
-            <motion.ul
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="absolute left-0 mt-2 w-56 h-80 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
-            >
-              {districts.map((district, index) => (
-                <li key={index}>
-                  <Link
-                    href={`/district/${district.toLowerCase()}`}
-                    className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
-                  >
-                    {district}
-                  </Link>
-                </li>
-              ))}
-            </motion.ul>
-          )}
-        </AnimatePresence>
-      </li>
+  {/* Dropdown Menu */}
+  <AnimatePresence>
+    {isOpen && districts.length > 0 && (
+      <motion.ul
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="absolute left-0 mt-3 w-56 h-96 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
+      >
+      {districts.map((district, index) => (
+  <li key={district.id || index}>
+    <Link
+      href={`/district/${district.name.toLowerCase()}`}
+      className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
+    >
+      {district.name}
+    </Link>
+  </li>
+))}
+
+      </motion.ul>
+    )}
+  </AnimatePresence>
+</li>
 
       <Link href="/notification">
         <li>
