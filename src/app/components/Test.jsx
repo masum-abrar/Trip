@@ -1,158 +1,218 @@
-'use client'
-import React, { useState } from "react";
+'use client';
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 
-const sections = [
-  {
-    id: 1,
-    title: "World News",
-    image: "https://upload.wikimedia.org/wikipedia/en/4/40/Abc_world_news_now_logo_2016.jpg",
-    content: `World leaders gather to discuss major global issues, including climate change, economic policies, and international conflicts. 
-    The recent summit in Geneva saw agreements on reducing carbon emissions, but tensions remain over trade wars. 
-    Political analysts predict further negotiations in the coming months.
+export default function EditProfileModal() {
+  const [showModal, setShowModal] = useState(false);
+  const [fullname, setFullname] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [division, setDivision] = useState("");
+  const [district, setDistrict] = useState("");
+  const [password, setPassword] = useState("");
 
-    According to sources, the upcoming trade agreements are expected to redefine international economic policies. 
-    Diplomats from multiple nations have expressed concerns about potential geopolitical shifts, and major corporations 
-    are already preparing contingency plans. 
+  const [userId, setUserId] = useState("");
+  const [divisions, setDivisions] = useState([]);
+  const [districts, setDistricts] = useState([]);
 
-    In a recent speech, the UN Secretary-General emphasized the importance of collaboration in solving global crises. 
-    Humanitarian organizations have also raised alarms about the impact of economic sanctions on vulnerable populations. 
-    Experts suggest that the global economy is at a critical juncture, and decisive action is needed.
+  // Prefill from cookies when modal opens
+  useEffect(() => {
+    if (showModal) {
+      const id = Cookies.get("userId");
+      const name = Cookies.get("userName");
+      const fullName = Cookies.get("fullName");
+      const userEmail = Cookies.get("userEmail");
+      const userPhone = Cookies.get("userPhone");
+      const userDivision = Cookies.get("userDivision");
+      const userDistrict = Cookies.get("userDistrict");
 
-    Meanwhile, climate change remains a pressing issue, with activists demanding stricter regulations. 
-    The recent wildfires in Australia and flooding in Europe highlight the urgent need for sustainable policies. 
-    The Paris Agreement targets are being reassessed, with some nations pushing for more aggressive carbon reduction strategies.
-    
-    Scientists are now debating the effectiveness of carbon tax policies, and energy companies are under pressure to transition to renewables.
-    With these ongoing discussions, the global community is watching closely for the next steps in addressing climate change.`,
-  },
-  {
-    id: 2,
-    title: "Business & Economy",
-    image: "https://upload.wikimedia.org/wikipedia/en/4/40/Abc_world_news_now_logo_2016.jpg",
-    content: `Stock markets show signs of recovery after a turbulent year, with major indices reporting gains. 
-    The Federal Reserve has hinted at potential interest rate adjustments to curb inflation. Meanwhile, tech companies 
-    continue to dominate, with record-breaking earnings reported in Q4.
+      if (id) setUserId(id);
+      if (name) setName(name);
+      if (fullName) setFullname(fullName);
+      if (userEmail) setEmail(userEmail);
+      if (userPhone) setPhone(userPhone);
+      if (userDivision) setDivision(userDivision);
+      if (userDistrict) setDistrict(userDistrict);
+    }
+  }, [showModal]);
 
-    Analysts predict that the job market will experience a significant shift as automation becomes more prevalent. 
-    Several industries, including finance and manufacturing, are investing heavily in AI-driven solutions, leading 
-    to both job displacement and the creation of new opportunities in the tech sector.
+  // Fetch divisions
+  useEffect(() => {
+    const fetchDivisions = async () => {
+      try {
+        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/divisions");
+        const data = await response.json();
+        setDivisions(data.data);
+      } catch (error) {
+        console.error("Failed to fetch divisions:", error);
+      }
+    };
+    fetchDivisions();
+  }, []);
 
-    In the cryptocurrency space, Bitcoin and Ethereum have seen volatile movements, with major investors 
-    expressing both optimism and skepticism. The regulatory environment remains uncertain, with several governments 
-    considering new policies to manage digital assets.
+  // Fetch districts on division change
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      try {
+        const response = await fetch(
+          `https://parjatak-core.vercel.app/api/v1/customer/districts?division=${division}`
+        );
+        const data = await response.json();
+        setDistricts(data.data);
+      } catch (error) {
+        console.error("Failed to fetch districts:", error);
+      }
+    };
+    if (division) fetchDistricts();
+  }, [division]);
 
-    Real estate markets are also experiencing fluctuations. While urban housing prices continue to rise, 
-    suburban areas are becoming more attractive due to remote work trends. Experts suggest that the future of 
-    real estate will be closely tied to evolving work-from-home policies and economic stability.
-    
-    Many experts believe that the increasing interest rates could slow down the housing boom, while new 
-    government regulations may impact mortgage availability. With new tax reforms on the horizon, businesses 
-    are adjusting their strategies for 2025.`,
-  },
-  {
-    id: 3,
-    title: "Business & Economy",
-    image: "https://upload.wikimedia.org/wikipedia/en/4/40/Abc_world_news_now_logo_2016.jpg",
-    content: `Stock markets show signs of recovery after a turbulent year, with major indices reporting gains. 
-    The Federal Reserve has hinted at potential interest rate adjustments to curb inflation. Meanwhile, tech companies 
-    continue to dominate, with record-breaking earnings reported in Q4.
+  // Handle profile update
+  const handleUpdate = async () => {
+    try {
+      const payload = {
+        fullname,
+        name,
+        email,
+        phone,
+        division,
+        district,
+        password,
+      };
 
-    Analysts predict that the job market will experience a significant shift as automation becomes more prevalent. 
-    Several industries, including finance and manufacturing, are investing heavily in AI-driven solutions, leading 
-    to both job displacement and the creation of new opportunities in the tech sector.
+      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    In the cryptocurrency space, Bitcoin and Ethereum have seen volatile movements, with major investors 
-    expressing both optimism and skepticism. The regulatory environment remains uncertain, with several governments 
-    considering new policies to manage digital assets.
+      const result = await response.json();
 
-    Real estate markets are also experiencing fluctuations. While urban housing prices continue to rise, 
-    suburban areas are becoming more attractive due to remote work trends. Experts suggest that the future of 
-    real estate will be closely tied to evolving work-from-home policies and economic stability.
-    
-    Many experts believe that the increasing interest rates could slow down the housing boom, while new 
-    government regulations may impact mortgage availability. With new tax reforms on the horizon, businesses 
-    are adjusting their strategies for 2025.`,
-  },
-  {
-    id: 4,
-    title: "Business & Economy",
-    image: "https://upload.wikimedia.org/wikipedia/en/4/40/Abc_world_news_now_logo_2016.jpg",
-    content: `Stock markets show signs of recovery after a turbulent year, with major indices reporting gains. 
-    The Federal Reserve has hinted at potential interest rate adjustments to curb inflation. Meanwhile, tech companies 
-    continue to dominate, with record-breaking earnings reported in Q4.
+      if (response.ok) {
+        // Optional: Update cookies
+        Cookies.set("userName", name);
+        Cookies.set("fullName", fullname);
+        Cookies.set("userEmail", email);
+        Cookies.set("userPhone", phone);
+        Cookies.set("userDivision", division);
+        Cookies.set("userDistrict", district);
 
-    Analysts predict that the job market will experience a significant shift as automation becomes more prevalent. 
-    Several industries, including finance and manufacturing, are investing heavily in AI-driven solutions, leading 
-    to both job displacement and the creation of new opportunities in the tech sector.
-
-    In the cryptocurrency space, Bitcoin and Ethereum have seen volatile movements, with major investors 
-    expressing both optimism and skepticism. The regulatory environment remains uncertain, with several governments 
-    considering new policies to manage digital assets.
-
-    Real estate markets are also experiencing fluctuations. While urban housing prices continue to rise, 
-    suburban areas are becoming more attractive due to remote work trends. Experts suggest that the future of 
-    real estate will be closely tied to evolving work-from-home policies and economic stability.
-    
-    Many experts believe that the increasing interest rates could slow down the housing boom, while new 
-    government regulations may impact mortgage availability. With new tax reforms on the horizon, businesses 
-    are adjusting their strategies for 2025.`,
-  }
-];
-
-function Test() {
-  const [selectedSection, setSelectedSection] = useState(null);
+        alert("Profile updated successfully!");
+        setShowModal(false);
+      } else {
+        alert("Failed to update: " + result.message);
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      alert("Something went wrong!");
+    }
+  };
 
   return (
-    <div className="p-4 bg-gray-100">
-      <h1 className="text-4xl font-bold text-center mb-4 font-serif">The Daily Gazette</h1>
+    <div className="p-4">
+      <button
+        onClick={() => setShowModal(true)}
+        className="mt-2 px-4 py-2 bg-[#8cc163] text-white rounded hover:bg-green-500 text-sm"
+      >
+        Edit Profile
+      </button>
 
-      {/* Newspaper Sections */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0">
-        {sections.map((section) => (
-          <div
-            key={section.id}
-            className="border border-gray-300 p-2 cursor-pointer hover:bg-gray-200 transition-all"
-            onClick={() => setSelectedSection(section)}
-          >
-            <img
-              src={section.image}
-              alt={section.title}
-              className="w-full h-60 object-cover"
-            />
-            <h3 className="text-lg font-bold mt-1">{section.title}</h3>
-            <p className="text-sm text-gray-700 line-clamp-2">{section.content.slice(0, 100)}...</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Modal for Full Article */}
-      {selectedSection && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          onClick={() => setSelectedSection(null)}
-        >
-          <div
-            className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-3xl relative font-serif leading-relaxed max-h-[80vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg relative"
           >
             <button
-              className="absolute top-2 right-2 text-xl text-gray-600 hover:text-red-500"
-              onClick={() => setSelectedSection(null)}
+              className="absolute top-2 right-2 text-black text-xl"
+              onClick={() => setShowModal(false)}
             >
-              ✖
+              ×
             </button>
-            <h2 className="text-3xl font-bold mb-4">{selectedSection.title}</h2>
-            <img
-              src={selectedSection.image}
-              alt={selectedSection.title}
-              className="w-full h-80 object-cover mb-4"
+            <h2 className="text-2xl font-bold mb-6 text-black text-center">
+              Edit Profile
+            </h2>
+
+            <input
+              type="text"
+              placeholder="Full Name"
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
             />
-            <p className="text-gray-800">{selectedSection.content}</p>
-          </div>
+            <input
+              type="text"
+              placeholder="Username"
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Phone"
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+
+            <select
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              value={division}
+              onChange={(e) => {
+                setDivision(e.target.value);
+                setDistrict("");
+              }}
+            >
+              <option value="">Select Division</option>
+              {divisions.map((div) => (
+                <option key={div.id} value={div.id}>
+                  {div.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+            >
+              <option value="">Select District</option>
+              {districts.map((dist) => (
+                <option key={dist.id} value={dist.id}>
+                  {dist.name}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="password"
+              placeholder="Password"
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <button
+              className="w-full p-2 bg-[#8cc163] text-white rounded"
+              onClick={handleUpdate}
+            >
+              Update Profile
+            </button>
+          </motion.div>
         </div>
       )}
     </div>
   );
 }
-
-export default Test;

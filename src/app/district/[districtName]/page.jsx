@@ -7,11 +7,14 @@ import EventTabSection from '@/app/components/EventTabSection';
 import PlacesTabSection from '@/app/components/PlacesTabSection';
 import DiscussTabSection from '@/app/components/DiscussionTabSection';
 import PlaceTabSec from '@/app/components/PlaceTabSec';
+import Cookies from "js-cookie";
 
-const DistrictPage = ({ params }) => {
-  const districtName = params.districtName;
+const DistrictPage  = ({ params }) => {
+  const districtName = params?.districtName ?? '';
   const [community, setCommunity] = useState(null);
   const [activeTab, setActiveTab] = useState('Discussion');
+  const [hasJoined, setHasJoined] = useState(false);
+
   const [newPost, setNewPost] = useState({ text: '', images: [], place: '', subdistrict: '' });
   const [posts, setPosts] = useState([
     {
@@ -58,9 +61,9 @@ const DistrictPage = ({ params }) => {
   useEffect(() => {
     const fetchCommunity = async () => {
       try {
-        const response = await fetch(`/api/v1/customer/districts/${districtName}`);
+        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts/${districtName}`);
         const data = await response.json();
-        setCommunity(data.data); // Assuming the API response has the `data` object containing community info
+        setCommunity(data.data); 
       } catch (error) {
         console.error('Failed to fetch community:', error);
       }
@@ -71,6 +74,46 @@ const DistrictPage = ({ params }) => {
     }
   }, [districtName]);
 
+
+  const handleJoin = async () => {
+    const userId = Cookies.get("userId"); 
+
+    if (!userId || !community?.id) {
+      console.warn("Missing userId or community id");
+      return;
+    }
+
+    try {
+      const userId = Cookies.get("userId"); 
+      const token = Cookies.get("token"); // assuming you stored the JWT token as 'token'
+
+      const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-district-follower", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 🔑 pass token here
+        },
+        body: JSON.stringify({
+          userId: userId,
+          districtId: community.id,
+        }),
+      });
+      
+      
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(` You have successfully joined the "${community?.name}" community!`);
+        setHasJoined(true); // or show toast/snackbar
+      } else {
+        alert(data.message || "Failed to follow.");
+      }
+    } catch (error) {
+      console.error("Failed to join community:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="shadow-lg w-full">
@@ -78,19 +121,33 @@ const DistrictPage = ({ params }) => {
       </div>
 
       <div className="relative w-full h-64">
-        <img src="https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" alt="District" className="w-full h-full object-cover" />
-        {community && (
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <h1 className="text-4xl font-bold text-white">
-              {community.name.charAt(0).toUpperCase() + community.name.slice(1)}
-             
-            </h1>
-            <button className="bg-[#8cc163] text-white px-10 lg:px-8 py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform hover:scale-110 hover:bg-[#6fb936] hover:shadow-lg">
-              Join
-            </button>
-          </div>
-        )}
-      </div>
+  <img
+    src={community?.images?.[0]?.image || "https://via.placeholder.com/600x400"}
+    alt="District"
+    className="w-full h-full object-cover"
+  />
+
+
+    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
+      <h1 className="text-3xl lg:text-4xl font-bold text-white">
+        {community?.name.charAt(0).toUpperCase() + community?.name.slice(1)}
+      </h1>
+      <button
+  onClick={handleJoin}
+  disabled={hasJoined}
+  className={`${
+    hasJoined
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-[#8cc163] hover:bg-[#6fb936] hover:shadow-lg hover:scale-110"
+  } text-white px-6 lg:px-8 py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform`}
+>
+  {hasJoined ? "Joined" : "Join"}
+</button>
+
+    </div>
+  
+</div>
+
 
       <div className="flex justify-center mt-4">
         {['Discussion', 'Events', 'Places'].map((tab) => (
@@ -106,18 +163,18 @@ const DistrictPage = ({ params }) => {
 
       <div className="p-4 max-w-[750px] mx-auto">
         {activeTab === 'Discussion' && (
-          <DiscussTabSection />
+          <DiscussTabSection PostData={community}/>
         )}
 
         {activeTab === 'Events' && (
           <div>
-            <EventTabSection />
+            <EventTabSection PostData={community} />
           </div>
         )}
 
         {activeTab === 'Places' && (
           <div>
-            <PlaceTabSec />
+            <PlaceTabSec PlaceData={community} />
           </div>
         )}
       </div>

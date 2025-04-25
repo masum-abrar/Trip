@@ -34,12 +34,12 @@ export default function Home() {
    <div> 
    <CommunitySlider/>
      </div>
-   <div>
+   {/* <div>
     <Banner/>
-   </div>
-   <div>
+   </div> */}
+   {/* <div>
     <Reviews/>
-   </div>
+   </div> */}
    {/* <div>
     <Test/>
    </div> */}

@@ -25,7 +25,7 @@ const Reviews = () => {
   
       <div className="grid grid-cols-6 md:grid-cols-6 gap-4">
         {movies.map((movie) => (
-          <Link href={`/PlaceDetails/${movie.id}`}> 
+          <Link href={``}> 
           <div
             key={movie.id}
             className="bg-gray-800 rounded-lg overflow-hidden "

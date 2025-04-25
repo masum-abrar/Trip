@@ -1,6 +1,6 @@
 'use client'
 import Navbar from "@/app/components/Navbar";
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import { Dialog, DialogContent, DialogTitle } from "@mui/material"; // Using Material UI for Modal
 import { FaStar, FaRegStar,FaImage } from "react-icons/fa"; // Star rating icons
 import DiscussTabSection from "@/app/components/DiscussionTabSection";
@@ -8,16 +8,17 @@ import EventTabSection from "@/app/components/EventTabSection";
 import ReviewsTabSection from "@/app/components/ReviewsTabSection";
 import Link from "next/link";
 
-const places = [
-  { id: 1, title: "Jaflong", district: "Sylhet",  subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
-  { id: 2, title: "Saint Martin", district: "CoxsBazar", subDistict:"Teknaf", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
-  { id: 3, title: "Inani", subDistict:"Ukhia", district: "Chittagong", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg", eyeCount: "750k", dotCount: "294k", heartCount: "266k" },
-  { id: 4, title: "Patuartek", subDistict:"Ukhia", district: "CoxsBazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg", eyeCount: "620k", dotCount: "394k", heartCount: "166k" },
-];
+// const places = [
+//   { id: 1, title: "Jaflong", district: "Sylhet",  subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
+//   { id: 2, title: "Saint Martin", district: "CoxsBazar", subDistict:"Teknaf", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
+//   { id: 3, title: "Inani", subDistict:"Ukhia", district: "Chittagong", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg", eyeCount: "750k", dotCount: "294k", heartCount: "266k" },
+//   { id: 4, title: "Patuartek", subDistict:"Ukhia", district: "CoxsBazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg", eyeCount: "620k", dotCount: "394k", heartCount: "166k" },
+// ];
 
 const PlaceDetails = ({ params }) => {
-  const placeId = parseInt(params.id, 10);
-  const place = places.find((p) => p.id === placeId);
+  const slug = params.slug;
+ 
+  
 
   // State for Modal & Rating
   const [isModalOpen, setModalOpen] = useState(false);
@@ -27,19 +28,64 @@ const PlaceDetails = ({ params }) => {
   const [expanded, setExpanded] = useState(false);
   const [image, setImage] = useState(null);
   const [date, setDate] = useState("");
+  const [place, setPlace] = useState(null);
+  const [community, setCommunity] = useState(null);
 
   // State for Active Tab
   const [activeTab, setActiveTab] = useState('Reviews');
   
 
-  if (!place) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold text-red-500">Place not found!</h1>
-      </div>
-    );
-  }
+  // if (!place) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <h1 className="text-2xl font-bold text-red-500">Place not found!</h1>
+  //     </div>
+  //   );
+  // }
 
+
+  // const params = useParams();
+
+
+ 
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPlace = async () => {
+      try {
+        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places/${slug}`);
+       
+        const data = await response.json();
+        setPlace(data.data);
+      } catch (err) {
+        console.error('Failed to fetch place:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchPlace();
+    }
+  }, [slug]);
+  const districtName = place?.district?.slug;
+    useEffect(() => {
+      const fetchCommunity = async () => {
+        // Get the district name from the place object
+        if (!districtName) return; // Exit if district name is not available
+        try {
+          const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts/${districtName}`);
+          const data = await response.json();
+          setCommunity(data.data); 
+        } catch (error) {
+          console.error('Failed to fetch community:', error);
+        }
+      };
+  
+      if (districtName) {
+        fetchCommunity();
+      }
+    }, [districtName]);
   return (
     <div className="bg-white">
       {/* Navbar */}
@@ -54,8 +100,8 @@ const PlaceDetails = ({ params }) => {
   {/* Background Image with Overlay */}
   <div className="relative w-full h-[400px] overflow-hidden rounded-lg shadow-lg">
     <img
-      src={place.image}
-      alt={place.title}
+      src={place?.images[0]?.image || place?.image}
+      alt={place?.title}
       className="w-full h-full object-cover"
     />
     {/* Gradient Overlay (Hidden on Hover) */}
@@ -63,17 +109,21 @@ const PlaceDetails = ({ params }) => {
 
     {/* Place Name & Stats Overlay */}
     <div className="absolute bottom-6 left-6 text-white transition-opacity duration-300 ">
-      <h1 className="text-3xl md:text-4xl font-extrabold">{place.title}</h1>
-      <h1 className="text-base font-normal mt-2"> {place.subDistict}</h1>
+      <h1 className="text-3xl md:text-4xl font-extrabold">{place?.name}</h1>
+      {place && place.district ? (
+  <h1 className="text-base font-normal mt-2">{place.district.name}</h1>
+) : (
+  <h1 className="text-base font-normal mt-2 text-gray-400">Loading district...</h1>
+)}
       <div className="flex space-x-4 mt-2 text-lg font-medium">
         <span className="flex items-center space-x-1">
-          👁 <span>{place.eyeCount}</span>
+          👁 <span>{place?.viewCount}</span>
         </span>
         <span className="flex items-center space-x-1">
-          💬 <span>{place.dotCount}</span>
+          💬 <span>{place?.dotCount}</span>
         </span>
         <span className="flex items-center space-x-1">
-          ❤️ <span>{place.heartCount}</span>
+          ❤️ <span>{place?.heartCount}</span>
         </span>
       </div>
     </div>
@@ -115,7 +165,7 @@ const PlaceDetails = ({ params }) => {
              backdrop-blur-lg bg-opacity-30 hover:shadow-blue-500/50 transition-all"
 >
   <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
-    {place.description}
+    {place?.description}
   </p>
 
   {/* Read More / Less Button */}
@@ -128,10 +178,14 @@ const PlaceDetails = ({ params }) => {
 </div>
 
 <div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
- <Link href={`/district/${place.district.toLowerCase()}`}>
- <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
-    {place.district} <span className="text-[#8cc163]">Community</span>
+ <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
+ {place && place.district ? (
+  <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
+    {place.district.name} <span className="text-[#8cc163]">Community</span>
   </h1>
+) : (
+  <h1 className="text-2xl lg:text-3xl font-bold text-gray-400">Loading Community...</h1>
+)}
  </Link>
   <button className="bg-[#8cc163] text-white px-12 lg:px-10  py-2  lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 transform hover:scale-110 hover:bg-[#6fb936] hover:shadow-lg">
     Join
@@ -241,12 +295,12 @@ const PlaceDetails = ({ params }) => {
         )}
          {activeTab === 'Discussion' && (
          <div className="max-w-3xl mx-auto mt-6">
-        <DiscussTabSection hidePlaceSelection={true} />
+        <DiscussTabSection hidePlaceSelection={true} locationData={community} />
           </div>
         )}
          {activeTab === 'Reviews' && (
          <div className="max-w-3xl mx-auto mt-6">
-       <ReviewsTabSection/>
+       <ReviewsTabSection  locationData={place}/>
           </div>
         )}
     </div>

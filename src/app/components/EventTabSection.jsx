@@ -1,15 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { FaImage, FaRegHeart, FaHeart, FaUserCircle, FaPaperPlane, FaCalendarAlt } from 'react-icons/fa';
+import Cookies from "js-cookie";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import { useRouter } from "next/navigation";
 
-const EventTabSection = ({ hidePlaceSelection }) => {
 
+const EventTabSection = ({ hidePlaceSelection , PostData }) => {
+  const router = useRouter();
   const [showAllImages, setShowAllImages] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-
+ const [locationData, setLocationData] = useState(null);
   const [activeTab, setActiveTab] = useState('Discussion');
-  const [newPost, setNewPost] = useState({ text: '', images: [], place: '', startDate: "", endDate: "", subdistrict: '' });
+  const [comments, setComments] = useState({});
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showReplyInput, setShowReplyInput] = useState({});
+const [replyTexts, setReplyTexts] = useState({});
+const cookiesuserId = Cookies.get("userId");
+const [liked, setLiked] = useState(false);
+
+const districtId = PostData?.id;
+  // const [newPost, setNewPost] = useState({ text: '', images: [], place: '', startDate: "", endDate: "", subdistrict: '' });
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -56,77 +71,60 @@ const EventTabSection = ({ hidePlaceSelection }) => {
       showAllComments: false,
     },
   ]);
-  const handleImageChange = (e) => {
-    if (!e.target.files) return;  // Ensure files exist
+  const isLiked =
+  Array.isArray(locationData?.like) &&
+  locationData.like.some((like) => like.user?.id === cookiesuserId);
+  // const handleImageChange = (e) => {
+  //   if (!e.target.files) return;  // Ensure files exist
   
-    const files = Array.from(e.target.files);
-    const imageUrls = files.map(file => URL.createObjectURL(file));
+  //   const files = Array.from(e.target.files);
+  //   const imageUrls = files.map(file => URL.createObjectURL(file));
   
-    setNewPost(prevState => ({
-      ...prevState,
-      images: [...(prevState.images || []), ...imageUrls]  // Ensure it's always an array
-    }));
-  };
-  
-  
-  const removeImage = (index) => {
-    setNewPost(prevState => ({
-      ...prevState,
-      images: prevState.images.filter((_, i) => i !== index)
-    }));
-  };
+  //   setNewPost(prevState => ({
+  //     ...prevState,
+  //     images: [...(prevState.images || []), ...imageUrls]  // Ensure it's always an array
+  //   }));
+  // };
   
   
-  const [showReplyInput, setShowReplyInput] = useState({});
-  const [replyTexts, setReplyTexts] = useState({});
+  // const removeImage = (index) => {
+  //   setNewPost(prevState => ({
+  //     ...prevState,
+  //     images: prevState.images.filter((_, i) => i !== index)
+  //   }));
+  // };
+  
+  
+  
 
-  const handleReplyToggle = (postId, commentId) => {
-    setShowReplyInput(prev => ({ ...prev, [commentId]: !prev[commentId] }));
-  };
+  // const handleReplyToggle = (postId, commentId) => {
+  //   setShowReplyInput(prev => ({ ...prev, [commentId]: !prev[commentId] }));
+  // };
 
-  const handleReply = (postId, commentId) => {
-    if (replyTexts[commentId]?.trim()) {
-      setPosts(posts.map(post =>
-        post.id === postId
-          ? {
-              ...post,
-              comments: post.comments.map(comment =>
-                comment.id === commentId
-                  ? {
-                      ...comment,
-                      replies: [...comment.replies, { id: Date.now(), text: replyTexts[commentId], user: "User" }]
-                    }
-                  : comment
-              )
-            }
-          : post
-      ));
-      setReplyTexts(prev => ({ ...prev, [commentId]: '' }));
-    }
-  };
 
-  const handlePost = () => {
-    if (!newPost.text.trim() && newPost.images.length === 0) {
-      alert("Please write something or add an image.");
-      return;
-    }
+
+  // const handlePost = () => {
+  //   if (!newPost.text.trim() && newPost.images.length === 0) {
+  //     alert("Please write something or add an image.");
+  //     return;
+  //   }
   
-    const newPostData = {
-      id: Date.now(),
-      user: "User Name",
-      text: newPost.text,
-      images: [...(newPost.images || [])], // Ensure images is an array
-      startDate: newPost.startDate, // Add start date
-      endDate: newPost.endDate, // Add end date
-      comments: [],
-      likes: 0,
-      liked: false
-    };
+  //   const newPostData = {
+  //     id: Date.now(),
+  //     user: "User Name",
+  //     text: newPost.text,
+  //     images: [...(newPost.images || [])], // Ensure images is an array
+  //     startDate: newPost.startDate, // Add start date
+  //     endDate: newPost.endDate, // Add end date
+  //     comments: [],
+  //     likes: 0,
+  //     liked: false
+  //   };
     
   
-    setPosts([newPostData, ...posts]);
-    setNewPost({ text: "", images: [], place: "" });  // Reset state after posting
-  };
+  //   setPosts([newPostData, ...posts]);
+  //   setNewPost({ text: "", images: [], place: "" });  // Reset state after posting
+  // };
   
 
   const toggleComments = (postId) => {
@@ -151,13 +149,236 @@ const EventTabSection = ({ hidePlaceSelection }) => {
       return post;
     }));
   };
+  const [newPost, setNewPost] = useState({
+    
+    text: "",
+    divisionId: "",
+    districtId: "",
+    placeId: "",
+    startDate: "",
+    endDate: "",
+    images: [],
+  });
+   const [divisions, setDivisions] = useState([]);
+     const [districts, setDistricts] = useState([]);
+     const [places, setPlaces] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+  //new code
+
+     // Handle image change
+     const handleImageChange = (e) => {
+      const files = Array.from(e.target.files);
+      const previewUrls = files.map((file) => URL.createObjectURL(file));
+      setSelectedFiles(files);
+      setNewPost((prev) => ({ ...prev, images: previewUrls }));
+    };
+  
+    const removeImage = (index) => {
+      const newImages = [...newPost.images];
+      const newFiles = [...selectedFiles];
+      newImages.splice(index, 1);
+      newFiles.splice(index, 1);
+      setNewPost({ ...newPost, images: newImages });
+      setSelectedFiles(newFiles);
+    };
+    const handlePost = async () => {
+       
+        const userId = Cookies.get("userId"); // Adjust this key if needed
+    
+        const formData = new FormData();
+    
+        formData.append("userId", userId);
+      formData.append("divisionId", locationData.divisionId);
+      formData.append("districtId", locationData.id); // this is districtId
+      formData.append("placeId", newPost.placeId);
+      formData.append("title", newPost.text);
+      formData.append("description", newPost.text);
+      formData.append("type", "event");
+      formData.append("eventStartDate", newPost.startDate || "");
+      formData.append("eventEndDate", newPost.endDate || "");
+      formData.append("isActive", "true");
+        formData.append("slug", "");
+    
+        selectedFiles.forEach((file, index) => {
+          formData.append(`images`, file);
+        });
+    
+        try {
+          const response = await fetch("https://parjatak-core.vercel.app/api/v1/posts", {
+            method: "POST",
+            body: formData,
+          });
+    
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+    
+          const data = await response.json();
+          console.log("Post created successfully:", data);
+          toast.success("Post has been created");
+        } catch (error) {
+          console.error("Post creation failed:", error);
+        }
+      }
+
+       useEffect(() => {
+    const idFromCookie = Cookies.get("userId");
+    if (idFromCookie) {
+      setUserId(idFromCookie);
+    }
+  }, []);
+
+  const handleCommentChange = (postId, value) => {
+    setComments(prev => ({
+      ...prev,
+      [postId]: value,
+    }));
+  };
+
+  const handleCommentSubmit = async (postId) => {
+    const comment = comments[postId];
+    if (!comment?.trim()) return;
+  
+    setLoading(true);
+    try {
+      const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-comment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: postId,
+          parentUserId: null,
+          userId,
+          comment,
+        }),
+      });
+  
+      const data = await res.json();
+      console.log("Comment posted:", data);
+  
+      // ✅ Clear comment input
+      setComments(prev => ({
+        ...prev,
+        [postId]: "",
+      }));
+  
+      // ✅ Refresh server-rendered data (like updated comments)
+      router.refresh();
+  
+    } catch (err) {
+      console.error("Failed to post comment:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  const handleReplyToggle = (commentId) => {
+    setShowReplyInput(prev => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
+  };
+  
+  
+  const [showAllCommentsForPost, setShowAllCommentsForPost] = useState({});
+
+  const handleToggleAllComments = (postId) => {
+    setShowAllCommentsForPost(prev => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
+  
+  const handleReply = async (postId, commentId, parentUserId) => {
+    const reply = replyTexts[commentId];
+    if (!reply?.trim()) return;
+  
+    try {
+      const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-comment-reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId,
+          postCommentId: commentId,
+          parentUserId,
+          userId,
+          reply
+        }),
+      });
+  
+      const data = await res.json();
+      console.log("Reply posted:", data);
+  
+      setReplyTexts(prev => ({ ...prev, [commentId]: "" }));
+      setShowReplyInput(prev => ({ ...prev, [commentId]: false }));
+      router.refresh(); // Or mutate() if using SWR
+  
+    } catch (error) {
+      console.error("Reply failed:", error);
+    }
+  };
+  
+
+    // Display the posts
 
 
+    useEffect(() => {
+      const fetchCommunity = async () => {
+        try {
+          const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
+          const data = await response.json();
+          setLocationData(data.data);
+        } catch (error) {
+          console.error('Failed to fetch community:', error);
+        }
+      };
+    
+      if (districtId) {
+        fetchCommunity();
+      }
+    }, [districtId]);
+
+
+
+     // Check if current user already liked the post
+    //  useEffect(() => {
+    //   if (locationData?.like?.some((like) => like.user.id == userId)) {
+    //     setLiked(true);
+    //   }
+    // }, [locationData?.like, userId]);
+
+  const handleLike = async (postId) => {
+    try {
+      await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-like", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId,
+          userId: cookiesuserId,
+          parentUserId: null,
+        }),
+      });
+
+      // Toggle like state (optional — for instant UI feedback)
+      setLiked((prev) => !prev);
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
   return (
     <div>
         <div className="space-y-6">
           {/* Post Input Section */}
-          <div className="bg-white shadow-md rounded-xl p-4">
+          <form
+  onSubmit={(e) => {
+    e.preventDefault();
+    handlePost(); // your existing post handler
+  }}
+  className="bg-white shadow-md rounded-xl p-4"
+>
   <textarea
     className="w-full p-3 border text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
     placeholder="What's on your mind?"
@@ -165,40 +386,40 @@ const EventTabSection = ({ hidePlaceSelection }) => {
     onChange={(e) => setNewPost({ ...newPost, text: e.target.value })}
   ></textarea>
 
- 
-
   {/* Start Date & End Date */}
-  <div className="flex  flex-col lg:flex-row gap-4 mt-3">
-  {/* Start Date */}
-  <div className="w-full">
-    <label className="block text-gray-700 mb-1">Start Date</label>
-    <div className="relative">
-      <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-      <input
-        type="date"
-        className="w-full p-2 pl-10 border bg-white text-black rounded-md focus:ring-2 focus:ring-blue-400"
-        value={newPost.startDate}
-        onChange={(e) => setNewPost({ ...newPost, startDate: e.target.value })}
-      />
+  <div className="flex flex-col lg:flex-row gap-4 mt-3">
+    {/* Start Date */}
+    <div className="w-full">
+      <label className="block text-gray-700 mb-1">Start Date</label>
+      <div className="relative">
+        <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        <input
+          type="date"
+          className="w-full p-2 pl-10 border bg-white text-black rounded-md focus:ring-2 focus:ring-blue-400"
+          value={newPost.startDate}
+          onChange={(e) => setNewPost({ ...newPost, startDate: e.target.value })}
+        />
+      </div>
+    </div>
+
+    {/* End Date */}
+    <div className="w-full">
+      <label className="block text-gray-700 mb-1">End Date</label>
+      <div className="relative">
+        <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        <input
+          type="date"
+          className="w-full p-2 pl-10 border bg-white text-black rounded-md focus:ring-2 focus:ring-blue-400"
+          value={newPost.endDate}
+          onChange={(e) => setNewPost({ ...newPost, endDate: e.target.value })}
+        />
+      </div>
     </div>
   </div>
 
-  {/* End Date */}
-  <div className="w-full">
-    <label className="block text-gray-700 mb-1">End Date</label>
-    <div className="relative">
-      <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-      <input
-        type="date"
-        className="w-full p-2 pl-10 border bg-white text-black rounded-md focus:ring-2 focus:ring-blue-400"
-        value={newPost.endDate}
-        onChange={(e) => setNewPost({ ...newPost, endDate: e.target.value })}
-      />
-    </div>
-  </div>
-</div>
- {/* Image Upload Section */}
- <div className="flex items-center justify-center gap-4 mt-6">
+  {/* Image Upload and Place Selection */}
+  <div className="flex items-center justify-center gap-4 mt-6">
+    {/* Image Upload */}
     <label className="cursor-pointer">
       <FaImage className="text-xl text-gray-600 hover:text-blue-500" />
       <input
@@ -211,32 +432,36 @@ const EventTabSection = ({ hidePlaceSelection }) => {
     </label>
 
     {/* Place Selection */}
-  {/* Conditionally render the select dropdown */}
-  {!hidePlaceSelection && (
-        <select
-          value={newPost.place}
-          onChange={(e) => setNewPost({ ...newPost, place: e.target.value })}
-          className="border bg-white p-2 text-black rounded-md focus:ring-2 focus:ring-blue-400"
-        >
-          <option value="">Select Place</option>
-          <option value="Beach">Beach</option>
-          <option value="Hill">Hill</option>
-        </select>
-      )}
-     {/* Post Button */}
-  <button onClick={handlePost} className="bg-[#8cc163] text-white px-6 py-2 rounded-lg hover:bg-[#39c252] ">
-    Post
-  </button>
+    {!hidePlaceSelection && (
+       <select
+       value={newPost.placeId}
+       onChange={(e) => setNewPost({ ...newPost, placeId: e.target.value })}
+       className="border bg-white p-2 text-black rounded-md"
+     >
+       <option value="">Select Place</option>
+       {locationData?.place?.map((place) => (
+<option key={place.id} value={place.id}>{place.name}</option>
+))}
+
+     </select>
+    )}
+
+    {/* Submit Button */}
+    <button
+      type="submit"
+      className="bg-[#8cc163] text-white px-6 py-2 rounded-lg hover:bg-[#39c252]"
+    >
+      Post
+    </button>
   </div>
 
- 
-
-  {/* Preview Selected Images */}
+  {/* Image Preview */}
   <div className="mt-3 grid grid-cols-3 gap-2">
     {newPost.images.map((image, index) => (
       <div key={index} className="relative">
         <img src={image} alt={`Selected ${index}`} className="w-full h-20 object-cover rounded-md" />
-        <button 
+        <button
+          type="button"
           onClick={() => removeImage(index)}
           className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
         >
@@ -245,165 +470,207 @@ const EventTabSection = ({ hidePlaceSelection }) => {
       </div>
     ))}
   </div>
-</div>
+</form>
+
           
       
           {/* Posts Display */}
-          {posts.map((post) => (
-            <div key={post.id} className="bg-white shadow-md rounded-xl p-4">
-              <div className="flex items-center gap-2">
-                <FaUserCircle className="text-2xl text-gray-600" />
-                <span className="font-semibold text-gray-800">{post.user}</span>
-              </div>
+          {locationData?.map((post) => (
+      <div key={post.id} className="bg-white shadow-md rounded-xl p-4">
+        <div className="flex items-center gap-2">
+          <FaUserCircle className="text-2xl text-gray-600" />
+          <span className="font-semibold text-gray-800">{post?.user.name}</span>
+        </div>
       
       {/* Display Multiple Images */}
-      {post.images && post.images.length > 0 && (
-        <div className={`mt-2 ${post.images.length === 1 ? "grid grid-cols-1" : "grid grid-cols-2"} gap-2 relative`}>
-          {post.images.slice(0, 4).map((img, index) => (
-            <div key={index} className="relative">
-              <img 
-                src={img} 
-                alt="Post" 
-                className={`w-full ${post.images.length === 1 ? "h-56" : "h-40"} object-cover rounded-md cursor-pointer`}
-                onClick={() => setSelectedImage(img)} // Click to preview
-              />
-              
-              {/* Show overlay if more than 4 images */}
-              {index === 3 && post.images.length > 4 && (
-                <div
-                  className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-md cursor-pointer"
-                  onClick={() => setShowAllImages(post.id)}
-                >
-                  <span className="text-white text-lg font-semibold">+{post.images.length - 4}</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-      
-      {/* Modal for Single Image Preview */}
-      {selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-          <div className="relative bg-white p-4 rounded-lg max-w-2xl w-full">
-            <button onClick={() => setSelectedImage(null)} className="absolute top-4 right-4 text-white text-2xl">❌</button>
-            <img src={selectedImage} alt="Preview" className="w-full max-h-[80vh] object-contain rounded-md" />
+      {post.images && post.images.length >= 0 && (
+  <div className={`mt-2 ${post.images.length === 1 ? "grid grid-cols-1" : "grid grid-cols-2"} gap-2 relative`}>
+    {post.images.slice(0, 4).map((imgObj, index) => (
+      <div key={index} className="relative">
+        <img 
+          src={imgObj.image} 
+          alt="Post" 
+          className={`w-full ${post.images.length === 1 ? "h-56" : "h-40"} object-cover rounded-md cursor-pointer`}
+          onClick={() => setSelectedImage(imgObj.image)} // Click to preview
+        />
+
+        {/* Overlay if there are more than 4 images */}
+        {index === 3 && post.images.length > 4 && (
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-md cursor-pointer"
+            onClick={() => setShowAllImages(post.id)}
+          >
+            <span className="text-white text-lg font-semibold">+{post.images.length - 4}</span>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+    ))}
+  </div>
+)}
+
+{/* Single Image Preview Modal */}
+{selectedImage && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+    <div className="relative bg-white p-4 rounded-lg max-w-2xl w-full">
+      <button onClick={() => setSelectedImage(null)} className="absolute top-4 right-4 text-white text-2xl">❌</button>
+      <img src={selectedImage} alt="Preview" className="w-full max-h-[80vh] object-contain rounded-md" />
+    </div>
+  </div>
+)}
+
+{/* Show All Images Modal */}
+{showAllImages === post.id && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+    <div className="bg-white p-4 rounded-lg max-w-4xl w-full relative">
+      <button onClick={() => setShowAllImages(null)} className="absolute top-4 right-4 text-black text-4xl">❌</button>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        {post.images.map((imgObj, index) => (
+          <img 
+            key={index} 
+            src={imgObj.image} 
+            alt="Post" 
+            className="w-full h-40 object-cover rounded-md cursor-pointer"
+            onClick={() => setSelectedImage(imgObj.image)} // Click to preview any image
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+)}
       
-      {/* Modal to Show All Images */}
-      {showAllImages === post.id && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg max-w-4xl w-full relative">
-            <button onClick={() => setShowAllImages(null)} className="absolute top-4 right-4 text-black text-4xl">❌</button>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {post.images.map((img, index) => (
-                <img 
-                  key={index} 
-                  src={img} 
-                  alt="Post" 
-                  className="w-full h-40 object-cover rounded-md cursor-pointer"
-                  onClick={() => setSelectedImage(img)} // Click to preview any image
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
       
-      
-              <p className="mt-2 text-gray-800">{post.text}</p>
+              <p className="mt-2 text-gray-800">{post.title}</p>
 
               <div className="flex justify-between items-center text-gray-700 mt-4 mb-4">
   {/* Start Date */}
   <div className="flex items-center gap-1 sm:gap-2 bg-green-100 text-green-700 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm">
     <FaCalendarAlt className="text-green-500 text-sm sm:text-base" />
-    <span className="font-medium">Start: {post.startDate}</span>
+    <span className="font-medium">Start: {post.eventStartDate}</span>
   </div>
 
   {/* End Date - Pushed to Extreme Right */}
   <div className="flex items-center gap-1 sm:gap-2 bg-red-100 text-red-700 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm ml-auto">
     <FaCalendarAlt className="text-red-500 text-sm sm:text-base" />
-    <span className="font-medium">End: {post.endDate}</span>
+    <span className="font-medium">End: {post.evenetEndDate}</span>
   </div>
 </div>
 
 
 
               {/* Like Button */}
-              <button onClick={() => toggleLike(post.id)} className="flex items-center justify-between w-full mt-2 text-black">
-  <div className="flex items-center gap-1">
-    {post.liked ? <FaHeart className="text-red-500" /> : <FaRegHeart />} {post.likes}
-  </div>
-  <span className="ml-auto">{post.comments.length} Comments</span>
-</button>
+              <button onClick={() => handleLike(post.id)} className="flex items-center gap-1 text-black mt-2">
+              {post.like.some(like => like.user?.id === cookiesuserId) ? (
+  <FaHeart className="text-red-500" />
+) : (
+  <FaRegHeart />
+)}
+
+      {post.like.length} {/* Or you can keep likeCount state for dynamic update */}
+    </button>
 
       
-              {/* Comments Section */}
-              {post.comments.slice(0, post.showAllComments ? post.comments.length : 2).map(comment => (
-                <div key={comment.id} className="ml-4 mt-2 bg-gray-100 p-2 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <FaUserCircle className="text-xl text-black" />
-                    <p className="font-medium text-black">{comment.user}</p>
-                  </div>
-                  <p className='text-black'>{comment.text}</p>
-      
-                  {/* Reply Button */}
-                  <button onClick={() => handleReplyToggle(post.id, comment.id)} className="text-blue-500 text-sm">Reply</button>
-      
-                  {/* Reply Input */}
-                  {showReplyInput[comment.id] && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <input
-                        type="text"
-                        placeholder="Write a reply..."
-                        className="border p-1 rounded-md flex-1"
-                        value={replyTexts[comment.id] || ''}
-                        onChange={(e) => setReplyTexts({ ...replyTexts, [comment.id]: e.target.value })}
-                      />
-                      <FaPaperPlane className="text-[#8cc163] cursor-pointer" onClick={() => handleReply(post.id, comment.id)} />
-                    </div>
-                  )}
-      
-                  {/* Display Replies */}
-                  {comment.replies.map(reply => (
-                    <div key={reply.id} className="ml-4 text-sm text-gray-600 flex items-center gap-1">
-                      <FaUserCircle className="text-sm text-gray-500" />
-                      <p>{reply.text}</p>
-                    </div>
-                  ))}
-                </div>
-              ))}
-      
-              {/* "See More" / "See Less" Button */}
-              {post.comments.length > 2 && (
-                <button
-                  onClick={() => toggleComments(post.id)}
-                  className="text-blue-500 text-sm mt-1"
-                >
-                  {post.showAllComments ? "See Less" : "See More"}
-                </button>
-              )}
+             
       
               {/* Add Comment Input */}
               <div className="flex items-center gap-2 mt-2">
-                <input
-                  type="text"
-                  value={post.newComment}
-                  onChange={(e) => setPosts(posts.map(p => p.id === post.id ? { ...p, newComment: e.target.value } : p))}
-                  placeholder="Write a comment..."
-                  className="flex-1 w-36 p-2 border rounded-md text-black focus:ring-2 focus:ring-blue-400 bg-white"
-                />
-                <button onClick={() => handleComment(post.id)} className="bg-[#8cc163] text-white px-4 py-1 rounded-md">
-                  Comment
-                </button>
-              </div>
+            <input
+              type="text"
+              value={comments[post.id] || ""}
+              onChange={(e) => handleCommentChange(post.id, e.target.value)}
+              placeholder="Write a comment..."
+              className="flex-1 w-36 p-2 border rounded-md text-black focus:ring-2 focus:ring-blue-400 bg-white"
+            />
+            <button
+              onClick={() => handleCommentSubmit(post.id)}
+              disabled={loading || !userId}
+              className="bg-[#8cc163] text-white px-4 py-1 rounded-md"
+            >
+              {loading ? "Posting..." : "Comment"}
+            </button>
+          </div>
+          {/* Display Comments */}
+        
+          <div>
+
+
+  {/* Slice logic: only show 2 unless showAllComments is true */}
+  <div>
+  {(post.comment.slice(0, showAllCommentsForPost[post.id] ? post.comment.length : 2)).map((comment) => (
+  <div key={comment.id} className="flex flex-col gap-1 mt-2 ml-4 bg-gray-100 p-2 rounded-md">
+    <div className="flex items-center gap-2">
+      <FaUserCircle className="text-xl text-gray-600" />
+      <span className="font-semibold text-gray-800">{comment.user.name}</span>
+    </div>
+   <div  className="flex justify-between ">
+   <p className="text-gray-700 ml-7">{comment.comment}</p>
+ {/* Replies Section */}
+
+{/* Reply Button */}
+<button
+  onClick={() => handleReplyToggle(comment.id)}
+  className="text-blue-500 text-sm mr-3"
+>
+  Reply
+</button>
+   </div>
+   {comment.reply?.length > 0 && (
+      <div className="mt-2 ">
+        {comment.reply.map((reply) => (
+          <div key={reply.id} className="flex flex-col gap-1 mt-1  bg-white p-2 rounded-md border-l-4 border-[#8cc163] w-full">
+            <div className="flex items-center gap-2">
+              <img
+                src={reply.user?.image || "https://cdn-icons-png.flaticon.com/512/9368/9368192.png"}
+                alt={reply.user?.name}
+                className="w-6 h-6 rounded-full object-cover"
+              />
+              <span className="text-sm font-medium text-gray-800">{reply.user?.name}</span>
+            </div>
+            <p className="ml-7 text-sm text-gray-700">{reply.reply}</p>
+          </div>
+        ))}
+      </div>
+    )}
+    {/* Reply Input Box */}
+    {showReplyInput[comment.id] && (
+      <div className="flex items-center gap-2 mt-1 ml-7">
+        <input
+          type="text"
+          placeholder="Write a reply..."
+          className="border p-1 rounded-md flex-1 text-black"
+          value={replyTexts[comment.id] || ''}
+          onChange={(e) => setReplyTexts({ ...replyTexts, [comment.id]: e.target.value })}
+        />
+        <FaPaperPlane
+          className="text-[#8cc163] cursor-pointer"
+          onClick={() => handleReply(post.id, comment.id, comment.user.id)}
+        />
+      </div>
+    )}
+
+
+  </div>
+))}
+
+
+  {/* Only show the button if there are more than 2 comments */}
+  {post.comment.length > 2 && (
+    <button
+      onClick={() => handleToggleAllComments(post.id)}
+      className="ml-4 text-blue-600 text-sm mt-1"
+    >
+      {showAllCommentsForPost[post.id] ? "Show Less" : "View All Comments"}
+    </button>
+  )}
+</div>
+
+</div>
+
+
             </div>
           ))}
         </div>
 
-
+        <ToastContainer position="top-right" autoClose={3000} />
 
     </div>
   )

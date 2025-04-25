@@ -29,12 +29,17 @@ const LoginPage = () => {
 
       const data = await res.json();
       console.log("Login Response:", data);
-
+      console.log("User Data:", data?.data);
+      console.log("Access Token:", data?.accessToken || data?.token || data?.data?.accessToken);
+      const token = data?.accessToken || data?.token || data?.data?.accessToken;
+if (token) {
+  Cookies.set("token", token, { expires: 7 });
+}
       if (res.ok) {
         toast.success("Login successful!");
 
         // Save user info in cookies
-        Cookies.set("userName", data?.data?.name || "Guest", { expires: 7 }); // store for 7 days
+        Cookies.set("userName", data?.data?.name || "Guest", { expires: 7 }); 
         Cookies.set("userId", data?.data?.id || "", { expires: 7 });
 
         setTimeout(() => {

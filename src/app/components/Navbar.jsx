@@ -5,7 +5,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
-import logo from "../../../public/Final_logo.png";
+import logo from "../../../public/Trip_LoGo.png";
 import Link from "next/link";
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
@@ -68,9 +68,13 @@ const Navbar = ({ href, children }) => {
   const handleLogout = () => {
     Cookies.remove("userName");
     Cookies.remove("userId");
-    // Add other cookies if needed
-    window.location.reload(); // Refresh to reflect logout
+    Cookies.remove("userToken");
+    Cookies.remove("token");
+  
+    // Redirect to login page
+    window.location.href = "/login";
   };
+  
   useEffect(() => {
     const fetchDistricts = async () => {
       try {
@@ -101,7 +105,7 @@ const Navbar = ({ href, children }) => {
             {isMenuOpen ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>
           <Image src={logo} alt="logo" width={50} height={50} />
-          <a className="btn btn-ghost text-xl text-black">Travel</a>
+          <a className="btn btn-ghost text-xl text-black">Parjatak</a>
         </div>
 
         {/* Navbar Center - Large Screens */}
