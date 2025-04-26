@@ -56,18 +56,18 @@ const DistrictPage  = ({ params }) => {
       showAllComments: false,
     },
   ]);
-
+  const fetchCommunity = async () => {
+    try {
+      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts/${districtName}`);
+      const data = await response.json();
+      setCommunity(data.data); 
+    } catch (error) {
+      console.error('Failed to fetch community:', error);
+    }
+  };
   // Fetch community data when districtName changes
   useEffect(() => {
-    const fetchCommunity = async () => {
-      try {
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts/${districtName}`);
-        const data = await response.json();
-        setCommunity(data.data); 
-      } catch (error) {
-        console.error('Failed to fetch community:', error);
-      }
-    };
+   
 
     if (districtName) {
       fetchCommunity();
@@ -168,7 +168,7 @@ const DistrictPage  = ({ params }) => {
 
         {activeTab === 'Events' && (
           <div>
-            <EventTabSection PostData={community} />
+            <EventTabSection PostData={community} fetchCommunity={fetchCommunity} />
           </div>
         )}
 

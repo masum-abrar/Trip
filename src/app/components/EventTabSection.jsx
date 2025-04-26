@@ -9,7 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import { useRouter } from "next/navigation";
 
 
-const EventTabSection = ({ hidePlaceSelection , PostData }) => {
+const EventTabSection = ({ hidePlaceSelection , PostData  }) => {
   const router = useRouter();
   const [showAllImages, setShowAllImages] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -22,6 +22,7 @@ const EventTabSection = ({ hidePlaceSelection , PostData }) => {
 const [replyTexts, setReplyTexts] = useState({});
 const cookiesuserId = Cookies.get("userId");
 const [liked, setLiked] = useState(false);
+ const [places, setPlaces] = useState([]);
 
 const districtId = PostData?.id;
   // const [newPost, setNewPost] = useState({ text: '', images: [], place: '', startDate: "", endDate: "", subdistrict: '' });
@@ -74,6 +75,20 @@ const districtId = PostData?.id;
   const isLiked =
   Array.isArray(locationData?.like) &&
   locationData.like.some((like) => like.user?.id === cookiesuserId);
+
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const response = await fetch("https://parjatak-core.vercel.app/api/v1/places");
+        const data = await response.json();
+        setPlaces(data.data); // API structure onujayi 'data' array access kortesi
+      } catch (error) {
+        console.error("Error fetching places:", error);
+      }
+    };
+
+    fetchPlaces();
+  }, []);
   // const handleImageChange = (e) => {
   //   if (!e.target.files) return;  // Ensure files exist
   
@@ -161,7 +176,7 @@ const districtId = PostData?.id;
   });
    const [divisions, setDivisions] = useState([]);
      const [districts, setDistricts] = useState([]);
-     const [places, setPlaces] = useState([]);
+    //  const [places, setPlaces] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
 
   //new code
@@ -184,13 +199,13 @@ const districtId = PostData?.id;
     };
     const handlePost = async () => {
        
-        const userId = Cookies.get("userId"); // Adjust this key if needed
+        const userId = Cookies.get("userId");
     
         const formData = new FormData();
     
         formData.append("userId", userId);
-      formData.append("divisionId", locationData.divisionId);
-      formData.append("districtId", locationData.id); // this is districtId
+      formData.append("divisionId", PostData.division.id);
+      formData.append("districtId", PostData.id); 
       formData.append("placeId", newPost.placeId);
       formData.append("title", newPost.text);
       formData.append("description", newPost.text);
@@ -217,6 +232,8 @@ const districtId = PostData?.id;
           const data = await response.json();
           console.log("Post created successfully:", data);
           toast.success("Post has been created");
+          router.refresh();
+          fetchCommunity() // Refresh the page or fetch new posts
         } catch (error) {
           console.error("Post creation failed:", error);
         }
@@ -228,6 +245,7 @@ const districtId = PostData?.id;
       setUserId(idFromCookie);
     }
   }, []);
+
 
   const handleCommentChange = (postId, value) => {
     setComments(prev => ({
@@ -258,7 +276,7 @@ const districtId = PostData?.id;
       const data = await res.json();
       console.log("Comment posted:", data);
   
-      // ✅ Clear comment input
+     
       setComments(prev => ({
         ...prev,
         [postId]: "",
@@ -314,7 +332,7 @@ const districtId = PostData?.id;
   
       setReplyTexts(prev => ({ ...prev, [commentId]: "" }));
       setShowReplyInput(prev => ({ ...prev, [commentId]: false }));
-      router.refresh(); // Or mutate() if using SWR
+      router.refresh(); 
   
     } catch (error) {
       console.error("Reply failed:", error);
@@ -323,18 +341,18 @@ const districtId = PostData?.id;
   
 
     // Display the posts
-
+    const fetchCommunity = async () => {
+      try {
+        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
+        const data = await response.json();
+        setLocationData(data.data);
+      } catch (error) {
+        console.error('Failed to fetch community:', error);
+      }
+    };
 
     useEffect(() => {
-      const fetchCommunity = async () => {
-        try {
-          const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
-          const data = await response.json();
-          setLocationData(data.data);
-        } catch (error) {
-          console.error('Failed to fetch community:', error);
-        }
-      };
+    
     
       if (districtId) {
         fetchCommunity();
@@ -433,17 +451,18 @@ const districtId = PostData?.id;
 
     {/* Place Selection */}
     {!hidePlaceSelection && (
-       <select
-       value={newPost.placeId}
-       onChange={(e) => setNewPost({ ...newPost, placeId: e.target.value })}
-       className="border bg-white p-2 text-black rounded-md"
-     >
-       <option value="">Select Place</option>
-       {locationData?.place?.map((place) => (
-<option key={place.id} value={place.id}>{place.name}</option>
-))}
-
-     </select>
+      <select
+      value={newPost.placeId}
+      onChange={(e) => setNewPost({ ...newPost, placeId: e.target.value })}
+      className="border bg-white p-2 text-black rounded-md"
+    >
+      <option value="">Select Place</option>
+      {places?.map((place) => (
+        <option key={place.id} value={place.id}>
+          {place.name}
+        </option>
+      ))}
+    </select>
     )}
 
     {/* Submit Button */}
@@ -558,11 +577,11 @@ const districtId = PostData?.id;
 
 
               {/* Like Button */}
-              <button onClick={() => handleLike(post.id)} className="flex items-center gap-1 text-black mt-2">
+              <button className="flex items-center gap-1 text-black mt-2">
               {post.like.some(like => like.user?.id === cookiesuserId) ? (
-  <FaHeart className="text-red-500" />
+  <FaHeart  className="text-red-500" />
 ) : (
-  <FaRegHeart />
+  <FaRegHeart  onClick={() => handleLike(post.id)} />
 )}
 
       {post.like.length} {/* Or you can keep likeCount state for dynamic update */}

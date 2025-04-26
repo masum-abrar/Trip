@@ -202,32 +202,32 @@ const PlaceDetails = ({ params }) => {
   <DialogTitle className="text-center font-bold text-gray-900">📖 Add to Diary</DialogTitle>
   <DialogContent className="lg:w-[350px]">
     {/* Star Rating */}
-    <div className="flex justify-center my-3">
+    {/* <div className="flex justify-center my-3">
       {[1, 2, 3, 4, 5].map((star) => (
         <span key={star} onClick={() => setRating(star)} className="cursor-pointer text-yellow-500 text-2xl">
           {rating >= star ? <FaStar /> : <FaRegStar />}
         </span>
       ))}
-    </div>
+    </div> */}
 
     {/* Review Input */}
-    <textarea
+    {/* <textarea
       className="w-full p-2 border rounded-md mt-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
       placeholder="Write your review..."
       value={review}
       onChange={(e) => setReview(e.target.value)}
-    ></textarea>
+    ></textarea> */}
 
     {/* Image Upload */}
-    <div className="mt-3">
+    {/* <div className="mt-3">
   <label className="font-semibold text-gray-800">Upload Image:</label>
   <div className="flex items-center space-x-2 mt-2">
-    {/* Icon as button */}
+  
     <label htmlFor="image-upload" className="cursor-pointer text-blue-500 text-2xl">
-      <FaImage /> {/* Display upload icon */}
+      <FaImage />
     </label>
     
-    {/* Hidden file input */}
+  
     <input
       id="image-upload"
       type="file"
@@ -236,7 +236,7 @@ const PlaceDetails = ({ params }) => {
       className="hidden" // Hide the file input but keep it functional
     />
   </div>
-</div>
+</div> */}
     {/* Date Picker */}
     <div className="mt-3">
       <label className="font-semibold text-gray-800">Date:</label>
