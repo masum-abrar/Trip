@@ -7,7 +7,7 @@ import DiscussTabSection from "@/app/components/DiscussionTabSection";
 import EventTabSection from "@/app/components/EventTabSection";
 import ReviewsTabSection from "@/app/components/ReviewsTabSection";
 import Link from "next/link";
-
+import Cookies from "js-cookie";
 // const places = [
 //   { id: 1, title: "Jaflong", district: "Sylhet",  subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
 //   { id: 2, title: "Saint Martin", district: "CoxsBazar", subDistict:"Teknaf", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
@@ -18,21 +18,28 @@ import Link from "next/link";
 const PlaceDetails = ({ params }) => {
   const slug = params.slug;
  
-  
+  const cookiesuserId = Cookies.get("userId");
 
   // State for Modal & Rating
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isBucketModalOpen, setBucketModalOpen] = useState(false);
+  const [isListModalOpen, setListModalOpen] = useState(false);
+
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
-  const [privacy, setPrivacy] = useState("Public");
+  
   const [expanded, setExpanded] = useState(false);
   const [image, setImage] = useState(null);
-  const [date, setDate] = useState("");
+ 
   const [place, setPlace] = useState(null);
   const [community, setCommunity] = useState(null);
 
   // State for Active Tab
   const [activeTab, setActiveTab] = useState('Reviews');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+  const [privacy, setPrivacy] = useState("Public");
   
 
   // if (!place) {
@@ -86,6 +93,69 @@ const PlaceDetails = ({ params }) => {
         fetchCommunity();
       }
     }, [districtName]);
+
+    const handleSave = async () => {
+      const payload = {
+        userId: cookiesuserId,
+        placeId :place?.id,
+        title,
+        description,
+        targetDate: date,
+        isActive: privacy === "Public" ? "true" : "false",
+      };
+  
+      try {
+        const res = await fetch("https://parjatak-core.vercel.app/api/v1/diaries", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        const data = await res.json();
+        console.log("Diary Saved:", data);
+        
+        setModalOpen(false); // Close modal after saving
+      } catch (error) {
+        console.error("Failed to save diary:", error);
+      }
+    };
+
+    const handleSaveBucketList = async () => {
+      const payload = {
+        userId: cookiesuserId,
+        placeId :place?.id,
+        title,
+        description,
+        targetDate: date,
+        isActive: privacy === "Public" ? "true" : "false",
+       
+      };
+    
+      try {
+        const res = await fetch("https://parjatak-core.vercel.app/api/v1/bucketLists", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+    
+        const data = await res.json();
+        console.log("Bucket added:", data);
+        if (res.ok) {
+          toast.success("Added to Bucket List!");
+          setBucketModalOpen(false);
+        } else {
+          toast.error(data.message || "Something went wrong");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Network error!");
+      }
+    };
+    
   return (
     <div className="bg-white">
       {/* Navbar */}
@@ -135,8 +205,8 @@ const PlaceDetails = ({ params }) => {
         <div className="flex flex-wrap gap-3 mt-6">
   {[
     { icon: "📖", text: "Add to Diary", onClick: () => setModalOpen(true) },
-    { icon: "📌", text: "Add to Bucket List" },
-    { icon: "📂", text: "Add to List" },
+    { icon: "📌", text: "Add to Bucket List",  onClick: () => setBucketModalOpen(true) },
+    { icon: "📂", text: "Add to List", onClick : () => setListModalOpen(true) },
     { icon: "⭐", text: "Add to Favorite Place" },
     { icon: "🚶", text: "12k Visitor" },
     { icon: "✅", text: "Visited" },
@@ -201,81 +271,231 @@ const PlaceDetails = ({ params }) => {
       <Dialog className="max-w-[500px] mx-auto p-6" open={isModalOpen} onClose={() => setModalOpen(false)}>
   <DialogTitle className="text-center font-bold text-gray-900">📖 Add to Diary</DialogTitle>
   <DialogContent className="lg:w-[350px]">
-    {/* Star Rating */}
-    {/* <div className="flex justify-center my-3">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <span key={star} onClick={() => setRating(star)} className="cursor-pointer text-yellow-500 text-2xl">
-          {rating >= star ? <FaStar /> : <FaRegStar />}
-        </span>
-      ))}
-    </div> */}
 
-    {/* Review Input */}
-    {/* <textarea
-      className="w-full p-2 border rounded-md mt-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      placeholder="Write your review..."
-      value={review}
-      onChange={(e) => setReview(e.target.value)}
-    ></textarea> */}
+    {/* Form Start */}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault(); // prevent page reload
+        handleSave();
+      }}
+    >
+      {/* Title Input */}
+      <div className="mt-3">
+        <label className="font-semibold text-gray-800">Title:</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
+          placeholder="Enter diary title..."
+          required
+        />
+      </div>
 
-    {/* Image Upload */}
-    {/* <div className="mt-3">
-  <label className="font-semibold text-gray-800">Upload Image:</label>
-  <div className="flex items-center space-x-2 mt-2">
-  
-    <label htmlFor="image-upload" className="cursor-pointer text-blue-500 text-2xl">
-      <FaImage />
-    </label>
-    
-  
-    <input
-      id="image-upload"
-      type="file"
-      accept="image/*"
-      onChange={(e) => setImage(e.target.files[0])}
-      className="hidden" // Hide the file input but keep it functional
-    />
-  </div>
-</div> */}
-    {/* Date Picker */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Date:</label>
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
-      />
-    </div>
+      {/* Description Input */}
+      <div className="mt-3">
+        <label className="font-semibold text-gray-800">Description:</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
+          placeholder="Write your description..."
+          required
+        />
+      </div>
 
-    {/* Privacy Options */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Privacy:</label>
-      <div className="relative mt-1">
+      {/* Date Picker */}
+      <div className="mt-3">
+        <label className="font-semibold text-gray-800">Date:</label>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
+          required
+        />
+      </div>
+
+      {/* Privacy Options */}
+      <div className="mt-3">
+        <label className="font-semibold text-gray-800">Privacy:</label>
         <select
           className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white text-gray-800"
           value={privacy}
           onChange={(e) => setPrivacy(e.target.value)}
+          required
         >
           <option value="Public">🌍 Public</option>
           <option value="Private">🔒 Private</option>
         </select>
       </div>
+
+      {/* Save & Cancel Buttons */}
+      <div className="flex justify-end mt-4">
+        <button
+          type="button"
+          onClick={() => setModalOpen(false)}
+          className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 ml-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340]"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+    {/* Form End */}
+
+  </DialogContent>
+</Dialog>
+
+  {/* Modal for Adding to BucketList */}
+
+{isBucketModalOpen && (
+  <Dialog
+    className="max-w-[500px] mx-auto p-6"
+    open={isBucketModalOpen}
+    onClose={() => setBucketModalOpen(false)}
+  >
+    <DialogTitle className="text-center font-bold text-gray-900">📌 Add to Bucket List</DialogTitle>
+  <DialogContent className="lg:w-[350px]">
+
+    {/* Title */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">Title:</label>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        placeholder="Enter title..."
+      />
     </div>
 
-    {/* Save & Cancel Buttons */}
+    {/* Description */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">Description:</label>
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        placeholder="Write description..."
+      />
+    </div>
+
+    {/* Date */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">Target Date:</label>
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+      />
+    </div>
+
+    {/* Privacy */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">Privacy:</label>
+      <select
+        value={privacy}
+        onChange={(e) => setPrivacy(e.target.value)}
+        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+      >
+        <option value="Public">🌍 Public</option>
+        <option value="Private">🔒 Private</option>
+      </select>
+    </div>
+
+   
+
+    {/* Save & Cancel */}
     <div className="flex justify-end mt-4">
-      <button onClick={() => setModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+      <button onClick={() => setBucketModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
         Cancel
       </button>
-      <button className="px-4 py-2 ml-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340]">
+      <button onClick={handleSaveBucketList} className="px-4 py-2 ml-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340]">
         Save
       </button>
     </div>
   </DialogContent>
-</Dialog>
+  </Dialog>
+)}
 
-    
+
+{isListModalOpen && (
+  <Dialog
+    className="max-w-[500px] mx-auto p-6"
+    open={isListModalOpen}
+    onClose={() => setListModalOpen(false)}
+  >
+    <DialogTitle className="text-center font-bold text-gray-900">📌 Add to Bucket List</DialogTitle>
+  <DialogContent className="lg:w-[350px]">
+
+    {/* Title */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">Title:</label>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        placeholder="Enter title..."
+      />
+    </div>
+
+    {/* Description */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">Description:</label>
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        placeholder="Write description..."
+      />
+    </div>
+
+    {/* Date */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">Target Date:</label>
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+      />
+    </div>
+
+    {/* Privacy */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">Privacy:</label>
+      <select
+        value={privacy}
+        onChange={(e) => setPrivacy(e.target.value)}
+        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+      >
+        <option value="Public">🌍 Public</option>
+        <option value="Private">🔒 Private</option>
+      </select>
+    </div>
+
+   
+
+    {/* Save & Cancel */}
+    <div className="flex justify-end mt-4">
+      <button onClick={() => setBucketModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+        Cancel
+      </button>
+      <button onClick={handleSaveBucketList} className="px-4 py-2 ml-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340]">
+        Save
+      </button>
+    </div>
+  </DialogContent>
+  </Dialog>
+)}
       <div className="flex justify-center mt-10">
         {[ 'Reviews', 'Events', 'Discussion' ].map((tab) => (
           <button

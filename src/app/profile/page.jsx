@@ -27,7 +27,58 @@ const ProfilePage = () => {
     const [districts, setDistricts] = useState([]);
   const [activeTab, setActiveTab] = useState('profile'); 
  const [userName, setUserName] = useState(null);
+ const [title, setTitle] = useState("");
+const [description, setDescription] = useState("");
+const [privacy, setPrivacy] = useState("Public"); // if isActive depend on privacy
+const cookiesuserId = Cookies.get("userId");
+const [places, setPlaces] = useState([]);
+  const [lists, setLists] = useState([]);
+  const [selectedPlace, setSelectedPlace] = useState("");
+  const [selectedList, setSelectedList] = useState("");
+  const [spotModalOpen, setSpotModalOpen] = useState(false);
+ 
 //  const [userId, setUserId] = useState("");
+const createBucketList = async (payload) => {
+  try {
+    const res = await fetch("https://parjatak-core.vercel.app/api/v1/lists", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || "Something went wrong");
+    }
+    return data;
+  } catch (error) {
+    console.error("Create Bucket List Error:", error.message);
+    throw error;
+  }
+};
+  
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    userId: cookiesuserId,
+   
+    title,
+    description,
+    isActive: privacy === "Public" ? "true" : "false",
+  };
+
+  try {
+    const result = await createBucketList(payload);
+    console.log("Bucket list created:", result);
+    setIsModalOpen(false); // close modal
+  } catch (error) {
+    console.error("Failed to create bucket list:", error.message);
+  }
+};
 
   useEffect(() => {
     if (showModal) {
@@ -164,6 +215,73 @@ const ProfilePage = () => {
     { name: "Jaflong", image: "https://source.unsplash.com/600x400/?river,mountains" },
   ];
   
+
+  // Fetch places function
+  const fetchPlaces = async () => {
+    try {
+      const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/places");
+      const data = await response.json();
+      setPlaces(data.data); // API response structure anujayi
+    } catch (error) {
+      console.error("Error fetching places:", error);
+    }
+  };
+
+  // Fetch lists function
+  const fetchLists = async () => {
+    try {
+      const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/lists");
+      const data = await response.json();
+      const userLists = data.data.filter((list) => list.user.id === userId);
+      setLists(userLists);
+    } catch (error) {
+      console.error("Error fetching lists:", error);
+    }
+  };
+
+  // Fetch on modal open
+  useEffect(() => {
+    if (spotModalOpen) {
+      fetchPlaces();
+      fetchLists();
+    }
+  }, [spotModalOpen]);
+
+  const handleSpotSubmit = async () => {
+    if (!selectedPlace || !selectedList) {
+      alert("Please select both Place and List");
+      return;
+    }
+
+    const payload = {
+      userId : cookiesuserId,
+      listId: selectedList,
+      placeId: selectedPlace,
+      isActive: true,
+    };
+
+    try {
+      const response = await fetch("https://parjatak-core.vercel.app/api/v1/add-lists-places", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        alert("Spot added successfully!");
+        setSpotModalOpen(false);
+        setSelectedPlace("");
+        setSelectedList("");
+      } else {
+        alert("Failed to add spot!");
+      }
+    } catch (error) {
+      console.error("Error posting spot:", error);
+      alert("Something went wrong!");
+    }
+  };
 
   return (
     <div className="bg-white text-gray-900 min-h-screen">
@@ -572,19 +690,81 @@ const ProfilePage = () => {
   onClick={() => setIsModalOpen(true)}
  className="bg-[#8cc163] text-white px-3 lg:px-6 py-2 rounded-lg ml-[100px] lg:ml-[85%] mb-10 flex items-center gap-2 hover:bg-[#8fe44d]">
   <FaPlus /> {/* Icon here */}
-  Add to List
+  Create List
 </button>
  {/* Header */}
  <div className="flex  justify-between items-center mb-4 w-full">
   
    <h2 className="text-lg lg:text-3xl font-bold text-gray-800">Best Places for Camping</h2>
-   <button
- 
-  className="bg-[#8cc163] text-white px-2 lg:px-6 py-1 lg:py-2 rounded-lg flex items-center gap-2 hover:bg-[#8fe44d]"
->
-<FaPlus /> {/* Icon here */}
-  Add Spot
-</button>
+   <div>
+      {/* Add Spot Button */}
+      <button
+        className="bg-[#8cc163] text-white px-2 lg:px-6 py-1 lg:py-2 rounded-lg flex items-center gap-2 hover:bg-[#8fe44d]"
+        onClick={() => setSpotModalOpen(true)}
+      >
+        <FaPlus /> Add Spot on List
+      </button>
+
+      {/* Modal */}
+      {spotModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <motion.div 
+            className="bg-white p-6 rounded-lg w-11/12 md:w-1/3"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+          >
+            <h2 className="text-xl font-bold mb-4">Add Spot to List</h2>
+
+            <div className="mb-4">
+              <label className="block mb-1">Select Place</label>
+              <select
+                value={selectedPlace}
+                onChange={(e) => setSelectedPlace(e.target.value)}
+                className="w-full border p-2 rounded"
+              >
+                <option value="">Select a Place</option>
+                {places.map((place) => (
+                  <option key={place.id} value={place.id}>
+                    {place.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-1">Select List</label>
+              <select
+                value={selectedList}
+                onChange={(e) => setSelectedList(e.target.value)}
+                className="w-full border p-2 rounded"
+              >
+                <option value="">Select a List</option>
+                {lists.map((list) => (
+                  <option key={list.id} value={list.id}>
+                    {list.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setSpotModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSpotSubmit}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Submit
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </div>
  </div>
 
  {/* First Row - Best Camping Spots */}
@@ -612,75 +792,46 @@ const ProfilePage = () => {
 </Swiper>
 
 
- {/* Second Row - Adventure Camping */}
-<div className="flex  justify-between items-center mb-4 w-full mt-12">
-  
-   <h2 className="text-xl lg:text-3xl font-bold text-gray-800 ">Top Adventure Spots</h2>
-   <button
-  onClick={() => setIsModalOpen(true)}
-  className="bg-[#8cc163] text-white px-2 lg:px-6 py-1 lg:py-2 rounded-lg flex items-center gap-2 hover:bg-[#8fe44d]"
->
-<FaPlus /> {/* Icon here */}
-  Add Spot
-</button>
- </div>
 
- <Swiper slidesPerView={5} spaceBetween={16}  breakpoints={{
-    320: { slidesPerView: 1 }, // 1 slide on small screens (mobile)
-    480: { slidesPerView: 2 }, // 2 slides on small tablets
-    768: { slidesPerView: 3 }, // 3 slides on tablets
-    1024: { slidesPerView: 4 }, // 4 slides on desktops
-    1280: { slidesPerView: 5 }, // 5 slides on larger screens
-  }} className="w-full mt-4">
-   {spots2.map((spot, index) => (
-     <SwiperSlide key={index} className="w-[250px]">
-       <a href={spot.image} target="_blank" rel="noopener noreferrer">
-         <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
-           <img src={spot.image} alt={spot.name} className="w-full h-full object-cover" />
-         </div>
-         <p className="text-center mt-2 font-medium">{spot.name}</p>
-       </a>
-     </SwiperSlide>
-   ))}
- </Swiper>
+
 
  {/* Modal */}
  {isModalOpen && (
    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
      <div className="bg-white p-8 rounded-lg w-[600px]">
        <h2 className="text-2xl font-bold mb-4">Add New List</h2>
-       <form>
-         <label className="block mb-2">Title:</label>
-         <input type="text" className="w-full border px-3 py-2 rounded mb-3 bg-white" placeholder="Enter Title" />
+       <form onSubmit={handleSubmit}>
+  <label className="block mb-2">Title:</label>
+  <input
+    type="text"
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    className="w-full border px-3 py-2 rounded mb-3 bg-white"
+    placeholder="Enter Title"
+  />
 
-         {/* <label className="block mb-2">Image:</label>
-         <input type="file" className="w-full border px-3 py-2 rounded mb-3  bg-white" placeholder="Enter image" /> */}
+  <label className="block mb-2">Description:</label>
+  <textarea
+    value={description}
+    onChange={(e) => setDescription(e.target.value)}
+    className="w-full border px-3 py-2 rounded mb-3 bg-white"
+    placeholder="Enter description"
+  />
 
-         <label className="block mb-2">Description:</label>
-         <textarea className="w-full border px-3 py-2 rounded mb-3 bg-white" placeholder="Enter description"></textarea>
+  <div className="flex justify-end gap-2 mt-3">
+    <button
+      type="button"
+      onClick={() => setIsModalOpen(false)}
+      className="px-4 py-2 bg-gray-300 rounded"
+    >
+      Cancel
+    </button>
+    <button type="submit" className="px-4 py-2 bg-[#8cc163] text-white rounded">
+      Save Spot
+    </button>
+  </div>
+</form>
 
-         {/* <label className="block mb-2">Places:</label>
-<select className="w-full border px-3 py-2 rounded mb-3 bg-white">
-  <option value="">Select a Place</option>
-  <option value="coxsbazar">Cox's Bazar</option>
-  <option value="saintmartin">Saint Martin</option>
-  <option value="sajek">Sajek</option>
-</select> */}
-
-
-         <div className="flex justify-end gap-2 mt-3">
-           <button
-             type="button"
-             onClick={() => setIsModalOpen(false)}
-             className="px-4 py-2 bg-gray-300 rounded"
-           >
-             Cancel
-           </button>
-           <button type="submit" className="px-4 py-2 bg-[#8cc163] text-white rounded">
-             Save Spot
-           </button>
-         </div>
-       </form>
      </div>
    </div>
  )}
