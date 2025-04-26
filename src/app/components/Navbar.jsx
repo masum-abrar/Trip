@@ -104,8 +104,12 @@ const Navbar = ({ href, children }) => {
           >
             {isMenuOpen ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>
-          <Image src={logo} alt="logo" width={50} height={50} />
-          <a className="btn btn-ghost text-xl text-black">Parjatak</a>
+         <Link href="/" className="flex items-center">
+         <Image src={logo} alt="logo" width={60} height={60} />
+        
+        <h1 className=" text-xl font-bold text-black ml-0">Parjatak</h1>
+         </Link>
+       
         </div>
 
         {/* Navbar Center - Large Screens */}

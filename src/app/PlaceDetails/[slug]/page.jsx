@@ -8,6 +8,7 @@ import EventTabSection from "@/app/components/EventTabSection";
 import ReviewsTabSection from "@/app/components/ReviewsTabSection";
 import Link from "next/link";
 import Cookies from "js-cookie";
+import { motion } from "framer-motion";
 // const places = [
 //   { id: 1, title: "Jaflong", district: "Sylhet",  subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
 //   { id: 2, title: "Saint Martin", district: "CoxsBazar", subDistict:"Teknaf", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
@@ -40,6 +41,9 @@ const PlaceDetails = ({ params }) => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [privacy, setPrivacy] = useState("Public");
+  const [spotModalOpen, setSpotModalOpen] = useState(false);
+   const [selectedList, setSelectedList] = useState("");
+     const [lists, setLists] = useState([]);
   
 
   // if (!place) {
@@ -156,6 +160,60 @@ const PlaceDetails = ({ params }) => {
       }
     };
     
+
+     // Fetch lists function
+      const fetchLists = async () => {
+        try {
+          const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/lists");
+          const data = await response.json();
+          const userLists = data.data.filter((list) => list.user.id === cookiesuserId);
+          setLists(userLists);
+        } catch (error) {
+          console.error("Error fetching lists:", error);
+        }
+      };
+    
+      // Fetch on modal open
+      useEffect(() => {
+        if (spotModalOpen) {
+        
+          fetchLists();
+        }
+      }, [spotModalOpen]);
+
+
+      const handleSpotSubmit = async () => {
+       
+    
+        const payload = {
+          userId : cookiesuserId,
+          listId: selectedList,
+          placeId: place?.id,
+          isActive: true,
+        };
+    
+        try {
+          const response = await fetch("https://parjatak-core.vercel.app/api/v1/add-lists-places", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+    
+          if (response.ok) {
+            alert("Spot added successfully!");
+            setSpotModalOpen(false);
+            
+            setSelectedList("");
+          } else {
+            alert("Failed to add spot!");
+          }
+        } catch (error) {
+          console.error("Error posting spot:", error);
+          alert("Something went wrong!");
+        }
+      };
   return (
     <div className="bg-white">
       {/* Navbar */}
@@ -206,8 +264,8 @@ const PlaceDetails = ({ params }) => {
   {[
     { icon: "📖", text: "Add to Diary", onClick: () => setModalOpen(true) },
     { icon: "📌", text: "Add to Bucket List",  onClick: () => setBucketModalOpen(true) },
-    { icon: "📂", text: "Add to List", onClick : () => setListModalOpen(true) },
-    { icon: "⭐", text: "Add to Favorite Place" },
+    { icon: "📂", text: "Add to List", onClick : () => setSpotModalOpen(true) },
+    // { icon: "⭐", text: "Add to Favorite Place" },
     { icon: "🚶", text: "12k Visitor" },
     { icon: "✅", text: "Visited" },
   ].map((button, index) => (
@@ -426,76 +484,68 @@ const PlaceDetails = ({ params }) => {
 )}
 
 
-{isListModalOpen && (
-  <Dialog
-    className="max-w-[500px] mx-auto p-6"
-    open={isListModalOpen}
-    onClose={() => setListModalOpen(false)}
-  >
-    <DialogTitle className="text-center font-bold text-gray-900">📌 Add to Bucket List</DialogTitle>
-  <DialogContent className="lg:w-[350px]">
 
-    {/* Title */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Title:</label>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        placeholder="Enter title..."
-      />
-    </div>
+  {spotModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <motion.div 
+            className="bg-white p-6 rounded-lg w-11/12 md:w-1/3"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+          >
+            <h2 className="text-xl font-bold mb-4">Add Spot to List</h2>
 
-    {/* Description */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Description:</label>
-      <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        placeholder="Write description..."
-      />
-    </div>
+            {/* <div className="mb-4">
+              <label className="block mb-1">Select Place</label>
+              <select
+                value={selectedPlace}
+                onChange={(e) => setSelectedPlace(e.target.value)}
+                className="w-full border p-2 rounded"
+              >
+                <option value="">Select a Place</option>
+                {places.map((place) => (
+                  <option key={place.id} value={place.id}>
+                    {place.name}
+                  </option>
+                ))}
+              </select>
+            </div> */}
 
-    {/* Date */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Target Date:</label>
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
-      />
-    </div>
+            <div className="mb-4">
+              <label className="block mb-1">Select List</label>
+              <select
+                value={selectedList}
+                onChange={(e) => setSelectedList(e.target.value)}
+                className="w-full border p-2 rounded"
+              >
+                <option value="">Select a List</option>
+                {lists.map((list) => (
+                  <option key={list.id} value={list.id}>
+                    {list.title}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-    {/* Privacy */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Privacy:</label>
-      <select
-        value={privacy}
-        onChange={(e) => setPrivacy(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-      >
-        <option value="Public">🌍 Public</option>
-        <option value="Private">🔒 Private</option>
-      </select>
-    </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setSpotModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSpotSubmit}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Submit
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
-   
 
-    {/* Save & Cancel */}
-    <div className="flex justify-end mt-4">
-      <button onClick={() => setBucketModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
-        Cancel
-      </button>
-      <button onClick={handleSaveBucketList} className="px-4 py-2 ml-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340]">
-        Save
-      </button>
-    </div>
-  </DialogContent>
-  </Dialog>
-)}
+
       <div className="flex justify-center mt-10">
         {[ 'Reviews', 'Events', 'Discussion' ].map((tab) => (
           <button

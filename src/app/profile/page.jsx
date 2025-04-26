@@ -36,6 +36,8 @@ const [places, setPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState("");
   const [selectedList, setSelectedList] = useState("");
   const [spotModalOpen, setSpotModalOpen] = useState(false);
+  const [bucketList, setBucketList] = useState([]);
+  const [diaryList, setDiaryList] = useState([]);
  
 //  const [userId, setUserId] = useState("");
 const createBucketList = async (payload) => {
@@ -59,6 +61,52 @@ const createBucketList = async (payload) => {
   }
 };
   
+const fetchBucketList = async () => {
+  try {
+    const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/bucketLists");
+    const result = await response.json();
+
+    if (result?.data?.length > 0) {
+      const userLists = result.data.filter((list) => list.user?.id === userId);
+      setBucketList(userLists);
+    } else {
+      setBucketList([]);
+    }
+  } catch (error) {
+    console.error("Error fetching BucketList:", error);
+  }
+};
+
+useEffect(() => {
+  if (userId) {
+    fetchBucketList(); // 👈 ekhane function ta call hobe
+  }
+}, [userId]);
+
+
+ // Diary List Fetch
+ const fetchDiaryList = async () => {
+  try {
+    const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/diaries");
+    const result = await response.json();
+
+    if (result?.data?.length > 0) {
+      const userDiaries = result.data.filter((diary) => diary.user?.id === userId);
+      setDiaryList(userDiaries);
+    } else {
+      setDiaryList([]);
+    }
+  } catch (error) {
+    console.error("Error fetching DiaryList:", error);
+  }
+};
+
+useEffect(() => {
+  if (userId) {
+ 
+    fetchDiaryList();
+  }
+}, [userId]);
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -226,7 +274,7 @@ const handleSubmit = async (e) => {
       console.error("Error fetching places:", error);
     }
   };
-
+  
   // Fetch lists function
   const fetchLists = async () => {
     try {
@@ -237,16 +285,17 @@ const handleSubmit = async (e) => {
     } catch (error) {
       console.error("Error fetching lists:", error);
     }
+    
   };
-
+  fetchLists();
   // Fetch on modal open
   useEffect(() => {
     if (spotModalOpen) {
       fetchPlaces();
-      fetchLists();
+    
     }
   }, [spotModalOpen]);
-
+  
   const handleSpotSubmit = async () => {
     if (!selectedPlace || !selectedList) {
       alert("Please select both Place and List");
@@ -444,14 +493,14 @@ const handleSubmit = async (e) => {
             >
               Activity
             </li>
-            <li
+            {/* <li
               className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                 activeTab === 'place' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
               }`}
               onClick={() => handleTabClick('place')}
             >
               Place
-            </li>
+            </li> */}
             <li
               className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                 activeTab === 'diary' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
@@ -460,14 +509,14 @@ const handleSubmit = async (e) => {
             >
               Diary
             </li>
-            <li
+            {/* <li
               className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                 activeTab === 'reviews' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
               }`}
               onClick={() => handleTabClick('reviews')}
             >
               Reviews
-            </li>
+            </li> */}
             <li
               className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                 activeTab === 'list' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
@@ -569,25 +618,26 @@ const handleSubmit = async (e) => {
 
 {/* Diary Section */}
 {activeTab === 'diary' && (
-  <div className="p-6">
-    <h2 className="text-3xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2 text-center">Diary Entries</h2>
-    <div className="space-y-4">
-      <div className="bg-white rounded shadow-md overflow-hidden">
-        <img className="w-full h-48 object-cover" src="https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg" alt="Srimangal" />
-        <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-700">Day 1: Exploring Srimangal</h3>
-          <p className="text-gray-600">The lush green tea gardens and quiet countryside offered the perfect escape from city life.</p>
-        </div>
-      </div>
-      <div className="bg-white rounded shadow-md overflow-hidden">
-        <img className="w-full h-48 object-cover" src="https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" alt="Sundarbans" />
-        <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-700">Day 3: Boating in Sundarbans</h3>
-          <p className="text-gray-600">Cruising through the serene waterways and spotting exotic wildlife was an unforgettable experience.</p>
-        </div>
-      </div>
-    </div>
-  </div>
+   <div className="p-6">
+
+   {/* Diary Entries */}
+   <h2 className="text-3xl font-bold text-gray-800 mt-12 mb-4 border-b-2 border-gray-300 pb-2 text-center">Diary Entries</h2>
+   <div className="space-y-4">
+     {diaryList.map((diary) => (
+       <div key={diary.id} className="bg-white rounded shadow-md overflow-hidden">
+         <img
+           className="w-full h-48 object-cover"
+           src={diary.place?.images?.[0]?.image || "https://via.placeholder.com/300x200"}
+           alt={diary.place?.name || "Diary Image"}
+         />
+         <div className="p-6">
+           <h3 className="text-xl font-semibold text-gray-700">{diary.title}</h3>
+           <p className="text-gray-600">{diary.description}</p>
+         </div>
+       </div>
+     ))}
+   </div>
+ </div>
 )}
 
 {/* Reviews Section */}
@@ -633,25 +683,31 @@ const handleSubmit = async (e) => {
 
 {/* Bucket List Section */}
 {activeTab === 'bucket' && (
-  <div className="p-6">
-    <h2 className="text-3xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2 text-center">Bucket List</h2>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-        <img className="w-full h-48 object-cover" src="https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg" alt="Sajek Valley" />
-        <div className="px-6 py-4">
-          <div className="font-bold text-xl mb-2 text-gray-700">Sajek Valley</div>
-          <p className="text-gray-600 text-base">Trek to the clouds and stay in cozy hillside cottages. A must-visit for adventure lovers.</p>
-        </div>
-      </div>
-      <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-        <img className="w-full h-48 object-cover" src="https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg" alt="Jaflong" />
-        <div className="px-6 py-4">
-          <div className="font-bold text-xl mb-2 text-gray-700">Jaflong</div>
-          <p className="text-gray-600 text-base">Crystal-clear rivers and beautiful hills await you here. A picturesque getaway.</p>
-        </div>
-      </div>
-    </div>
-  </div>
+ <div className="p-6">
+ <h2 className="text-3xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2 text-center">
+   Bucket List
+ </h2>
+
+ <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+   {bucketList.map((item) => (
+     <div key={item.id} className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
+       <img
+         className="w-full h-48 object-cover"
+         src={item.place?.images[0]?.image || 'https://via.placeholder.com/400x300'}
+         alt={item.place?.name || "Place Image"}
+       />
+       <div className="px-6 py-4">
+         <div className="font-bold text-xl mb-2 text-gray-700">
+           {item.place?.name || item.title}
+         </div>
+         <p className="text-gray-600 text-base">
+           {item.description || 'No Description'}
+         </p>
+       </div>
+     </div>
+   ))}
+ </div>
+</div>
 )}
 
 {/* Events Section */}
@@ -683,6 +739,11 @@ const handleSubmit = async (e) => {
     </div>
   </div>
 )}
+
+
+
+
+
 {/* List Section */}
 {activeTab === 'list' && (
  <div className="p-6 w-full">
@@ -695,11 +756,11 @@ const handleSubmit = async (e) => {
  {/* Header */}
  <div className="flex  justify-between items-center mb-4 w-full">
   
-   <h2 className="text-lg lg:text-3xl font-bold text-gray-800">Best Places for Camping</h2>
+   {/* <h2 className="text-lg lg:text-3xl font-bold text-gray-800">Best Places for Camping</h2> */}
    <div>
       {/* Add Spot Button */}
       <button
-        className="bg-[#8cc163] text-white px-2 lg:px-6 py-1 lg:py-2 rounded-lg flex items-center gap-2 hover:bg-[#8fe44d]"
+        className="bg-[#8cc163] text-white px-2 lg:px-6 py-1 lg:py-2 rounded-lg flex items-center   gap-2 hover:bg-[#8fe44d]"
         onClick={() => setSpotModalOpen(true)}
       >
         <FaPlus /> Add Spot on List
@@ -768,28 +829,56 @@ const handleSubmit = async (e) => {
  </div>
 
  {/* First Row - Best Camping Spots */}
- <Swiper
-  spaceBetween={16}
-  breakpoints={{
-    320: { slidesPerView: 1 }, // 1 slide on small screens (mobile)
-    480: { slidesPerView: 2 }, // 2 slides on small tablets
-    768: { slidesPerView: 3 }, // 3 slides on tablets
-    1024: { slidesPerView: 4 }, // 4 slides on desktops
-    1280: { slidesPerView: 5 }, // 5 slides on larger screens
-  }}
-  className="w-full"
->
-  {spots1.map((spot, index) => (
-    <SwiperSlide key={index} className="w-[250px]">
-      <a href={spot.image} target="_blank" rel="noopener noreferrer">
-        <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
-          <img src={spot.image} alt={spot.name} className="w-full h-full object-cover" />
-        </div>
-        <p className="text-center mt-2 font-medium">{spot.name}</p>
-      </a>
-    </SwiperSlide>
-  ))}
-</Swiper>
+
+{lists.map((spot, index) => (
+  <div key={index} className="mb-8">
+    {/* List Title */}
+    <h2 className="text-lg lg:text-3xl font-bold text-gray-800 mb-4">{spot.title}</h2>
+
+    {/* Swiper for places */}
+    {spot.listPlace.length > 0 ? (
+      <Swiper
+        spaceBetween={20}
+        slidesPerView={2}
+        breakpoints={{
+          640: { slidesPerView: 2 },
+          768: { slidesPerView: 3 },
+          1024: { slidesPerView: 4 },
+        }}
+      >
+        {spot.listPlace.map((listPlaceItem, idx) => (
+          <SwiperSlide key={idx} className="w-[250px]">
+            <a
+              href={listPlaceItem.place?.images[0]?.image}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block mb-4"
+            >
+              <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+                <img
+                  src={listPlaceItem.place?.images[0]?.image}
+                  alt={listPlaceItem.place?.name || "Place Image"}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p className="text-center mt-2 font-medium text-gray-700">
+                {listPlaceItem.place?.name}
+              </p>
+            </a>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    ) : (
+      <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
+        <p>No Places Added</p>
+      </div>
+    )}
+  </div>
+))}
+
+
+
+
 
 
 
