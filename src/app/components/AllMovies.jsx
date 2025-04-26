@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 const AllPlaces = () => {
   const [places, setPlaces] = useState([]);
-  const [loading, setLoading] = useState(true);
+
   const movies = [
     { id: 1, title: 'Jaflong', district: "Chittagong", image: 'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg', eyeCount: '990k', dotCount: '194k', heartCount: '366k' },
     { id: 2, title: 'Saint Martin', district: "CoxsBazar", image: 'https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg', eyeCount: '890k', dotCount: '134k', heartCount: '456k' },
@@ -17,7 +17,14 @@ const AllPlaces = () => {
   ];
 
 
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (places?.length > 0) {
+      setLoading(false);
+    }
+  }, [places]);
+  
   const settings = {
     dots: false, 
     infinite: true,
@@ -69,25 +76,32 @@ const AllPlaces = () => {
       <hr className="bg-gray-400 mb-6" />
 
       {/* Card Slider */}
-    <Slider {...settings}>
-        {places?.map((place) => (
-           <Link href={`/PlaceDetails/${place.slug}`} key={place.id}> 
+      <Slider {...settings}>
+  {loading
+    ? Array.from({ length: 5 }).map((_, index) => (
+        <div
+          key={index}
+          className="relative bg-gray-200 shadow-md rounded-lg p-4 w-full h-64 animate-pulse"
+        >
+          <div className="w-full h-[75%] bg-gray-300 rounded-lg mb-4"></div>
+          <div className="w-3/4 h-4 bg-gray-300 rounded mb-2"></div>
+          <div className="w-1/2 h-4 bg-gray-300 rounded"></div>
+        </div>
+      ))
+    : places?.map((place) => (
+        <Link href={`/PlaceDetails/${place.slug}`} key={place.id}>
           <div
-            key={place.id}
             className="relative bg-white shadow-md rounded-lg p-4 w-full h-64 group overflow-hidden transition-all duration-300"
           >
-            {/* Movie Image */}
+            {/* Real Card Design */}
             <img
               src={place.images[0]?.image || "https://via.placeholder.com/600x400"}
               alt={place.name}
-              className="w-full h-[75%] object-cover rounded-lg "
+              className="w-full h-[75%] object-cover rounded-lg"
             />
-            {/* Movie Title */}
             <div className="absolute top-[0px] left-1/2 w-full lg:w-[40%] transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-800 text-white text-xs font-bold py-1 px-2 rounded-lg shadow-lg text-center">
               {place.name}
             </div>
-
-            {/* Overlay with Movie Info */}
             <div className="absolute top-0 left-0 w-full h-[60%] flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 sm:top-40">
               <div className="lg:flex justify-center gap-4 bg-stone-900 p-2 rounded-lg transform group-hover:scale-90 sm:group-hover:scale-100 transition-transform duration-300">
                 <div className="lg:flex items-center text-white text-sm group-hover:text-xs sm:group-hover:text-sm">
@@ -104,9 +118,7 @@ const AllPlaces = () => {
                 </div>
               </div>
             </div>
-
-            {/* Bottom Info (Visible on Large Screens) */}
-            <div className=" lg:top-12 lg:left-0 w-full flex justify-center items-center px-2 text-base">
+            <div className="lg:top-12 lg:left-0 w-full flex justify-center items-center px-2 text-base">
               <div className="flex items-center text-green-500 px-2 py-1 rounded">
                 <FaEye className="mr-1" />
                 <span>{place.viewCount}</span>
@@ -121,9 +133,10 @@ const AllPlaces = () => {
               </div>
             </div>
           </div>
-          </Link>
-        ))}
-      </Slider>
+        </Link>
+      ))}
+</Slider>
+
  
     </div>
   );
