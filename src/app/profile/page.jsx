@@ -9,6 +9,10 @@ import "swiper/css/navigation";
 import { FaPlus } from "react-icons/fa";
 import Cookies from "js-cookie";
 import { motion } from "framer-motion";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 
 
 
@@ -38,6 +42,7 @@ const [places, setPlaces] = useState([]);
   const [spotModalOpen, setSpotModalOpen] = useState(false);
   const [bucketList, setBucketList] = useState([]);
   const [diaryList, setDiaryList] = useState([]);
+  const [loading, setLoading] = useState(true);
  
 //  const [userId, setUserId] = useState("");
 const createBucketList = async (payload) => {
@@ -63,12 +68,14 @@ const createBucketList = async (payload) => {
   
 const fetchBucketList = async () => {
   try {
+    setLoading(true);
     const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/bucketLists");
     const result = await response.json();
 
     if (result?.data?.length > 0) {
       const userLists = result.data.filter((list) => list.user?.id === userId);
       setBucketList(userLists);
+      setLoading(false);
     } else {
       setBucketList([]);
     }
@@ -113,7 +120,6 @@ const handleSubmit = async (e) => {
 
   const payload = {
     userId: cookiesuserId,
-   
     title,
     description,
     isActive: privacy === "Public" ? "true" : "false",
@@ -121,12 +127,22 @@ const handleSubmit = async (e) => {
 
   try {
     const result = await createBucketList(payload);
-    console.log("Bucket list created:", result);
-    setIsModalOpen(false); // close modal
+    toast.success("List created successfully!");
+    setIsModalOpen(false); // Close modal
+    setTitle("");
+    setDescription("");
   } catch (error) {
     console.error("Failed to create bucket list:", error.message);
+
+    // Check for the "already exists" error and show appropriate toast
+    if (error.message.includes("already exists")) {
+      toast.error("Bucket list with this name already exists. Please change the name.");
+    } else {
+      toast.error("Failed to create bucket list. Please try again.");
+    }
   }
 };
+
 
   useEffect(() => {
     if (showModal) {
@@ -210,7 +226,7 @@ const handleSubmit = async (e) => {
         Cookies.set("userDivision", division);
         Cookies.set("userDistrict", district);
 
-        alert("Profile updated successfully!");
+       toast.success("Profile updated successfully!");
         setShowModal(false);
       } else {
         alert("Failed to update: " + result.message);
@@ -319,7 +335,7 @@ const handleSubmit = async (e) => {
       });
 
       if (response.ok) {
-        alert("Spot added successfully!");
+       toast.success("Spot added successfully!");
         setSpotModalOpen(false);
         setSelectedPlace("");
         setSelectedList("");
@@ -617,25 +633,43 @@ const handleSubmit = async (e) => {
 )}
 
 {/* Diary Section */}
+
+
 {activeTab === 'diary' && (
    <div className="p-6">
-
    {/* Diary Entries */}
-   <h2 className="text-3xl font-bold text-gray-800 mt-12 mb-4 border-b-2 border-gray-300 pb-2 text-center">Diary Entries</h2>
+   <h2 className="text-3xl font-bold text-gray-800 mt-12 mb-4 border-b-2 border-gray-300 pb-2 text-center">
+     Diary Entries
+   </h2>
+   
    <div className="space-y-4">
-     {diaryList.map((diary) => (
-       <div key={diary.id} className="bg-white rounded shadow-md overflow-hidden">
-         <img
-           className="w-full h-48 object-cover"
-           src={diary.place?.images?.[0]?.image || "https://via.placeholder.com/300x200"}
-           alt={diary.place?.name || "Diary Image"}
-         />
-         <div className="p-6">
-           <h3 className="text-xl font-semibold text-gray-700">{diary.title}</h3>
-           <p className="text-gray-600">{diary.description}</p>
+     {loading ? (
+       // Skeleton loader while data is loading
+       Array.from({ length: 3 }).map((_, index) => (
+         <div key={index} className="bg-white rounded shadow-md overflow-hidden animate-pulse">
+           <div className="w-full h-48 bg-gray-300"></div>
+           <div className="p-6">
+             <div className="h-6 bg-gray-300 rounded mb-2"></div>
+             <div className="h-4 bg-gray-300 rounded"></div>
+           </div>
          </div>
-       </div>
-     ))}
+       ))
+     ) : (
+       // Render actual data once it's loaded
+       diaryList.map((diary) => (
+         <div key={diary.id} className="bg-white rounded shadow-md overflow-hidden">
+           <img
+             className="w-full h-48 object-cover"
+             src={diary.place?.images?.[0]?.image || "https://via.placeholder.com/300x200"}
+             alt={diary.place?.name || "Diary Image"}
+           />
+           <div className="p-6">
+             <h3 className="text-xl font-semibold text-gray-700">{diary.title}</h3>
+             <p className="text-gray-600">{diary.description}</p>
+           </div>
+         </div>
+       ))
+     )}
    </div>
  </div>
 )}
@@ -683,30 +717,44 @@ const handleSubmit = async (e) => {
 
 {/* Bucket List Section */}
 {activeTab === 'bucket' && (
- <div className="p-6">
- <h2 className="text-3xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2 text-center">
-   Bucket List
- </h2>
+  <div className="p-6">
+  <h2 className="text-3xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2 text-center">
+    Bucket List
+  </h2>
 
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-   {bucketList.map((item) => (
-     <div key={item.id} className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-       <img
-         className="w-full h-48 object-cover"
-         src={item.place?.images[0]?.image || 'https://via.placeholder.com/400x300'}
-         alt={item.place?.name || "Place Image"}
-       />
-       <div className="px-6 py-4">
-         <div className="font-bold text-xl mb-2 text-gray-700">
-           {item.place?.name || item.title}
-         </div>
-         <p className="text-gray-600 text-base">
-           {item.description || 'No Description'}
-         </p>
-       </div>
-     </div>
-   ))}
- </div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {loading ? (
+      // Skeleton Loader while data is loading
+      Array.from({ length: 3 }).map((_, index) => (
+        <div key={index} className="max-w-sm rounded overflow-hidden shadow-lg bg-white animate-pulse">
+          <div className="w-full h-48 bg-gray-300"></div>
+          <div className="px-6 py-4">
+            <div className="h-6 bg-gray-300 rounded mb-2"></div>
+            <div className="h-4 bg-gray-300 rounded"></div>
+          </div>
+        </div>
+      ))
+    ) : (
+      // Render actual data once it's loaded
+      bucketList.map((item) => (
+        <div key={item.id} className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
+          <img
+            className="w-full h-48 object-cover"
+            src={item.place?.images[0]?.image || 'https://via.placeholder.com/400x300'}
+            alt={item.place?.name || "Place Image"}
+          />
+          <div className="px-6 py-4">
+            <div className="font-bold text-xl mb-2 text-gray-700">
+              {item.place?.name || item.title}
+            </div>
+            <p className="text-gray-600 text-base">
+              {item.description || 'No Description'}
+            </p>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
 </div>
 )}
 
@@ -760,7 +808,7 @@ const handleSubmit = async (e) => {
    <div>
       {/* Add Spot Button */}
       <button
-        className="bg-[#8cc163] text-white px-2 lg:px-6 py-1 lg:py-2 rounded-lg flex items-center   gap-2 hover:bg-[#8fe44d]"
+        className="bg-[#8cc163] text-white px-3 py-2 lg:px-6  lg:py-2 rounded-lg flex items-center ml-[100px]  gap-2 hover:bg-[#8fe44d]"
         onClick={() => setSpotModalOpen(true)}
       >
         <FaPlus /> Add Spot on List
@@ -888,7 +936,7 @@ const handleSubmit = async (e) => {
  {isModalOpen && (
    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
      <div className="bg-white p-8 rounded-lg w-[600px]">
-       <h2 className="text-2xl font-bold mb-4">Add New List</h2>
+       <h2 className="text-2xl font-bold mb-4">Create New List</h2>
        <form onSubmit={handleSubmit}>
   <label className="block mb-2">Title:</label>
   <input
@@ -916,7 +964,7 @@ const handleSubmit = async (e) => {
       Cancel
     </button>
     <button type="submit" className="px-4 py-2 bg-[#8cc163] text-white rounded">
-      Save Spot
+      Save list
     </button>
   </div>
 </form>
@@ -962,6 +1010,7 @@ const handleSubmit = async (e) => {
       <div className="w-full">
         <Footer />
       </div>
+       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
