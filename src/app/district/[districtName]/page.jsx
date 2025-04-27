@@ -123,14 +123,14 @@ const DistrictPage  = ({ params }) => {
       <div className="relative w-full h-64">
   <img
     src={community?.images?.[0]?.image || "https://via.placeholder.com/600x400"}
-    alt="District"
+    alt=""
     className="w-full h-full object-cover"
   />
 
 
     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <h1 className="text-3xl lg:text-4xl font-bold text-white">
-        {community?.name.charAt(0).toUpperCase() + community?.name.slice(1)}
+        {community?.name.charAt(0).toUpperCase() + community?.name.slice(1) || "loading District..."}
       </h1>
       <button
   onClick={handleJoin}
