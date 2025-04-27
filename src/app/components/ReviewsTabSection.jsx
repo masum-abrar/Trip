@@ -144,7 +144,7 @@ const ReviewsTabSection = ({locationData}) => {
       {/* <Button variant="contained" color="primary" className="mt-6" onClick={() => setIsModalOpen(true)}>
         ✍️ Write a Review
       </Button> */}
-     <div className="flex justify-end mt-6 mb-6">
+     <div className="flex justify-end mt-6 mb-10">
   <button onClick={() => setIsModalOpen(true)} className="bg-[#8cc163] text-white px-4 py-2 rounded-md">
     ✍️ Write a Review
   </button>

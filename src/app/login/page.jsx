@@ -106,8 +106,8 @@ if (token) {
                 Sign Up
               </motion.span>
             </p>
-            <p className="text-sm mt-8 text-center">
- <span className="font-bold"> Forgot your password?</span> Please email us at{" "}
+            <p className="text-sm mt-8 text-center text-black">
+ <span className="font-bold text-black"> Forgot your password?</span> Please email us at{" "}
   <a href="mailto:support@parjatak.com" className="text-[#8cc163] underline">
     support@parjatak.com
   </a>{" "}

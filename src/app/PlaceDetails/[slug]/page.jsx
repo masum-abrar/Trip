@@ -492,7 +492,7 @@ const PlaceDetails = ({ params }) => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
           >
-            <h2 className="text-xl font-bold mb-4">Add Spot to List</h2>
+            <h2 className="text-xl font-bold mb-4 text-black">Add Spot to List</h2>
 
             {/* <div className="mb-4">
               <label className="block mb-1">Select Place</label>
@@ -511,11 +511,11 @@ const PlaceDetails = ({ params }) => {
             </div> */}
 
             <div className="mb-4">
-              <label className="block mb-1">Select List</label>
+              <label className="block mb-1 text-black">Select List</label>
               <select
                 value={selectedList}
                 onChange={(e) => setSelectedList(e.target.value)}
-                className="w-full border p-2 rounded"
+                className="w-full border p-2 rounded bg-white text-black"
               >
                 <option value="">Select a List</option>
                 {lists.map((list) => (
@@ -529,7 +529,7 @@ const PlaceDetails = ({ params }) => {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setSpotModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="px-4 py-2 bg-gray-500 rounded hover:bg-gray-400"
               >
                 Cancel
               </button>
