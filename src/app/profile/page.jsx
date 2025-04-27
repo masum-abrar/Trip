@@ -363,7 +363,7 @@ const handleSubmit = async (e) => {
             </div>
             <div>
               <h1 className="text-3xl font-bold">{userName}</h1>
-              <p className="text-lg text-gray-600">ID: {userId}</p>
+              {/* <p className="text-lg text-gray-600">ID: {userId}</p> */}
               <p className="text-gray-500 text-sm mt-1">Traveler | Explorer | Nature Enthusiast</p> {/* Short Bio */}
               <button
         onClick={() => setShowModal(true)}
