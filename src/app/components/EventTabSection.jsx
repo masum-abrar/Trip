@@ -284,7 +284,7 @@ const districtId = PostData?.id;
   
       // ✅ Refresh server-rendered data (like updated comments)
       router.refresh();
-  
+      fetchCommunity() 
     } catch (err) {
       console.error("Failed to post comment:", err);
     } finally {
@@ -333,7 +333,7 @@ const districtId = PostData?.id;
       setReplyTexts(prev => ({ ...prev, [commentId]: "" }));
       setShowReplyInput(prev => ({ ...prev, [commentId]: false }));
       router.refresh(); 
-  
+      fetchCommunity() 
     } catch (error) {
       console.error("Reply failed:", error);
     }
@@ -386,6 +386,35 @@ const districtId = PostData?.id;
       console.error("Error liking post:", error);
     }
   };
+
+const handleUnlike = async (postId, parentUserId) => {
+  try {
+    const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-post-like", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        postId: postId,
+        userId: cookiesuserId,
+        parentUserId: parentUserId,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to unlike the post");
+    }
+
+    console.log("Successfully unliked the post");
+  } catch (error) {
+    console.error("Error unliking post:", error);
+  }
+};
+
+  
+  
+  
+  
   return (
     <div>
         <div className="space-y-6">
@@ -578,14 +607,22 @@ const districtId = PostData?.id;
 
               {/* Like Button */}
               <button className="flex items-center gap-1 text-black mt-2">
-              {post.like.some(like => like.user?.id === cookiesuserId) ? (
-  <FaHeart  className="text-red-500" />
-) : (
-  <FaRegHeart  onClick={() => handleLike(post.id)} />
-)}
+  {post.like.some(like => like.user?.id === cookiesuserId) ? (
+    <FaHeart 
+      className="text-red-500 cursor-pointer"
+      onClick={() => handleUnlike(post.id, post.user?.id)}
+    />
+  ) : (
+    <FaRegHeart 
+      className="cursor-pointer"
+      onClick={() => handleLike(post.id)}
+    />
+  )}
 
-      {post.like.length} {/* Or you can keep likeCount state for dynamic update */}
-    </button>
+  {post.like.length}
+</button>
+
+
 
       
              

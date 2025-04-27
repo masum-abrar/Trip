@@ -17,6 +17,11 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
  const [locationData, setLocationData] = useState(null);
   const [activeTab, setActiveTab] = useState('Discussion');
   const districtId = PostData?.id;
+  const cookiesuserId = Cookies.get("userId");
+  const [liked, setLiked] = useState(false);
+   const [comments, setComments] = useState({});
+    const [loading, setLoading] = useState(false);
+     const [userId, setUserId] = useState(null);
   // const [newPost, setNewPost] = useState({
   //   text: "",
   //   images: [],
@@ -99,30 +104,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
   const [showReplyInput, setShowReplyInput] = useState({});
   const [replyTexts, setReplyTexts] = useState({});
 
-  const handleReplyToggle = (postId, commentId) => {
-    setShowReplyInput(prev => ({ ...prev, [commentId]: !prev[commentId] }));
-  };
-
-  const handleReply = (postId, commentId) => {
-    if (replyTexts[commentId]?.trim()) {
-      setPosts(posts.map(post =>
-        post.id === postId
-          ? {
-              ...post,
-              comments: post.comments.map(comment =>
-                comment.id === commentId
-                  ? {
-                      ...comment,
-                      replies: [...comment.replies, { id: Date.now(), text: replyTexts[commentId], user: "User" }]
-                    }
-                  : comment
-              )
-            }
-          : post
-      ));
-      setReplyTexts(prev => ({ ...prev, [commentId]: '' }));
-    }
-  };
+ 
 
   // const handlePost = () => {
   //   if (!newPost.text.trim() && newPost.images.length === 0) {
@@ -317,30 +299,186 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         const data = await response.json();
         console.log("Post created successfully:", data);
         toast.success("Post has been created");
+        fetchCommunity() 
       } catch (error) {
         console.error("Post creation failed:", error);
       }
+      
     }
+   useEffect(() => {
+      const idFromCookie = Cookies.get("userId");
+      if (idFromCookie) {
+        setUserId(idFromCookie);
+      }
+    }, []);
   
 
     // Display the posts
 
-
+    const fetchCommunity = async () => {
+      try {
+        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-posts-discussion/${districtId}`);
+        const data = await response.json();
+        setLocationData(data.data);
+      } catch (error) {
+        console.error('Failed to fetch community:', error);
+      }
+    };
     useEffect(() => {
-        const fetchCommunity = async () => {
-          try {
-            const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-posts-discussion/${districtId}`);
-            const data = await response.json();
-            setLocationData(data.data);
-          } catch (error) {
-            console.error('Failed to fetch community:', error);
-          }
-        };
+       
       
         if (districtId) {
           fetchCommunity();
         }
       }, [districtId]);
+
+
+      //Post Like and Unlike
+      const handleLike = async (postId) => {
+        try {
+          await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-like", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              postId,
+              userId: cookiesuserId,
+              parentUserId: null,
+            }),
+          });
+    
+          // Toggle like state (optional — for instant UI feedback)
+          setLiked((prev) => !prev);
+          fetchCommunity() 
+        } catch (error) {
+          console.error("Error liking post:", error);
+        }
+      };
+    
+      const handleUnlike = async (postId, parentUserId) => {
+        try {
+          const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-post-like", {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              postId: postId,
+              userId: cookiesuserId,
+              parentUserId: null,
+            }),
+          });
+      
+          if (!res.ok) {
+            throw new Error("Failed to unlike the post");
+          }
+      
+          console.log("Successfully unliked the post");
+        } catch (error) {
+          console.error("Error unliking post:", error);
+        }
+      };
+
+
+
+
+
+
+
+
+
+       const handleCommentChange = (postId, value) => {
+          setComments(prev => ({
+            ...prev,
+            [postId]: value,
+          }));
+        };
+      
+        const handleCommentSubmit = async (postId) => {
+          const comment = comments[postId];
+          if (!comment?.trim()) return;
+        
+          setLoading(true);
+          try {
+            const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-comment", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                postId: postId,
+                parentUserId: null,
+                userId,
+                comment,
+              }),
+            });
+        
+            const data = await res.json();
+            console.log("Comment posted:", data);
+        
+           
+            setComments(prev => ({
+              ...prev,
+              [postId]: "",
+            }));
+        
+            // ✅ Refresh server-rendered data (like updated comments)
+            router.refresh();
+            fetchCommunity() 
+          } catch (err) {
+            console.error("Failed to post comment:", err);
+          } finally {
+            setLoading(false);
+          }
+        };
+        
+      
+        const handleReplyToggle = (commentId) => {
+          setShowReplyInput(prev => ({
+            ...prev,
+            [commentId]: !prev[commentId],
+          }));
+        };
+        
+        
+        const [showAllCommentsForPost, setShowAllCommentsForPost] = useState({});
+      
+        const handleToggleAllComments = (postId) => {
+          setShowAllCommentsForPost(prev => ({
+            ...prev,
+            [postId]: !prev[postId],
+          }));
+        };
+        
+        const handleReply = async (postId, commentId, parentUserId) => {
+          const reply = replyTexts[commentId];
+          if (!reply?.trim()) return;
+        
+          try {
+            const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-comment-reply", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                postId,
+                postCommentId: commentId,
+                parentUserId,
+                userId,
+                reply
+              }),
+            });
+        
+            const data = await res.json();
+            console.log("Reply posted:", data);
+        
+            setReplyTexts(prev => ({ ...prev, [commentId]: "" }));
+            setShowReplyInput(prev => ({ ...prev, [commentId]: false }));
+            router.refresh(); 
+            fetchCommunity() 
+          } catch (error) {
+            console.error("Reply failed:", error);
+          }
+        };
+        
+      
   return (
     <div>
      <div className="space-y-6">
@@ -511,8 +649,126 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
 
         <p className="mt-2 text-gray-800">{post?.title}</p>
 
+
+
+ {/* Like Button */}
+              <button  className="flex items-center gap-1 text-black mt-2" >
+  {post.like.some(like => like.user?.id === cookiesuserId) ? (
+    <FaHeart 
+      className="text-red-500 cursor-pointer"
+      onClick={() => handleUnlike(post.id, post.user?.id)} 
+    />
+  ) : (
+    <FaRegHeart 
+      className="cursor-pointer"
+      onClick={() => handleLike(post.id)}
+    />
+  )}
+
+  {post.like.length}
+</button>
+
+
+          {/* Add Comment Input */}
+              <div className="flex items-center gap-2 mt-2">
+            <input
+              type="text"
+              value={comments[post.id] || ""}
+              onChange={(e) => handleCommentChange(post.id, e.target.value)}
+              placeholder="Write a comment..."
+              className="flex-1 w-36 p-2 border rounded-md text-black focus:ring-2 focus:ring-blue-400 bg-white"
+            />
+            <button
+              onClick={() => handleCommentSubmit(post.id)}
+              disabled={loading || !userId}
+              className="bg-[#8cc163] text-white px-4 py-1 rounded-md"
+            >
+              {loading ? "Posting..." : "Comment"}
+            </button>
+          </div>
+          {/* Display Comments */}
+        
+          <div>
+
+
+  {/* Slice logic: only show 2 unless showAllComments is true */}
+  <div>
+  {(post.comment.slice(0, showAllCommentsForPost[post.id] ? post.comment.length : 2)).map((comment) => (
+  <div key={comment.id} className="flex flex-col gap-1 mt-2 ml-4 bg-gray-100 p-2 rounded-md">
+    <div className="flex items-center gap-2">
+      <FaUserCircle className="text-xl text-gray-600" />
+      <span className="font-semibold text-gray-800">{comment.user.name}</span>
+    </div>
+   <div  className="flex justify-between ">
+   <p className="text-gray-700 ml-7">{comment.comment}</p>
+ {/* Replies Section */}
+
+{/* Reply Button */}
+<button
+  onClick={() => handleReplyToggle(comment.id)}
+  className="text-blue-500 text-sm mr-3"
+>
+  Reply
+</button>
+   </div>
+   {comment.reply?.length > 0 && (
+      <div className="mt-2 ">
+        {comment.reply.map((reply) => (
+          <div key={reply.id} className="flex flex-col gap-1 mt-1  bg-white p-2 rounded-md border-l-4 border-[#8cc163] w-full">
+            <div className="flex items-center gap-2">
+              <img
+                src={reply.user?.image || "https://cdn-icons-png.flaticon.com/512/9368/9368192.png"}
+                alt={reply.user?.name}
+                className="w-6 h-6 rounded-full object-cover"
+              />
+              <span className="text-sm font-medium text-gray-800">{reply.user?.name}</span>
+            </div>
+            <p className="ml-7 text-sm text-gray-700">{reply.reply}</p>
+          </div>
+        ))}
+      </div>
+    )}
+    {/* Reply Input Box */}
+    {showReplyInput[comment.id] && (
+      <div className="flex items-center gap-2 mt-1 ml-7">
+        <input
+          type="text"
+          placeholder="Write a reply..."
+          className="border p-1 rounded-md flex-1 text-black"
+          value={replyTexts[comment.id] || ''}
+          onChange={(e) => setReplyTexts({ ...replyTexts, [comment.id]: e.target.value })}
+        />
+        <FaPaperPlane
+          className="text-[#8cc163] cursor-pointer"
+          onClick={() => handleReply(post.id, comment.id, comment.user.id)}
+        />
+      </div>
+    )}
+
+
+  </div>
+))}
+
+
+  {/* Only show the button if there are more than 2 comments */}
+  {post.comment.length > 2 && (
+    <button
+      onClick={() => handleToggleAllComments(post.id)}
+      className="ml-4 text-blue-600 text-sm mt-1"
+    >
+      {showAllCommentsForPost[post.id] ? "Show Less" : "View All Comments"}
+    </button>
+  )}
+</div>
+
+</div>
+
       
       </div>
+
+
+
+
     ))}
   </div>
 
