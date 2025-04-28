@@ -43,7 +43,37 @@ const [places, setPlaces] = useState([]);
   const [bucketList, setBucketList] = useState([]);
   const [diaryList, setDiaryList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
  
+
+
+  const [activities, setActivities] = useState([]);
+
+useEffect(() => {
+  const fetchActivities = async () => {
+    const userId = Cookies.get("userId"); // cookies theke userId nibo
+    if (!userId) {
+      console.error("User ID not found in cookies");
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/activities/${userId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch activities");
+      }
+      const data = await response.json();
+      setActivities(data.data); // assuming backend returns { data: [...] }
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
+
+  if (activeTab === 'activity') {
+    fetchActivities();
+  }
+}, [activeTab]);
+
 //  const [userId, setUserId] = useState("");
 const createBucketList = async (payload) => {
   try {
@@ -249,7 +279,7 @@ const handleSubmit = async (e) => {
     if (id) setUserId(id);
   }, []);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
 
   const spots1 = [
     { name: "St. Martin & Chera Dwip", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" },
@@ -590,24 +620,24 @@ const handleSubmit = async (e) => {
 
             {/* Activity Section */}
             {activeTab === 'activity' && (
-              <div>
-                <h2 className="text-xl font-bold mb-4 border-b">Recent Activity</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {[ 
-                    { name: "Sylhet", img: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg" },
-                    { name: "Coxs Bazar", img: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg" },
-                    { name: "Saint Martin", img: "https://tripjive.com/wp-content/uploads/2024/09/Must-see-places-in-Bangladesh-1024x585.jpg" },
-                    { name: "Coxs Bazar", img: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg" },
-                  ].map((place, idx) => (
-                    <div key={idx} className="bg-gray-100 p-4 rounded">
-                      <img src={place.img} alt={place.name} className="w-full rounded" />
-                      <h3 className="mt-2 text-sm font-bold text-center">{place.name}</h3>
-                      <p className="text-center text-gray-500 text-xs">★★★★½</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+  <div>
+    <h2 className="text-xl font-bold mb-4 border-b">Recent Activity</h2>
+
+    {/* Activity List */}
+    <div>
+      {activities.length === 0 ? (
+        <p>No recent activity found.</p>
+      ) : (
+        activities.map((activity) => (
+          <div key={activity.id} className="border-b py-3">
+            <p className="text-gray-800">{activity.message}</p>
+            <p className="text-xs text-gray-500">{new Date(activity.createdAt).toLocaleString()}</p>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+)}
 
            {/* Place Section */}
            {activeTab === 'place' && (

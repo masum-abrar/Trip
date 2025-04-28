@@ -17,7 +17,7 @@ const DistrictPage  = ({ params }) => {
   const [community, setCommunity] = useState(null);
   const [activeTab, setActiveTab] = useState('Discussion');
   const [hasJoined, setHasJoined] = useState(false);
-  const isAlreadyJoined = community.follower.some(follower => follower.user.id === Cookies.get("userId"));
+  const isAlreadyJoined = community?.follower?.some(follower => follower.user.id === Cookies.get("userId"));
   const [newPost, setNewPost] = useState({ text: '', images: [], place: '', subdistrict: '' });
   const [posts, setPosts] = useState([
     {
@@ -89,7 +89,7 @@ const DistrictPage  = ({ params }) => {
   
     try {
       // Check if the user is already a follower
-      const isAlreadyJoined = community.follower.some(follower => follower.user.id === userId);
+      const isAlreadyJoined = community.follower?.some(follower => follower.user.id === userId);
   
       if (isAlreadyJoined) {
         // If already joined, remove from followers

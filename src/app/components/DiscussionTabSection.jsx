@@ -271,46 +271,67 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
     };
   
     const handlePost = async () => {
-     
-      const userId = Cookies.get("userId"); // Adjust this key if needed
-  
+      const userId = Cookies.get("userId");
+      
       const formData = new FormData();
-  
+      
       formData.append("userId", userId);
-    formData.append("divisionId", PostData.division.id);
-    formData.append("districtId", PostData.id); 
-    formData.append("placeId", newPost.placeId);
-    formData.append("title", newPost.text);
-    formData.append("description", newPost.text);
-    formData.append("type", "discussion");
-    formData.append("eventStartDate", "");
-    formData.append("eventEndDate", "");
-    formData.append("isActive", "true");
+      formData.append("divisionId", PostData.division.id);
+      formData.append("districtId", PostData.id); 
+      formData.append("placeId", newPost.placeId);
+      formData.append("title", newPost.text);
+      formData.append("description", newPost.text);
+      formData.append("type", "discussion");
+      formData.append("eventStartDate", "");
+      formData.append("eventEndDate", "");
+      formData.append("isActive", "true");
       formData.append("slug", "");
-  
-      selectedFiles.forEach((file, index) => {
-        formData.append(`images`, file);
+      
+      selectedFiles.forEach((file) => {
+        formData.append("images", file);
       });
-  
+    
       try {
         const response = await fetch("https://parjatak-core.vercel.app/api/v1/posts", {
           method: "POST",
           body: formData,
         });
-  
+    
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-  
+    
         const data = await response.json();
         console.log("Post created successfully:", data);
         toast.success("Post has been created");
-        fetchCommunity() 
+        fetchCommunity();
+    
+        // Step 2: Trigger Notification after successful post creation
+        const notificationPayload = {
+          userId: userId, // You can change this to the user who should receive the notification
+          message: `New post created: ${newPost.text}`, // Customize the message as needed
+          type: "post",  // Notification type (could be 'post', 'comment', etc.)
+          link: `https://example.com`,  // Link to the newly created post
+        };
+    
+        // Send notification to the backend API
+        await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(notificationPayload),
+        });
+    
+        console.log("Notification sent successfully");
+    
       } catch (error) {
         console.error("Post creation failed:", error);
       }
-      
-    }
+    };
+    
+
+    
    useEffect(() => {
       const idFromCookie = Cookies.get("userId");
       if (idFromCookie) {
@@ -342,25 +363,54 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
 
 
       //Post Like and Unlike
-      const handleLike = async (postId) => {
+      const handleLike = async (postId, postOwnerUserId) => {
         try {
+          const userName = Cookies.get("userName"); // liker username o uthai nite hobe
+      
           await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-like", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               postId,
-              userId: cookiesuserId,
-              parentUserId: null,
+              userId: cookiesuserId,  
+              parentUserId: null, 
             }),
           });
-    
-          // Toggle like state (optional — for instant UI feedback)
+      
+          // 1. Add to your own profile activities
+          await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: cookiesuserId, 
+              message: `You liked a post.`,
+              type: "activity",
+              link: `/post/${postId}`,
+            }),
+          });
+      
+          // 2. Send notification to post owner with your name
+          await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: postOwnerUserId, 
+             
+              message: `${userName} liked your post.`,
+              type: "notification",
+              link: `/post/${postId}`,
+            }),
+          });
+      
+          // UI update
           setLiked((prev) => !prev);
-          fetchCommunity() 
+          fetchCommunity();
+      
         } catch (error) {
           console.error("Error liking post:", error);
         }
       };
+      
     
       const handleUnlike = async (postId, parentUserId) => {
         try {
@@ -815,7 +865,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
 ) : (
   <FaRegHeart 
     className="cursor-pointer"
-    onClick={() => handleLike(post.id)}
+    onClick={() => handleLike(post.id , post.user?.id)}
   />
 )}
 
