@@ -586,7 +586,7 @@ const PlaceDetails = ({ params }) => {
           rtl={false}
           pauseOnFocusLoss
           draggable
-          pauseOnHover/>
+         />
     </div>
   );
 };
