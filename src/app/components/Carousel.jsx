@@ -138,7 +138,7 @@ const handleSearch = async () => {
                 <Link
                   key={spot.slug}
                   href={`/PlaceDetails/${spot.slug}`}
-                  className="block px-4 py-2 hover:bg-[#f7ebd7] hover:text-[#256029] text-gray-700 font-medium transition-all duration-200"
+                  className="block px-4 py-2 hover:bg-[#FCF0DC] hover:text-[#256029] text-gray-700 font-medium transition-all duration-200"
                   onClick={() => setShowDropdown(false)}
                 >
                   {spot.name}
