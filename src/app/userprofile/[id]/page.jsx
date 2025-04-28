@@ -9,6 +9,11 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import  { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 
 const UserProfile = () => {
   const { id } = useParams();
@@ -27,7 +32,57 @@ const UserProfile = () => {
     const [diaryList, setDiaryList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
      const [userId, setUserId] = useState("");
- 
+     const [isFollowing, setIsFollowing] = useState(false); 
+     const cookiesUserId = Cookies.get("userId");
+
+
+     useEffect(() => {
+      const checkIfFollowing = async () => {
+        try {
+          const res = await axios.get(`https://parjatak-core.vercel.app/api/v1/customer/check-follow-status?userId=${cookiesUserId}&parentUserId=${id}`);
+          if (res.data.success && res.data.data) {
+            setIsFollowing(true);
+          } else {
+            setIsFollowing(false);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+    
+      checkIfFollowing();
+    }, []);
+    
+
+
+    const handleFollowToggle = async () => {
+      try {
+        const res = await fetch('https://parjatak-core.vercel.app/api/v1/customer/create-followers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: cookiesUserId,
+            parentUserId: id,
+          }),
+        });
+    
+        const data = await res.json();
+    
+        if (data.success) {
+          toast.success(data.message);
+          setIsFollowing((prev) => !prev); 
+        } else {
+          toast.error("Action failed!");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Something went wrong!");
+      }
+    };
+    
+    
 
 const createBucketList = async (payload) => {
   try {
@@ -162,14 +217,13 @@ const handleSubmit = async (e) => {
       }
       
     };
-    fetchLists();
-    // Fetch on modal open
-    useEffect(() => {
-      if (spotModalOpen) {
-        fetchPlaces();
-      
-      }
-    }, [spotModalOpen]);
+
+     useEffect(() => {
+       if (id) {
+         fetchPlaces();
+         fetchLists();
+       }
+     }, [id]);
     
     const handleSpotSubmit = async () => {
       if (!selectedPlace || !selectedList) {
@@ -303,9 +357,15 @@ const handleSubmit = async (e) => {
               <h1 className="text-3xl font-bold">{user.name}</h1>
               <p className="text-gray-500 text-sm mt-1">Traveler | Explorer | Nature Enthusiast</p>
            
-              <button className="mt-3 bg-[#8cc163] text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-all text-sm font-semibold">
-                Follow
-              </button>
+              <button 
+  onClick={handleFollowToggle}
+  className={`mt-3 px-4 py-2 rounded-xl transition-all text-sm font-semibold ${
+    isFollowing ? 'bg-gray-400 text-white hover:bg-gray-600' : 'bg-[#8cc163] text-white hover:bg-green-700'
+  }`}
+>
+  {isFollowing ? "Following" : "Follow"}
+</button>
+
             </div>
           </div>
 
@@ -805,6 +865,7 @@ const handleSubmit = async (e) => {
                   )}
                 </div>
       </div>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
     </div>
   );
 };

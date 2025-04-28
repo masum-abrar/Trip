@@ -303,14 +303,14 @@ const handleSubmit = async (e) => {
     }
     
   };
-  fetchLists();
+
   // Fetch on modal open
   useEffect(() => {
-    if (spotModalOpen) {
+    if (userId) {
       fetchPlaces();
-    
+      fetchLists();
     }
-  }, [spotModalOpen]);
+  }, [userId]);
   
   const handleSpotSubmit = async () => {
     if (!selectedPlace || !selectedList) {

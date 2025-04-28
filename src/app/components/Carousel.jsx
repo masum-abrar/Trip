@@ -4,8 +4,46 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import { useState ,useEffect } from 'react';
+import Link from 'next/link';
 
 const Carousel = () => {
+
+
+  const [searchText, setSearchText] = useState('');
+  const [places, setPlaces] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
+ // Live search with debounce
+ useEffect(() => {
+  const delayDebounceFn = setTimeout(() => {
+    if (searchText.trim() !== '') {
+      handleSearch();
+    } else {
+      setPlaces([]);
+      setShowDropdown(false);
+    }
+  }, 500); // 500ms delay
+
+  return () => clearTimeout(delayDebounceFn);
+}, [searchText]);
+
+const handleSearch = async () => {
+  try {
+    setLoading(true);
+    const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places?name=${searchText}`);
+    const data = await response.json();
+
+    setPlaces(data.data || []);
+    setShowDropdown(true);
+  } catch (error) {
+    console.error('Error fetching places:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   const slides = [
     {
       id: 1,
@@ -35,12 +73,13 @@ const Carousel = () => {
 
   return (
     <div className="relative">
- <Swiper
-      modules={[Navigation, Pagination, Autoplay]} // Pass modules here
+    {/* Swiper Slider */}
+    <Swiper
+      modules={[Navigation, Pagination, Autoplay]}
       navigation
       pagination={{ clickable: true }}
-      autoplay={{ delay: 5000, disableOnInteraction: false }} // Enable autoplay
-      loop={true} // Loop slides
+      autoplay={{ delay: 5000, disableOnInteraction: false }}
+      loop={true}
       className="w-full"
     >
       {slides.map((slide) => (
@@ -65,21 +104,54 @@ const Carousel = () => {
         </SwiperSlide>
       ))}
     </Swiper>
-  
-    {/* Search Bar (Now outside the Swiper) */}
+
+    {/* Search Bar */}
     <div className="absolute bottom-16 sm:bottom-24 md:bottom-28 lg:bottom-32 left-1/2 transform -translate-x-1/2 w-full max-w-[90%] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px] px-4 z-10">
       <div className="relative w-full">
+        {/* Input */}
         <input
           type="text"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
           placeholder="Search destination, places"
-          className="w-full py-3 pl-4 pr-16 bg-[#FCF0DC] backdrop-blur-lg border border-gray-300 rounded-2xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base"
+          className="w-full py-3 pl-4 pr-20 bg-[#FCF0DC] backdrop-blur-md border border-gray-300 rounded-3xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8cc163] focus:border-[#8cc163] shadow-md text-sm sm:text-base transition-all duration-300"
         />
+
         {/* Search Button */}
-        <button className="absolute right-3 top-1/2 transform -translate-y-1/2 py-2 px-4 sm:px-6 bg-[#8cc163] text-white rounded-full text-sm sm:text-base hover:bg-gray-900 transition duration-300">
+        <button
+          onClick={handleSearch}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 py-2 px-5 sm:px-6 bg-gradient-to-r from-[#8cc163] to-[#6aa84f] text-white font-semibold rounded-full text-sm sm:text-base hover:from-gray-700 hover:to-gray-900 transition-all duration-300 shadow-lg"
+        >
           Search
         </button>
+
+        {/* Dropdown */}
+        {showDropdown && (
+          <div className="absolute mt-1 w-full bg-[#FCF0DC] shadow-2xl rounded-3xl  max-h-60 overflow-y-auto z-20 animate-fade-in-up border border-gray-200">
+            {loading ? (
+             <div className="flex justify-center py-4 text-gray-600 font-semibold">
+             {/* Spinner */}
+             <div className="w-6 h-6 border-4 border-t-[#8cc163] border-gray-300 rounded-full animate-spin"></div>
+           </div>
+            ) : places.length > 0 ? (
+              places.map((spot) => (
+                <Link
+                  key={spot.slug}
+                  href={`/PlaceDetails/${spot.slug}`}
+                  className="block px-4 py-2 hover:bg-[#f7ebd7] hover:text-[#256029] text-gray-700 font-medium transition-all duration-200"
+                  onClick={() => setShowDropdown(false)}
+                >
+                  {spot.name}
+                </Link>
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">No places found</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
+
   </div>
   
   );

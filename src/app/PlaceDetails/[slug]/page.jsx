@@ -9,6 +9,9 @@ import ReviewsTabSection from "@/app/components/ReviewsTabSection";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { motion } from "framer-motion";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 // const places = [
 //   { id: 1, title: "Jaflong", district: "Sylhet",  subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
 //   { id: 2, title: "Saint Martin", district: "CoxsBazar", subDistict:"Teknaf", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
@@ -118,7 +121,7 @@ const PlaceDetails = ({ params }) => {
         });
   
         const data = await res.json();
-        console.log("Diary Saved:", data);
+       toast.success("Diary added successfully!");
         
         setModalOpen(false); // Close modal after saving
       } catch (error) {
@@ -202,7 +205,7 @@ const PlaceDetails = ({ params }) => {
           });
     
           if (response.ok) {
-            alert("Spot added successfully!");
+           toast.success("Spot added to list!");
             setSpotModalOpen(false);
             
             setSelectedList("");
@@ -573,6 +576,17 @@ const PlaceDetails = ({ params }) => {
        <ReviewsTabSection  locationData={place}/>
           </div>
         )}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover/>
     </div>
   );
 };
