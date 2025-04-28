@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Select, TextField } from "@mui/material";
-import { FaStar, FaRegStar, FaHeart, FaRegHeart ,FaPaperPlane,FaImage} from "react-icons/fa";
+import { FaStar, FaRegStar, FaHeart, FaRegHeart ,FaPaperPlane,FaImage ,FaTrashAlt} from "react-icons/fa";
 import { AiOutlineUpload } from "react-icons/ai";
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import { ToastContainer } from 'react-toastify';
+import Link from "next/link";
+
+
 const ReviewsTabSection = ({locationData}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 0, comment: "", privacy: "Public", images: [], replies: [], likes: 0 ,user :["User"]});
@@ -89,61 +92,83 @@ const ReviewsTabSection = ({locationData}) => {
       toast.error("❌ Failed to submit review");
     }
   };
+  const handleDeleteReview = async (reviewId) => {
+    const userId = Cookies.get("userId"); // Current user's ID
+    const accessToken = Cookies.get("token"); // JWT Token
   
+    if (!userId || !accessToken) {
+      toast.error("User not authenticated!");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/reviews/${reviewId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        toast.success("Review deleted successfully!");
+        // Optionally, update the state to reflect the deletion (e.g., remove the review from the list)
+        // For example: setLocationData(prevData => ({ ...prevData, review: prevData.review.filter(r => r.id !== reviewId) }));
+      } else {
+        toast.error(data.message || "Failed to delete review");
+      }
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      toast.error("An error occurred while deleting the review.");
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto mt-6">
-      {/* Header & Sorting */}
-      {/* <div className="flex justify-end items-center mb-4">
-      
-        <Select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className="bg-white rounded-md p-1 text-sm">
-          <MenuItem value="Most Recent">Most Recent</MenuItem>
-          <MenuItem value="Oldest">Oldest</MenuItem>
-          <MenuItem value="Most Liked">Most Liked</MenuItem>
-        </Select>
-      </div> */}
 
       {/* Reviews List */}
       <div className="space-y-4">
-  {locationData?.review?.map((review, index) => (
-    <div key={index} className="bg-white p-4 rounded-lg shadow-md">
-      <div className="flex items-center space-x-3">
-        <Avatar />
-        <div>
-          <h3 className="font-semibold text-gray-900">{review.user.name || "Anonymous"}</h3>
-          <div className="flex">
-            {[...Array(10)].map((_, i) =>
-              i < review.rating ? (
-                <FaStar key={i} className="text-yellow-500" />
-              ) : (
-                <FaRegStar key={i} className="text-gray-300" />
-              )
-            )}
-          </div>
-        </div>
-        
-      </div>
-
-      {/* Review Content */}
-      <p className="text-gray-700 mt-2">{review.comment}</p>
-        {/* Actions: Like & Reply */}
-        <div className="flex items-center mt-3 space-x-4">
-              <IconButton onClick={() => toggleLike(review.id)}>
-                {review.likes > 0 ? <FaHeart className="text-red-500" /> : <FaRegHeart className="text-gray-500" />}
-              </IconButton>
-              <span className="text-gray-600">{review.likes} Likes</span>
-             
+    {locationData?.review?.map((review, index) => (
+      <div key={index} className="bg-white p-4 rounded-lg shadow-md">
+        <div className="flex items-center space-x-3">
+          <Avatar />
+          <div>
+           <Link href={`/userprofile/${review.user.id}`} className="text-blue-500 hover:underline">
+           <h3 className="font-semibold text-gray-900">{review.user.name || "Anonymous"}</h3>
+           </Link>
+            <div className="flex">
+              {[...Array(10)].map((_, i) =>
+                i < review.rating ? (
+                  <FaStar key={i} className="text-yellow-500" />
+                ) : (
+                  <FaRegStar key={i} className="text-gray-300" />
+                )
+              )}
             </div>
-    </div>
-    
-  ))}
-</div>
+          </div>
+          
+          {/* Delete button */}
+          {review.user.id === Cookies.get("userId") && (
+            <button
+              onClick={() => handleDeleteReview(review.id)}
+              className="text-red-500 hover:text-red-700 ml-28"
+              aria-label="Delete review"
+            >
+              <FaTrashAlt />
+            </button>
+          )}
+        </div>
+
+        {/* Review Content */}
+        <p className="text-gray-700 mt-2">{review.comment}</p>
+      </div>
+    ))}
+  </div>
 
 
-      {/* Write a Review Button */}
-      {/* <Button variant="contained" color="primary" className="mt-6" onClick={() => setIsModalOpen(true)}>
-        ✍️ Write a Review
-      </Button> */}
+   
      <div className="flex justify-end mt-6 mb-10">
   <button onClick={() => setIsModalOpen(true)} className="bg-[#8cc163] text-white px-4 py-2 rounded-md">
     ✍️ Write a Review

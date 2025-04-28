@@ -8,13 +8,16 @@ import PlacesTabSection from '@/app/components/PlacesTabSection';
 import DiscussTabSection from '@/app/components/DiscussionTabSection';
 import PlaceTabSec from '@/app/components/PlaceTabSec';
 import Cookies from "js-cookie";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const DistrictPage  = ({ params }) => {
   const districtName = params?.districtName ?? '';
   const [community, setCommunity] = useState(null);
   const [activeTab, setActiveTab] = useState('Discussion');
   const [hasJoined, setHasJoined] = useState(false);
-
+  const isAlreadyJoined = community.follower.some(follower => follower.user.id === Cookies.get("userId"));
   const [newPost, setNewPost] = useState({ text: '', images: [], place: '', subdistrict: '' });
   const [posts, setPosts] = useState([
     {
@@ -76,41 +79,67 @@ const DistrictPage  = ({ params }) => {
 
 
   const handleJoin = async () => {
-    const userId = Cookies.get("userId"); 
-
+    const userId = Cookies.get("userId");
+    const token = Cookies.get("token");
+  
     if (!userId || !community?.id) {
       console.warn("Missing userId or community id");
       return;
     }
-
+  
     try {
-      const userId = Cookies.get("userId"); 
-      const token = Cookies.get("token"); // assuming you stored the JWT token as 'token'
-
-      const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-district-follower", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // 🔑 pass token here
-        },
-        body: JSON.stringify({
-          userId: userId,
-          districtId: community.id,
-        }),
-      });
-      
-      
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert(` You have successfully joined the "${community?.name}" community!`);
-        setHasJoined(true); // or show toast/snackbar
+      // Check if the user is already a follower
+      const isAlreadyJoined = community.follower.some(follower => follower.user.id === userId);
+  
+      if (isAlreadyJoined) {
+        // If already joined, remove from followers
+        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-district-follower", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId: userId,
+            districtId: community.id,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (data.success) {
+          
+          toast.success(`You have successfully left the "${community?.name}" community!`);
+          setHasJoined(false); // Update button to "Join"
+        } else {
+          alert(data.message || "Failed to leave.");
+        }
       } else {
-        alert(data.message || "Failed to follow.");
+        // If not joined, add to followers
+        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-district-follower", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId: userId,
+            districtId: community.id,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (data.success) {
+         
+          toast.success(`You have successfully joined the "${community?.name}" community!`);
+          setHasJoined(true); // Update button to "Joined"
+        } else {
+          alert(data.message || "Failed to follow.");
+        }
       }
     } catch (error) {
-      console.error("Failed to join community:", error);
+      console.error("Failed to join/leave community:", error);
     }
   };
 
@@ -133,16 +162,16 @@ const DistrictPage  = ({ params }) => {
         {community?.name.charAt(0).toUpperCase() + community?.name.slice(1) || "loading District..."}
       </h1>
       <button
-  onClick={handleJoin}
-  disabled={hasJoined}
-  className={`${
-    hasJoined
-      ? "bg-gray-400 cursor-not-allowed"
-      : "bg-[#8cc163] hover:bg-[#6fb936] hover:shadow-lg hover:scale-110"
-  } text-white px-6 lg:px-8 py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform`}
->
-  {hasJoined ? "Joined" : "Join"}
-</button>
+    onClick={handleJoin}
+    disabled={hasJoined}
+    className={`${
+      isAlreadyJoined
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-[#8cc163] hover:bg-[#6fb936] hover:shadow-lg hover:scale-110"
+    } text-white px-6 lg:px-8 py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform`}
+  >
+    {isAlreadyJoined ? "Joined" : "Join"}
+  </button>
 
     </div>
   
@@ -178,6 +207,7 @@ const DistrictPage  = ({ params }) => {
           </div>
         )}
       </div>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
