@@ -304,6 +304,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         const data = await response.json();
         console.log("Post created successfully:", data);
         toast.success("Post has been created");
+        setNewPost({ text: "", images: [], placeId: "" }); // Reset the form
         fetchCommunity();
     
         // Step 2: Trigger Notification after successful post creation
@@ -451,9 +452,10 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
           }));
         };
       
-        const handleCommentSubmit = async (postId) => {
+        const handleCommentSubmit = async (postId , postOwnerUserId) => {
           const comment = comments[postId];
           if (!comment?.trim()) return;
+          const userName = Cookies.get("userName");
         
           setLoading(true);
           try {
@@ -480,7 +482,31 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
             }));
         
             // ✅ Refresh server-rendered data (like updated comments)
-          
+            // 1. Add to your own profile activities
+            await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId: cookiesuserId, 
+                message: `You Comment on a post.`,
+                type: "activity",
+                link: ``,
+              }),
+            });
+        
+            // 2. Send notification to post owner with your name
+            await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId: postOwnerUserId, 
+               
+                message: `${userName} liked your post.`,
+                type: "notification",
+                link: ``,
+              }),
+            });
+
             fetchCommunity() 
           } catch (err) {
             console.error("Failed to post comment:", err);
@@ -883,7 +909,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
             className="flex-1 w-36 p-2 border rounded-md text-black focus:ring-2 focus:ring-blue-400 bg-white"
           />
           <button
-            onClick={() => handleCommentSubmit(post.id)}
+            onClick={() => handleCommentSubmit(post.id , post.user?.id)}
             disabled={loading || !userId}
             className="bg-[#8cc163] text-white px-4 py-1 rounded-md"
           >

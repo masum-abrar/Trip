@@ -1,80 +1,130 @@
-import React from "react";
-import { FaInstagram, FaGithub, FaTwitter, FaFacebook, FaTiktok, FaYoutube } from "react-icons/fa";
+'use client';
+import { useEffect, useRef } from "react";
+import { FaFacebook, FaLinkedin, FaTwitter, FaInstagram ,FaYoutube } from "react-icons/fa";
 
-const Footer = () => {
+function Footer() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const particles = [];
+    const colors = ["#ffffff", "#bbbbbb", "#999999"];
+    const numParticles = 85;
+    const maxRadius = 3;
+
+    // Resize canvas to fit the footer
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    // Handle window resize
+    const handleResize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    // Particle class
+    class Particle {
+      constructor(x, y, dx, dy, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.dx = dx;
+        this.dy = dy;
+        this.radius = radius;
+        this.color = color;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      update() {
+        if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+          this.dx = -this.dx;
+        }
+        if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+          this.dy = -this.dy;
+        }
+        this.x += this.dx;
+        this.y += this.dy;
+        this.draw();
+      }
+    }
+
+    // Initialize particles
+    for (let i = 0; i < numParticles; i++) {
+      const radius = Math.random() * maxRadius;
+      const x = Math.random() * (canvas.width - radius * 2) + radius;
+      const y = Math.random() * (canvas.height - radius * 2) + radius;
+      const dx = (Math.random() - 0.5) * 2;
+      const dy = (Math.random() - 0.5) * 2;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particles.push(new Particle(x, y, dx, dy, radius, color));
+    }
+
+    // Animation loop
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((particle) => particle.update());
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
-    <footer className="bg-[#443F38] text-white text-sm py-6 mt-16">
-      <div className="container mx-auto px-4">
-        {/* Top Section: Links */}
-        <div className="flex justify-between items-center flex-wrap">
-          <div className="flex flex-wrap gap-4 mb-4 lg:mb-0">
-            <a href="#" className="hover:underline">
-              About
-            </a>
-            <a href="#" className="hover:underline">
-              Pro
-            </a>
-            <a href="#" className="hover:underline">
-              News
-            </a>
-            <a href="#" className="hover:underline">
-              Apps
-            </a>
-            <a href="#" className="hover:underline">
-              Podcast
-            </a>
-            <a href="#" className="hover:underline">
-              Year in Review
-            </a>
-            <a href="#" className="hover:underline">
-              Gifts
-            </a>
-            <a href="#" className="hover:underline">
-              Help
-            </a>
-            <a href="#" className="hover:underline">
-              Terms
-            </a>
-            <a href="#" className="hover:underline">
-              API
-            </a>
-            <a href="#" className="hover:underline">
-              Contact
-            </a>
-          </div>
+    <footer className="relative bg-slate-950 text-white">
+    {/* Particle Canvas */}
+    <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-20 pointer-events-none z-0" />
 
-          {/* Social Icons */}
-          <div className="flex gap-4 text-white">
-            <FaInstagram className="hover:text-white cursor-pointer" />
-            <FaGithub className="hover:text-white cursor-pointer" />
-            <FaTwitter className="hover:text-white cursor-pointer" />
-            <FaFacebook className="hover:text-white cursor-pointer" />
-            <FaTiktok className="hover:text-white cursor-pointer" />
-            <FaYoutube className="hover:text-white cursor-pointer" />
-          </div>
-        </div>
+    {/* Main Footer Content */}
+    <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-16 grid grid-cols-1 md:grid-cols-3 gap-12">
+      {/* Left: Parjatak Description */}
+      <div className="text-left">
+        <h2 className="text-3xl font-bold  mb-4">Parjatak</h2>
+        <p className="text-gray-300 text-sm leading-relaxed max-w-sm">
+          Discover hidden treasures, connect with fellow explorers, and plan your next adventure. Parjatak is your travel companion for the modern world.
+        </p>
+      </div>
 
-        {/* Bottom Section */}
-        <div className="mt-6 text-white text-xs">
-          <p>
-            © TRIP Limited. Made by fans in Aotearoa New Zealand. Place
-            data from TMDb. Mobile site.
-          </p>
-          <p className="mt-2">
-            This site is protected by reCAPTCHA and the Google{" "}
-            <a href="#" className="hover:underline">
-              privacy policy
-            </a>{" "}
-            and{" "}
-            <a href="#" className="hover:underline">
-              terms of service
-            </a>{" "}
-            apply.
-          </p>
+      {/* Center: Social Media Icons */}
+      <div className="flex flex-col items-center justify-center space-y-6">
+        <h4 className="text-lg font-semibold">Follow Us</h4>
+        <div className="flex space-x-5 text-2xl">
+          <a href="#" className="hover:text-[#1877F2] transition"><FaFacebook /></a>
+          <a href="#" className="hover:text-[#1DA1F2] transition"><FaTwitter /></a>
+          <a href="#" className="hover:text-pink-500 transition"><FaInstagram /></a>
+          <a href="#" className="hover:text-[#0A66C2] transition"><FaLinkedin /></a>
+          <a href="#" className="hover:text-[#FF0000] transition"><FaYoutube /></a>
         </div>
       </div>
-    </footer>
+
+      {/* Right: Support Links */}
+      <div className="text-right">
+        <h4 className="text-lg font-semibold mb-4">Support</h4>
+        <ul className="space-y-3 text-sm text-gray-400">
+          <li><a href="#" className="hover:text-teal-400 transition">Contact Us</a></li>
+          <li><a href="#" className="hover:text-teal-400 transition">FAQs</a></li>
+          <li><a href="#" className="hover:text-teal-400 transition">Privacy Policy</a></li>
+          <li><a href="#" className="hover:text-teal-400 transition">Terms & Conditions</a></li>
+        </ul>
+      </div>
+    </div>
+
+    {/* Footer Bottom */}
+    <div className="relative z-10 border-t border-gray-800 py-4 text-center text-sm text-gray-500">
+      © {new Date().getFullYear()} Parjatak. Built with passion for modern-day wanderers.
+    </div>
+  </footer>
   );
-};
+}
 
 export default Footer;

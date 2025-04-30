@@ -628,7 +628,7 @@ const handleSubmit = async (e) => {
       {activities.length === 0 ? (
         <p>No recent activity found.</p>
       ) : (
-        activities.map((activity) => (
+        activities.filter(item => item.type === "activity").map((activity) => (
           <div key={activity.id} className="border-b py-3">
             <p className="text-gray-800">{activity.message}</p>
             <p className="text-xs text-gray-500">{new Date(activity.createdAt).toLocaleString()}</p>
