@@ -899,29 +899,41 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
 
 
         {/* Add Comment Input */}
-            <div className="flex items-center gap-2 mt-2">
-          <input
-            type="text"
-            value={comments[post.id] || ""}
-            onChange={(e) => handleCommentChange(post.id, e.target.value)}
-            placeholder="Write a comment..."
-            className="flex-1 w-36 p-2 border rounded-md text-black focus:ring-2 focus:ring-blue-400 bg-white"
-          />
-          <button
-            onClick={() => handleCommentSubmit(post.id , post.user?.id)}
-            disabled={loading || !userId}
-            className="bg-[#8cc163] text-white px-4 py-1 rounded-md"
-          >
-            Comment
-          </button>
-        </div>
+        <div
+  className="flex items-center gap-2 mt-2"
+  onClick={(e) => {
+    e.stopPropagation(); // stop bubbling up
+    e.preventDefault();  // stop navigation
+  }}
+>
+  <input
+    type="text"
+    value={comments[post.id] || ""}
+    onChange={(e) => handleCommentChange(post.id, e.target.value)}
+    placeholder="Write a comment..."
+    className="flex-1 w-36 p-2 border rounded-md text-black focus:ring-2 focus:ring-blue-400 bg-white"
+  />
+  <button
+    onClick={() => handleCommentSubmit(post.id , post.user?.id)}
+    disabled={loading || !userId}
+    className="bg-[#8cc163] text-white px-4 py-1 rounded-md"
+  >
+    Comment
+  </button>
+</div>
+
         {/* Display Comments */}
       
         <div>
 
       
 {/* Slice logic: only show 2 unless showAllComments is true */}
-<div>
+<div
+ onClick={(e) => {
+  e.stopPropagation(); // stop bubbling up
+  e.preventDefault();  // stop navigation
+}}
+>
 {(post.comment.slice(0, showAllCommentsForPost[post.id] ? post.comment.length : 2)).map((comment) => (
   <div key={comment.id} className="flex flex-col gap-1 mt-2 ml-4 bg-gray-100 p-2 rounded-md">
     

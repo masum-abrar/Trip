@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-
+import { FaHeart, FaEye, FaStar, FaList, FaPlus ,FaComment } from 'react-icons/fa';
 const Category = () => {
   const [divisions, setDivisions] = useState([]);
   const [districts, setDistricts] = useState([]);
@@ -190,9 +190,43 @@ const Category = () => {
                 alt={post.title}
                 className="h-48 w-full object-cover"
               />
+              <div className='mt-2 mb-2'>
+                {post.district?.name && (
+                  <span className="bg-[#8cc163] text-white text-xs font-medium px-2 py-1 rounded-full mt-4 ml-2">
+                    {post.district.name}
+                  </span>
+                )}
+                </div>
+                <div className="flex items-center gap-2 mt-2 ml-2">
+  {post.user?.image && (
+    <>
+      <img
+        src={post.user.image}
+        alt={post.user.name}
+        className="w-8 h-8 rounded-full"
+      />
+      <span className="text-sm font-medium">{post.user.name}</span>
+    </>
+  )}
+</div>
+
               <div className="p-4">
                 <h2 className="text-lg font-semibold text-black">{post.title}</h2>
                 <p className="text-gray-600 mt-2 line-clamp-3">{post.description}</p>
+              </div>
+              <div>
+                <div className="flex justify-between items-center text-gray-600 px-4 pb-4">
+                  <div className="flex space-x-4">
+                    <div className="flex items-center space-x-1">
+                      <FaHeart className="cursor-pointer text-red-500" />
+                      <span className="text-sm">{post.like?.length ?? 0} Likes</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                       <FaComment className="cursor-pointer text-green-500" />
+                      <span className="text-sm">{post.comment?.length ?? 0} Comments</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ))

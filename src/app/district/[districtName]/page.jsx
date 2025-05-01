@@ -111,6 +111,7 @@ const DistrictPage  = ({ params }) => {
           
           toast.success(`You have successfully left the "${community?.name}" community!`);
           setHasJoined(false); 
+          fetchCommunity(); 
         } else {
           alert(data.message || "Failed to leave.");
         }
@@ -134,6 +135,7 @@ const DistrictPage  = ({ params }) => {
          
           toast.success(`You have successfully joined the "${community?.name}" community!`);
           setHasJoined(true); 
+          fetchCommunity(); 
         } else {
           alert(data.message || "Failed to follow.");
         }
