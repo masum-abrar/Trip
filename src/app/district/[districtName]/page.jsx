@@ -80,7 +80,7 @@ const DistrictPage  = ({ params }) => {
 
   const handleJoin = async () => {
     const userId = Cookies.get("userId");
-    const token = Cookies.get("token");
+   
   
     if (!userId || !community?.id) {
       console.warn("Missing userId or community id");
@@ -88,16 +88,16 @@ const DistrictPage  = ({ params }) => {
     }
   
     try {
-      // Check if the user is already a follower
+     
       const isAlreadyJoined = community.follower?.some(follower => follower.user.id === userId);
   
       if (isAlreadyJoined) {
-        // If already joined, remove from followers
+        
         const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-district-follower", {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+           
           },
           body: JSON.stringify({
             userId: userId,
@@ -110,17 +110,17 @@ const DistrictPage  = ({ params }) => {
         if (data.success) {
           
           toast.success(`You have successfully left the "${community?.name}" community!`);
-          setHasJoined(false); // Update button to "Join"
+          setHasJoined(false); 
         } else {
           alert(data.message || "Failed to leave.");
         }
       } else {
-        // If not joined, add to followers
+       
         const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-district-follower", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+           
           },
           body: JSON.stringify({
             userId: userId,
@@ -133,7 +133,7 @@ const DistrictPage  = ({ params }) => {
         if (data.success) {
          
           toast.success(`You have successfully joined the "${community?.name}" community!`);
-          setHasJoined(true); // Update button to "Joined"
+          setHasJoined(true); 
         } else {
           alert(data.message || "Failed to follow.");
         }

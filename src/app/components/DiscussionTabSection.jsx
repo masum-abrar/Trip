@@ -366,7 +366,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
       //Post Like and Unlike
       const handleLike = async (postId, postOwnerUserId) => {
         try {
-          const userName = Cookies.get("userName"); // liker username o uthai nite hobe
+          const userName = Cookies.get("userName"); 
       
           await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-like", {
             method: "POST",
@@ -378,7 +378,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
             }),
           });
       
-          // 1. Add to your own profile activities
+         
           await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -390,7 +390,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
             }),
           });
       
-          // 2. Send notification to post owner with your name
+          
           await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -423,7 +423,6 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
             body: JSON.stringify({
               postId: postId,
               userId: cookiesuserId,
-              parentUserId: null,
             }),
           });
       
@@ -481,8 +480,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
               [postId]: "",
             }));
         
-            // ✅ Refresh server-rendered data (like updated comments)
-            // 1. Add to your own profile activities
+           
             await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -494,7 +492,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
               }),
             });
         
-            // 2. Send notification to post owner with your name
+            
             await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -746,6 +744,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
 ) : (
   // Render actual post content when not loading
   locationData?.slice(0, visiblePosts).map((post) => (
+    <Link key={post.id} href={`/PostDetails/${post.id}`} className="bg-white shadow-md rounded-xl p-4 mb-4 block">
     <div key={post.id} className="bg-white shadow-md rounded-xl p-4">
     
     <div className="flex items-center justify-between mb-2 relative">
@@ -1025,6 +1024,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
   
 </div>
     </div>
+    </Link>
     
   ))
 

@@ -14,7 +14,7 @@ function App() {
   const [likes, setLikes] = useState({});
   const [newComments, setNewComments] = useState({});
 
-  const userId = Cookies.get("userId"); // Cookie থেকে userId আনলাম
+  const userId = Cookies.get("userId"); 
 
   const settings = {
     dots: true,
@@ -41,7 +41,7 @@ function App() {
         // Like status setup
         const initialLikes = {};
         data.data.forEach(section => {
-          initialLikes[section.id] = section.isLiked; // API যদি isLiked দেয়
+          initialLikes[section.id] = section.isLiked; 
         });
         setLikes(initialLikes);
       }
@@ -93,7 +93,7 @@ function App() {
           }),
         });
 
-        // refresh after post
+       
         fetchLists();
 
         setNewComments({ ...newComments, [listId]: '' });
@@ -106,7 +106,7 @@ function App() {
   const handleCommentDelete = async (commentId) => {
     try {
       const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/delete-list-review/${commentId}`, {
-        method: 'DELETE',
+        method: 'POST',
       });
   
       if (res.ok) {

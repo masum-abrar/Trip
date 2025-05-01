@@ -102,8 +102,8 @@ const ReviewsTabSection = ({locationData}) => {
     }
   
     try {
-      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/reviews/${reviewId}`, {
-        method: "DELETE",
+      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/delete-place-review/${reviewId}`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,

@@ -495,8 +495,11 @@ const PlaceDetails = ({ params }) => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
           >
+           
             <h2 className="text-xl font-bold mb-4 text-black">Add Spot to List</h2>
-
+            <p className="text-red-600 text-sm mb-4">
+    If you haven't created any list yet, please go to your profile and create one first.
+  </p>
             {/* <div className="mb-4">
               <label className="block mb-1">Select Place</label>
               <select

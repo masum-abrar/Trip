@@ -12,6 +12,8 @@ import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import Image from 'next/image';
+
 
 
 
@@ -44,10 +46,27 @@ const [places, setPlaces] = useState([]);
   const [diaryList, setDiaryList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [image, setImage] = useState(null);
+const [preview, setPreview] = useState(null);
+
  
+const userImage = Cookies.get("userImage") 
 
 
   const [activities, setActivities] = useState([]);
+
+//NewApi
+  const [userData, setUserData] = useState(null);
+  
+  const [error, setError] = useState(null);
+
+  const userIdFromCookie = Cookies.get("userId");
+
+
+  const imageSrc =
+  userImage && userImage !== "null"
+    ? userImage
+    : "/default-avatar.png";
 
 useEffect(() => {
   const fetchActivities = async () => {
@@ -174,25 +193,30 @@ const handleSubmit = async (e) => {
 };
 
 
-  useEffect(() => {
-    if (showModal) {
-      const id = Cookies.get("userId");
-      const name = Cookies.get("userName");
-      const fullName = Cookies.get("fullName");
-      const userEmail = Cookies.get("userEmail");
-      const userPhone = Cookies.get("userPhone");
-      const userDivision = Cookies.get("userDivision");
-      const userDistrict = Cookies.get("userDistrict");
+useEffect(() => {
+  if (showModal) {
+    const id = Cookies.get("userId");
+    const name = Cookies.get("userName");
+    const fullName = Cookies.get("fullName");
+    const userEmail = Cookies.get("userEmail");
+    const userPhone = Cookies.get("userPhone");
+    const userDivision = Cookies.get("userDivision");
+    const userDistrict = Cookies.get("userDistrict");
+    const userPassword = Cookies.get("userPassword");
+    const userImage = Cookies.get("userImage");
 
-      if (id) setUserId(id);
-      if (name) setName(name);
-      if (fullName) setFullname(fullName);
-      if (userEmail) setEmail(userEmail);
-      if (userPhone) setPhone(userPhone);
-      if (userDivision) setDivision(userDivision);
-      if (userDistrict) setDistrict(userDistrict);
-    }
-  }, [showModal]);
+    if (id) setUserId(id);
+    if (name) setName(name);
+    if (fullName) setFullname(fullName);
+    if (userEmail) setEmail(userEmail);
+    if (userPhone) setPhone(userPhone);
+    if (userDivision) setDivision(userDivision);
+    if (userDistrict) setDistrict(userDistrict);
+    if (userPassword) setPassword(userPassword);
+    if (userImage) setImage(userImage);
+  }
+}, [showModal]);
+
 
   // Fetch divisions
   useEffect(() => {
@@ -223,40 +247,40 @@ const handleSubmit = async (e) => {
     };
     if (division) fetchDistricts();
   }, [division]);
+// Only for development or testing!
 
   // Handle profile update
   const handleUpdate = async () => {
     try {
-      const payload = {
-        fullname,
-        name,
-        email,
-        phone,
-        division,
-        district,
-        password,
-      };
-
+      const formData = new FormData();
+      formData.append("fullname", fullname);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("phone", phone);
+      formData.append("divisionId", division);
+      formData.append("districtId", district);
+      formData.append("password", password);
+       formData.append("image", image); 
+  
       const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       });
-
+  
       const result = await response.json();
-
+  
       if (response.ok) {
-        // Optional: Update cookies
         Cookies.set("userName", name);
         Cookies.set("fullName", fullname);
         Cookies.set("userEmail", email);
         Cookies.set("userPhone", phone);
         Cookies.set("userDivision", division);
         Cookies.set("userDistrict", district);
-
-       toast.success("Profile updated successfully!");
+        Cookies.set("userImage", preview);
+        Cookies.set("userPassword", password); 
+        Cookies.set("userImage", result.image);
+  
+        toast.success("Profile updated successfully!");
         setShowModal(false);
       } else {
         alert("Failed to update: " + result.message);
@@ -266,6 +290,7 @@ const handleSubmit = async (e) => {
       alert("Something went wrong!");
     }
   };
+  
 
 
   const handleTabClick = (tab) => {
@@ -295,7 +320,7 @@ const handleSubmit = async (e) => {
   ];
   
 
-  // Second Category: Top Adventure Spots
+  
   const spots2 = [
     { name: "Saint Martin's Island", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJdc6c_s_wrlJABb7pNAIjWYPR8YYNtJbuog&s" },
     { name: "Keokradong", image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/18/32/94/best-view-of-keokradong.jpg?w=1200&h=-1&s=1" },
@@ -378,6 +403,48 @@ const handleSubmit = async (e) => {
     }
   };
 
+
+
+  //New Api
+
+  useEffect(() => {
+    if (!userIdFromCookie) {
+      setError("User not logged in.");
+      setLoading(false);
+      return;
+    }
+
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userIdFromCookie}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          // Check if the user ID matches the one from the cookie
+          if (data.data && data.data.id === userIdFromCookie) {
+            setUserData(data.data);
+          } else {
+            setError("User not found.");
+          }
+        } else {
+          setError(data.message || "Failed to fetch data.");
+        }
+      } catch (err) {
+        setError("Error fetching data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userIdFromCookie]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
+  // Destructure the user data
+  const {   billingAddress, following, followers } = userData || {};
+
   return (
     <div className="bg-white text-gray-900 min-h-screen">
       <div className="shadow-lg w-full">
@@ -388,13 +455,34 @@ const handleSubmit = async (e) => {
       <div className="container mx-auto px-4 py-8 max-w-[1120px]">
         <div className="flex flex-col lg:flex-row items-center lg:justify-between border-b border-gray-300 pb-6 mb-6 space-y-6 lg:space-y-0">
           <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl font-bold text-gray-600">R</span>
-            </div>
+          <div className="flex flex-col items-center mb-4">
+          <div className="w-24 h-24 rounded-full overflow-hidden mb-2 border-2 border-gray-300">
+  {userData?.image ? (
+    <Image
+      src={userData?.image} // External image URL
+      alt="Profile Preview"
+      width={96}
+      height={96}
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <Image
+      src="https://cdn-icons-png.flaticon.com/512/9368/9368192.png" // Default image URL
+      width={96}
+      height={96}
+      alt="Default Avatar"
+      className="w-full h-full object-cover"
+    />
+  )}
+</div>
+
+ 
+</div>
+
             <div>
               <h1 className="text-3xl font-bold">{userName}</h1>
               {/* <p className="text-lg text-gray-600">ID: {userId}</p> */}
-              <p className="text-gray-500 text-sm mt-1">Traveler | Explorer | Nature Enthusiast</p> {/* Short Bio */}
+              <p className="text-gray-500 text-sm mt-1">{billingAddress}</p> 
               <button
         onClick={() => setShowModal(true)}
         className="mt-2 px-4 py-2 bg-[#8cc163] text-white rounded hover:bg-green-500 text-sm"
@@ -479,12 +567,23 @@ const handleSubmit = async (e) => {
             </select>
 
             <input
-              type="password"
-              placeholder="Password"
-              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+  type="password"
+  placeholder="Password"
+  className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+/>
+
+             <input
+    type="file"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files[0];
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }}
+    className="text-sm text-gray-500"
+  />
 
             <button
               className="w-full p-2 bg-[#8cc163] text-white rounded"
@@ -499,25 +598,17 @@ const handleSubmit = async (e) => {
           </div>
 
           <div>
-            <ul className="flex space-x-6 md:space-x-8">
-              <li className="text-center">
-                <h2 className="text-xl font-bold">1</h2>
-                <p className="text-sm text-gray-500">Place</p>
-              </li>
-              <li className="text-center">
-                <h2 className="text-xl font-bold">1</h2>
-                <p className="text-sm text-gray-500">This Year</p>
-              </li>
-              <li className="text-center">
-                <h2 className="text-xl font-bold">0</h2>
-                <p className="text-sm text-gray-500">Following</p>
-              </li>
-              <li className="text-center">
-                <h2 className="text-xl font-bold">0</h2>
-                <p className="text-sm text-gray-500">Followers</p>
-              </li>
-            </ul>
-          </div>
+        <ul className="flex space-x-6 md:space-x-8">
+          <li className="text-center">
+            <h2 className="text-xl font-bold">{following ? following.length : 0}</h2>
+            <p className="text-sm text-gray-500">Following</p>
+          </li>
+          <li className="text-center">
+            <h2 className="text-xl font-bold">{followers ? followers.length : 0}</h2>
+            <p className="text-sm text-gray-500">Followers</p>
+          </li>
+        </ul>
+      </div>
         </div>
 
         {/* Tab Navigation */}

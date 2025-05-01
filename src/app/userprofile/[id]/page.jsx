@@ -21,7 +21,7 @@ const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('profile');
    const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [privacy, setPrivacy] = useState("Public"); // if isActive depend on privacy
+  const [privacy, setPrivacy] = useState("Public");
   const cookiesuserId = Cookies.get("userId");
   const [places, setPlaces] = useState([]);
     const [lists, setLists] = useState([]);
@@ -32,28 +32,30 @@ const UserProfile = () => {
     const [diaryList, setDiaryList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
      const [userId, setUserId] = useState("");
-     const [isFollowing, setIsFollowing] = useState(false); 
+    //  const [isFollowing, setIsFollowing] = useState(false); 
      const cookiesUserId = Cookies.get("userId");
 
 
-     useEffect(() => {
-      const checkIfFollowing = async () => {
-        try {
-          const res = await axios.get(`https://parjatak-core.vercel.app/api/v1/customer/check-follow-status?userId=${cookiesUserId}&parentUserId=${id}`);
-          if (res.data.success && res.data.data) {
-            setIsFollowing(true);
-          } else {
-            setIsFollowing(false);
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      };
+    //  useEffect(() => {
+    //   const checkIfFollowing = async () => {
+    //     try {
+    //       const res = await axios.get(`https://parjatak-core.vercel.app/api/v1/customer/check-follow-status?userId=${cookiesUserId}&parentUserId=${id}`);
+    //       if (res.data.success && res.data.data) {
+    //         setIsFollowing(true);
+    //       } else {
+    //         setIsFollowing(false);
+    //       }
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //   };
     
-      checkIfFollowing();
-    }, []);
+    //   checkIfFollowing();
+    // }, []);
     
-
+    const isFollowing = user?.follower?.some(
+      (f) => f.userId === id && f.parentUserId === cookiesUserId
+    );
 
     const handleFollowToggle = async () => {
       try {
@@ -63,8 +65,8 @@ const UserProfile = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userId: cookiesUserId,
-            parentUserId: id,
+            userId: id,
+            parentUserId: cookiesUserId,
           }),
         });
     
@@ -72,7 +74,7 @@ const UserProfile = () => {
     
         if (data.success) {
           toast.success(data.message);
-          setIsFollowing((prev) => !prev); 
+          // setIsFollowing((prev) => !prev); 
         } else {
           toast.error("Action failed!");
         }
@@ -123,7 +125,7 @@ const fetchBucketList = async () => {
 
 useEffect(() => {
   if (id) {
-    fetchBucketList(); // 👈 ekhane function ta call hobe
+    fetchBucketList(); 
   }
 }, [id]);
 
@@ -199,7 +201,7 @@ const handleSubmit = async (e) => {
       try {
         const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/places");
         const data = await response.json();
-        setPlaces(data.data); // API response structure anujayi
+        setPlaces(data.data); 
       } catch (error) {
         console.error("Error fetching places:", error);
       }
@@ -381,11 +383,11 @@ const handleSubmit = async (e) => {
                 <p className="text-sm text-gray-500">This Year</p>
               </li>
               <li>
-                <h2 className="text-xl font-bold">{user.followingg || 1}</h2>
+                <h2 className="text-xl font-bold">{user?.following?.length }</h2>
                 <p className="text-sm text-gray-500">Following</p>
               </li>
               <li>
-                <h2 className="text-xl font-bold">{user.followers || 0}</h2>
+                <h2 className="text-xl font-bold">{user.follower?.length || 0}</h2>
                 <p className="text-sm text-gray-500">Followers</p>
               </li>
             </ul>

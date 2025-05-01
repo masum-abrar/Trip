@@ -167,7 +167,7 @@ const Navbar = ({ href, children }) => {
       {districts.map((district, index) => (
   <li key={district.id || index}>
     <Link
-      href={`/district/${district.name.toLowerCase()}`}
+      href={`/district/${district.slug.toLowerCase()}`}
       className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
     >
       {district.name}

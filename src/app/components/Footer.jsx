@@ -86,7 +86,7 @@ function Footer() {
     <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-20 pointer-events-none z-0" />
 
     {/* Main Footer Content */}
-    <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-16 grid grid-cols-1 md:grid-cols-3 gap-12">
+    <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-16 grid grid-cols-1 md:grid-cols-2 gap-12">
       {/* Left: Parjatak Description */}
       <div className="text-left">
         <h2 className="text-3xl font-bold  mb-4">Parjatak</h2>
@@ -96,10 +96,10 @@ function Footer() {
       </div>
 
       {/* Center: Social Media Icons */}
-      <div className="flex flex-col items-center justify-center space-y-6">
+      <div className="flex flex-col  justify-center space-y-6">
         <h4 className="text-lg font-semibold">Follow Us</h4>
         <div className="flex space-x-5 text-2xl">
-          <a href="#" className="hover:text-[#1877F2] transition"><FaFacebook /></a>
+          <a href="https://facebook.com/officialPARJATAK" target="_blank" className="hover:text-[#1877F2] transition"><FaFacebook /></a>
           <a href="#" className="hover:text-[#1DA1F2] transition"><FaTwitter /></a>
           <a href="#" className="hover:text-pink-500 transition"><FaInstagram /></a>
           <a href="#" className="hover:text-[#0A66C2] transition"><FaLinkedin /></a>
@@ -108,7 +108,7 @@ function Footer() {
       </div>
 
       {/* Right: Support Links */}
-      <div className="text-right">
+      {/* <div className="text-right">
         <h4 className="text-lg font-semibold mb-4">Support</h4>
         <ul className="space-y-3 text-sm text-gray-400">
           <li><a href="#" className="hover:text-teal-400 transition">Contact Us</a></li>
@@ -116,7 +116,7 @@ function Footer() {
           <li><a href="#" className="hover:text-teal-400 transition">Privacy Policy</a></li>
           <li><a href="#" className="hover:text-teal-400 transition">Terms & Conditions</a></li>
         </ul>
-      </div>
+      </div> */}
     </div>
 
     {/* Footer Bottom */}
