@@ -21,7 +21,7 @@ const PopularPost = () => {
       try {
         const userId = Cookies.get('userId');
         const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/new-posts-from-friends?userId=${userId}`);
-        const data = await response.json(); // ⬅️ important
+        const data = await response.json(); 
   
         if (data.success) {
           setPosts(data.data);  // Update the state with fetched posts
@@ -76,8 +76,8 @@ const PopularPost = () => {
     <div className="container mx-auto max-w-6xl py-8 p-2">
     <h2 className="text-2xl text-black mb-6">New Posts From Friends</h2>
     <Slider {...settings}>
-      {posts.map((post) => (
-        <div key={post.id} className="p-2">
+      {posts?.map((post) => (
+        <div key={post?.id} className="p-2">
           <div
             className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
             onClick={() => openModal(post)}
@@ -85,20 +85,20 @@ const PopularPost = () => {
             <div className="relative">
              
                 <img
-                  src={post.images[0]?.image || post.image}
-                  alt={post.heading}
+                  src={post?.images[0]?.image || post.image}
+                  alt={post?.heading}
                   className="w-full h-48 object-cover"
                 />
              
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
               <div className="absolute bottom-2 left-2 text-white">
-                <h4 className="text-lg font-bold">{post.heading}</h4>
+                <h4 className="text-lg font-bold">{post?.heading}</h4>
                 <Link href={`/district/${post.district?.name}`}>
                   <span
                     onClick={handleDistrictClick}
                     className="inline-block bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full mt-1 cursor-pointer hover:bg-blue-200"
                   >
-                    {post.district?.name}
+                    {post?.district?.name}
                   </span>
                 </Link>
               </div>
@@ -118,7 +118,7 @@ const PopularPost = () => {
                 <FiMoreVertical className="ml-auto text-gray-500" />
               </div>
               <div>
-                <p className="text-gray-600 text-sm mb-2">{post.description}</p>
+                <p className="text-gray-600 text-sm mb-2">{post?.description}</p>
               </div>
               <div className="flex justify-between items-center text-gray-600">
                 <div className="flex space-x-4">

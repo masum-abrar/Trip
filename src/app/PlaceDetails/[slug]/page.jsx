@@ -12,6 +12,9 @@ import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { useRouter } from "next/navigation"; // ✅ correct for App Router
+
+
 // const places = [
 //   { id: 1, title: "Jaflong", district: "Sylhet",  subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
 //   { id: 2, title: "Saint Martin", district: "CoxsBazar", subDistict:"Teknaf", description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Best-Bangladeshi-landmarks-1024x585.jpg", eyeCount: "890k", dotCount: "134k", heartCount: "456k" },
@@ -217,6 +220,63 @@ const PlaceDetails = ({ params }) => {
           alert("Something went wrong!");
         }
       };
+
+      const [visited, setVisited] = useState(false);
+      const placeId = place?.id;
+      const userId = Cookies.get("userId");
+      const hasVisited = place?.visitor?.some(v => v.userId === userId);
+
+
+ const router = useRouter(); // Add this at top of component
+
+ const handleVisitToggle = async () => {
+  if (!placeId || !userId) return;
+  setLoading(true);
+
+  const payload = { placeId, userId };
+
+  try {
+    const hasVisited = place.visitor.some(v => v.userId === userId);
+
+    if (!hasVisited) {
+      await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-visitor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    
+      place.visitor.push({ userId }); // ✅ manually add visitor
+      setVisited(true);
+    } else {
+      await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-visitor", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    
+      place.visitor = place.visitor.filter(v => v.userId !== userId); // ✅ manually remove visitor
+      setVisited(false);
+    }
+    
+
+    // Soft reload to reflect updated visitor data
+    router.refresh();
+
+  } catch (err) {
+    console.error("Visitor toggle failed", err);
+  }
+
+  setLoading(false);
+};
+
+
+
+      
+      
+     
+
+
+
   return (
     <div className="bg-white">
       {/* Navbar */}
@@ -266,28 +326,34 @@ const PlaceDetails = ({ params }) => {
         <div className="flex flex-wrap gap-3 mt-6">
   {[
     { icon: "📖", text: "Add to Diary", onClick: () => setModalOpen(true) },
-    { icon: "📌", text: "Add to Bucket List",  onClick: () => setBucketModalOpen(true) },
-    { icon: "📂", text: "Add to List", onClick : () => setSpotModalOpen(true) },
-    // { icon: "⭐", text: "Add to Favorite Place" },
-    { icon: "🚶", text: "12k Visitor" },
-    { icon: "✅", text: "Visited" },
+    { icon: "📌", text: "Add to Bucket List", onClick: () => setBucketModalOpen(true) },
+    { icon: "📂", text: "Add to List", onClick: () => setSpotModalOpen(true) },
+    { icon: "🚶", text: place?.visitor ? `${place.visitor.length}` : "Loading..." },
+
+
+    {
+      icon: hasVisited ? "✅" : "☑️",
+      text: hasVisited ? "Visited" : "Mark as Visited",
+      onClick: handleVisitToggle,
+    },
   ].map((button, index) => (
     <button
       key={index}
-      onClick={button.onClick} // Add the onClick handler here
-      className="relative px-6 py-2 text-sm font-medium rounded-full border border-gray-300 text-gray-800 shadow-lg transition-all duration-300 overflow-hidden group"
+      onClick={button.onClick}
+      disabled={loading && button.text.includes("Visit")}
+      className={`relative px-6 py-2 text-sm font-medium rounded-full border border-gray-300 text-gray-800 shadow-lg transition-all duration-300 overflow-hidden group ${
+        button.text === "Visited" ? "bg-green-600 text-white" : "bg-white text-gray-800"
+      } ${button.text === "Mark as Visited" ? "bg-white text-gray-800" : ""
+      }`}
     >
-      {/* Default Text */}
       <span className="relative z-10 flex items-center gap-2 transition-colors duration-300 group-hover:text-white">
         {button.icon} {button.text}
       </span>
-
-      {/* Gradient Hover Background Effect */}
       <span className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-900 left-0 w-full h-full scale-0 origin-center transition-transform duration-300 ease-in-out group-hover:scale-100"></span>
     </button>
   ))}
-  
 </div>
+
 
 
 {/* Description */}

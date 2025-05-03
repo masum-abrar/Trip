@@ -16,9 +16,10 @@ const DistrictPage  = ({ params }) => {
   const districtName = params?.districtName ?? '';
   const [community, setCommunity] = useState(null);
   const [activeTab, setActiveTab] = useState('Discussion');
-  const [hasJoined, setHasJoined] = useState(false);
-  const isAlreadyJoined = community?.follower?.some(follower => follower.user.id === Cookies.get("userId"));
+  // const [hasJoined, setHasJoined] = useState(false);
+  const hasJoined = community?.follower?.some(follower => follower.user.id === Cookies.get("userId"));
   const [newPost, setNewPost] = useState({ text: '', images: [], place: '', subdistrict: '' });
+  const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -80,7 +81,6 @@ const DistrictPage  = ({ params }) => {
 
   const handleJoin = async () => {
     const userId = Cookies.get("userId");
-   
   
     if (!userId || !community?.id) {
       console.warn("Missing userId or community id");
@@ -88,54 +88,68 @@ const DistrictPage  = ({ params }) => {
     }
   
     try {
-     
-      const isAlreadyJoined = community.follower?.some(follower => follower.user.id === userId);
+      const isAlreadyJoined = community.follower?.some(
+        (follower) => follower.user.id === userId
+      );
   
       if (isAlreadyJoined) {
-        
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-district-follower", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-           
-          },
-          body: JSON.stringify({
-            userId: userId,
-            districtId: community.id,
-          }),
-        });
+        const response = await fetch(
+          "https://parjatak-core.vercel.app/api/v1/customer/delete-district-follower",
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userId,
+              districtId: community.id,
+            }),
+          }
+        );
   
         const data = await response.json();
   
         if (data.success) {
-          
-          toast.success(`You have successfully left the "${community?.name}" community!`);
-          setHasJoined(false); 
-          fetchCommunity(); 
+          toast.success(
+            `You have successfully left the "${community?.name}" community!`
+          );
+          // Remove follower from state
+          const updatedFollowers = community.follower.filter(
+            (follower) => follower.user.id !== userId
+          );
+          setCommunity({ ...community, follower: updatedFollowers });
+          setHasJoined(false);
         } else {
           alert(data.message || "Failed to leave.");
         }
       } else {
-       
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-district-follower", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-           
-          },
-          body: JSON.stringify({
-            userId: userId,
-            districtId: community.id,
-          }),
-        });
+        const response = await fetch(
+          "https://parjatak-core.vercel.app/api/v1/customer/create-district-follower",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userId,
+              districtId: community.id,
+            }),
+          }
+        );
   
         const data = await response.json();
   
         if (data.success) {
-         
-          toast.success(`You have successfully joined the "${community?.name}" community!`);
-          setHasJoined(true); 
-          fetchCommunity(); 
+          toast.success(
+            `You have successfully joined the "${community?.name}" community!`
+          );
+          // Add follower to state
+          const updatedFollowers = [
+            ...community.follower,
+            { user: { id: userId } },
+          ];
+          setCommunity({ ...community, follower: updatedFollowers });
+          setHasJoined(true);
         } else {
           alert(data.message || "Failed to follow.");
         }
@@ -144,6 +158,7 @@ const DistrictPage  = ({ params }) => {
       console.error("Failed to join/leave community:", error);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-white">
@@ -164,16 +179,17 @@ const DistrictPage  = ({ params }) => {
         {community?.name.charAt(0).toUpperCase() + community?.name.slice(1) || "loading District..."}
       </h1>
       <button
-    onClick={handleJoin}
-    disabled={hasJoined}
-    className={`${
-      isAlreadyJoined
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-[#8cc163] hover:bg-[#6fb936] hover:shadow-lg hover:scale-110"
-    } text-white px-6 lg:px-8 py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform`}
-  >
-    {isAlreadyJoined ? "Joined" : "Join"}
-  </button>
+  onClick={handleJoin}
+  disabled={loading} // prevent multiple calls
+  className={`${
+    hasJoined
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-[#8cc163] hover:bg-[#6fb936] hover:shadow-lg hover:scale-110"
+  } text-white px-6 lg:px-8 py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform`}
+>
+  {hasJoined ? "Joined" : loading ? "Joining..." : "Join"}
+</button>
+
 
     </div>
   
@@ -209,7 +225,8 @@ const DistrictPage  = ({ params }) => {
           </div>
         )}
       </div>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000}  closeOnClick
+  pauseOnHover/>
     </div>
   );
 };
