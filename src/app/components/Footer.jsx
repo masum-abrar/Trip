@@ -121,7 +121,7 @@ function Footer() {
 
     {/* Footer Bottom */}
     <div className="relative z-10 border-t border-gray-800 py-4 text-center text-sm text-gray-500">
-      © {new Date().getFullYear()} Parjatak. Promote your local tourism".
+      © {new Date().getFullYear()} Parjatak. Promote your local tourism.
     </div>
   </footer>
   );

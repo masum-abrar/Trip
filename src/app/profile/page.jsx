@@ -31,11 +31,11 @@ const ProfilePage = () => {
     const [userId, setUserId] = useState("");
     const [divisions, setDivisions] = useState([]);
     const [districts, setDistricts] = useState([]);
-  const [activeTab, setActiveTab] = useState('profile'); 
+  const [activeTab, setActiveTab] = useState('activity'); 
  const [userName, setUserName] = useState(null);
  const [title, setTitle] = useState("");
 const [description, setDescription] = useState("");
-const [privacy, setPrivacy] = useState("Public"); // if isActive depend on privacy
+const [privacy, setPrivacy] = useState("Public"); 
 const cookiesuserId = Cookies.get("userId");
 const [places, setPlaces] = useState([]);
   const [lists, setLists] = useState([]);
@@ -49,7 +49,8 @@ const [places, setPlaces] = useState([]);
   const [image, setImage] = useState(null);
 const [preview, setPreview] = useState(null);
 
- 
+      const [showFollowers, setShowFollowers] = useState(false);
+      const [showFollowing, setShowFollowing] = useState(false);
 const userImage = Cookies.get("userImage") 
 
 
@@ -247,7 +248,7 @@ useEffect(() => {
     };
     if (division) fetchDistricts();
   }, [division]);
-// Only for development or testing!
+
 
   // Handle profile update
   const handleUpdate = async () => {
@@ -260,7 +261,7 @@ useEffect(() => {
       formData.append("divisionId", division);
       formData.append("districtId", district);
       formData.append("password", password);
-       formData.append("image", image); 
+      formData.append("image", image); 
   
       const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userId}`, {
         method: "PUT",
@@ -278,8 +279,7 @@ useEffect(() => {
         Cookies.set("userDistrict", district);
         Cookies.set("userImage", preview);
         Cookies.set("userPassword", password); 
-        Cookies.set("userImage", result.image);
-  
+       
         toast.success("Profile updated successfully!");
         setShowModal(false);
       } else {
@@ -420,7 +420,7 @@ useEffect(() => {
         const data = await response.json();
 
         if (response.ok) {
-          // Check if the user ID matches the one from the cookie
+          
           if (data.data && data.data.id === userIdFromCookie) {
             setUserData(data.data);
           } else {
@@ -459,7 +459,7 @@ useEffect(() => {
           <div className="w-24 h-24 rounded-full overflow-hidden mb-2 border-2 border-gray-300">
   {userData?.image ? (
     <Image
-      src={userData?.image} // External image URL
+      src={userData?.image} 
       alt="Profile Preview"
       width={96}
       height={96}
@@ -467,7 +467,7 @@ useEffect(() => {
     />
   ) : (
     <Image
-      src="https://cdn-icons-png.flaticon.com/512/9368/9368192.png" // Default image URL
+      src="https://cdn-icons-png.flaticon.com/512/9368/9368192.png" 
       width={96}
       height={96}
       alt="Default Avatar"
@@ -599,14 +599,79 @@ useEffect(() => {
 
           <div>
         <ul className="flex space-x-6 md:space-x-8">
-          <li className="text-center">
-            <h2 className="text-xl font-bold">{following ? following.length : 0}</h2>
-            <p className="text-sm text-gray-500">Following</p>
-          </li>
-          <li className="text-center">
-            <h2 className="text-xl font-bold">{followers ? followers.length : 0}</h2>
-            <p className="text-sm text-gray-500">Followers</p>
-          </li>
+        <li onClick={() => setShowFollowing(true)} className="cursor-pointer">
+  <h2 className="text-xl font-bold">{userData?.following?.length || 0}</h2>
+  <p className="text-sm text-gray-500">Following</p>
+</li>
+{showFollowing && (
+  <div className="fixed inset-0  bg-opacity-40 z-50 flex items-center justify-center">
+    <div className="bg-white w-full max-w-md rounded-lg p-5 max-h-[400px] overflow-y-auto relative shadow-lg">
+      <button
+        className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl"
+        onClick={() => setShowFollowing(false)}
+      >
+        ✕
+      </button>
+
+      <h3 className="text-xl font-semibold mb-4 text-center">Following</h3>
+
+      {userData?.following?.length > 0 ? (
+        userData?.following.map((f, index) => (
+          <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
+            <img
+              src={f.otherUser?.image || "https://via.placeholder.com/40"}
+              alt={f.otherUser?.name || "User"}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div>
+              <p className="font-medium">{f.otherUser?.fullname || f.otherUser?.name}</p>
+              {/* <p className="text-sm text-gray-500">{f.otherUser?.name}</p> */}
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-600 text-sm">No following found.</p>
+      )}
+    </div>
+  </div>
+)}
+
+              <li onClick={() => setShowFollowers(true)} className="cursor-pointer">
+  <h2 className="text-xl font-bold">{userData?.follower?.length || 0}</h2>
+  <p className="text-sm text-gray-500">Followers</p>
+</li>
+{showFollowers && (
+  <div className="fixed inset-0  bg-opacity-40 z-50 flex items-center justify-center">
+    <div className="bg-white w-full max-w-md rounded-lg p-5 max-h-[400px] overflow-y-auto relative shadow-lg">
+      <button
+        className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl"
+        onClick={() => setShowFollowers(false)}
+      >
+        ✕
+      </button>
+
+      <h3 className="text-xl font-semibold mb-4 text-center">Followers</h3>
+
+      {userData?.follower?.length > 0 ? (
+        userData?.follower?.map((f, index) => (
+          <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
+            <img
+              src={f.meUser?.image || "https://via.placeholder.com/40"}
+              alt={f.meUser?.name || "User"}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div>
+              <p className="font-medium">{f.meUser?.fullname || f.meUser?.name}</p>
+             
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-600 text-sm">No followers found.</p>
+      )}
+    </div>
+  </div>
+)}
         </ul>
       </div>
         </div>
@@ -614,14 +679,14 @@ useEffect(() => {
         {/* Tab Navigation */}
         <div className="text-center mb-8">
           <ul className="inline-flex flex-wrap justify-center border-b w-full border-gray-300 pb-2 space-x-4 sm:space-x-6">
-            <li
+            {/* <li
               className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                 activeTab === 'profile' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
               }`}
               onClick={() => handleTabClick('profile')}
             >
               Profile
-            </li>
+            </li> */}
             <li
               className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                 activeTab === 'activity' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
@@ -928,12 +993,12 @@ useEffect(() => {
    {/* <h2 className="text-lg lg:text-3xl font-bold text-gray-800">Best Places for Camping</h2> */}
    <div>
       {/* Add Spot Button */}
-      <button
+      {/* <button
         className="bg-[#8cc163] text-white px-3 py-2 lg:px-6  lg:py-2 rounded-lg flex items-center ml-[100px]  gap-2 hover:bg-[#8fe44d]"
         onClick={() => setSpotModalOpen(true)}
       >
         <FaPlus /> Add Spot on List
-      </button>
+      </button> */}
 
       {/* Modal */}
       {spotModalOpen && (

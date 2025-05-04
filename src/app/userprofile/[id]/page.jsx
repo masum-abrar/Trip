@@ -18,7 +18,7 @@ import { ToastContainer } from 'react-toastify';
 const UserProfile = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('diary');
    const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [privacy, setPrivacy] = useState("Public");
@@ -34,6 +34,10 @@ const UserProfile = () => {
      const [userId, setUserId] = useState("");
     //  const [isFollowing, setIsFollowing] = useState(false); 
      const cookiesUserId = Cookies.get("userId");
+     const [showFollowers, setShowFollowers] = useState(false);
+     const [showFollowing, setShowFollowing] = useState(false);
+
+
 
 
     //  useEffect(() => {
@@ -58,6 +62,9 @@ const UserProfile = () => {
     );
 
     const handleFollowToggle = async () => {
+      const isFollowing = user?.follower?.some(
+        (f) => f.userId === id && f.parentUserId === cookiesUserId
+      );
       try {
         const res = await fetch('https://parjatak-core.vercel.app/api/v1/customer/create-followers', {
           method: 'POST',
@@ -373,23 +380,82 @@ const handleSubmit = async (e) => {
 
           {/* Right Section: Stats */}
           <div className="mt-6 md:mt-0 w-full md:w-1/2">
-            <ul className="flex justify-around gap-4 text-center">
-              <li>
-                <h2 className="text-xl font-bold">{user.placesCount || 1}</h2>
-                <p className="text-sm text-gray-500">Places</p>
-              </li>
-              <li>
-                <h2 className="text-xl font-bold">{user.tripsThisYear || 1}</h2>
-                <p className="text-sm text-gray-500">This Year</p>
-              </li>
-              <li>
-                <h2 className="text-xl font-bold">{user?.following?.length }</h2>
-                <p className="text-sm text-gray-500">Following</p>
-              </li>
-              <li>
-                <h2 className="text-xl font-bold">{user.follower?.length || 0}</h2>
-                <p className="text-sm text-gray-500">Followers</p>
-              </li>
+            <ul className="flex justify-center lg:justify-end gap-4 text-center">
+             
+              <li onClick={() => setShowFollowing(true)} className="cursor-pointer">
+  <h2 className="text-xl font-bold">{user?.following?.length || 0}</h2>
+  <p className="text-sm text-gray-500">Following</p>
+</li>
+{showFollowing && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center">
+    <div className="bg-white w-full max-w-md rounded-lg p-5 max-h-[400px] overflow-y-auto relative shadow-lg">
+      <button
+        className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl"
+        onClick={() => setShowFollowing(false)}
+      >
+        ✕
+      </button>
+
+      <h3 className="text-xl font-semibold mb-4 text-center">Following</h3>
+
+      {user.following?.length > 0 ? (
+        user.following.map((f, index) => (
+          <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
+            <img
+              src={f.otherUser?.image || "https://via.placeholder.com/40"}
+              alt={f.otherUser?.name || "User"}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div>
+              <p className="font-medium">{f.otherUser?.fullname || f.otherUser?.name}</p>
+              {/* <p className="text-sm text-gray-500">{f.otherUser?.name}</p> */}
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-600 text-sm">No following found.</p>
+      )}
+    </div>
+  </div>
+)}
+
+              <li onClick={() => setShowFollowers(true)} className="cursor-pointer">
+  <h2 className="text-xl font-bold">{user.follower?.length || 0}</h2>
+  <p className="text-sm text-gray-500">Followers</p>
+</li>
+{showFollowers && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center">
+    <div className="bg-white w-full max-w-md rounded-lg p-5 max-h-[400px] overflow-y-auto relative shadow-lg">
+      <button
+        className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl"
+        onClick={() => setShowFollowers(false)}
+      >
+        ✕
+      </button>
+
+      <h3 className="text-xl font-semibold mb-4 text-center">Followers</h3>
+
+      {user.follower?.length > 0 ? (
+        user.follower.map((f, index) => (
+          <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
+            <img
+              src={f.meUser?.image || "https://via.placeholder.com/40"}
+              alt={f.meUser?.name || "User"}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div>
+              <p className="font-medium">{f.meUser?.fullname || f.meUser?.name}</p>
+             
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-600 text-sm">No followers found.</p>
+      )}
+    </div>
+  </div>
+)}
+
             </ul>
           </div>
 
@@ -397,22 +463,22 @@ const handleSubmit = async (e) => {
          {/* Tab Navigation */}
                 <div className="text-center mb-8">
                   <ul className="inline-flex flex-wrap justify-center border-b w-full border-gray-300 pb-2 space-x-4 sm:space-x-6">
-                    <li
+                    {/* <li
                       className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                         activeTab === 'profile' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
                       }`}
                       onClick={() => handleTabClick('profile')}
                     >
                       Profile
-                    </li>
-                    <li
+                    </li> */}
+                    {/* <li
                       className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                         activeTab === 'activity' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
                       }`}
                       onClick={() => handleTabClick('activity')}
                     >
                       Activity
-                    </li>
+                    </li> */}
                     {/* <li
                       className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                         activeTab === 'place' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'

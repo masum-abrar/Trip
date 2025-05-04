@@ -17,6 +17,8 @@ function App() {
   const [sections, setSections] = useState([]);
   const [likes, setLikes] = useState({});
   const [newComments, setNewComments] = useState({});
+  const [filteredSections, setFilteredSections] = useState([]);
+const [searchQuery, setSearchQuery] = useState("");
 
   const userId = Cookies.get("userId"); 
 
@@ -61,6 +63,7 @@ function App() {
       
       if (data && data.data) {
         setSections(data.data);
+        setFilteredSections(data.data);
 
         // Like status setup
         const initialLikes = {};
@@ -152,6 +155,41 @@ function App() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
+      <div className="flex justify-center mb-8">
+  <div className="relative w-full max-w-lg">
+    <input
+      type="text"
+      value={searchQuery}
+      onChange={(e) => {
+        const value = e.target.value.toLowerCase();
+        setSearchQuery(value);
+
+        const filtered = sections.filter((section) =>
+          section.title?.toLowerCase().includes(value)
+        );
+        setFilteredSections(filtered);
+      }}
+      placeholder="Search lists by title..."
+      className="w-full py-3 pl-5 pr-12 text-gray-700 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-[#8cc163] transition-all"
+    />
+    
+    {/* Reset Button */}
+    {searchQuery && (
+      <button
+        onClick={() => {
+          setSearchQuery("");
+          setFilteredSections(sections);
+        }}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition"
+        title="Clear"
+      >
+        ✕
+      </button>
+    )}
+  </div>
+</div>
+
+
       {sections.length === 0 ? (
   // Skeleton Loader
   <div className="space-y-6">
@@ -201,10 +239,12 @@ function App() {
   </div>
 ) : (
   // Actual content when loaded
-  sections.map((section) => (
+  
+  filteredSections.map((section) => (
     <section key={section.id} className="space-y-6">
       {/* Section Header */}
       <div className="flex justify-between items-center">
+        
         <Link href={`/list/${(section.slug)}`}>
           <h2 className="text-xl lg:text-3xl font-bold text-gray-900">{section.title}</h2>
         </Link>

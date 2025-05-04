@@ -105,6 +105,13 @@ const PlaceDetails = ({ params }) => {
     }, [districtName]);
 
     const handleSave = async () => {
+      if (!cookiesuserId) {
+        toast.error("You need to log in first to add a diary.");
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+        return;
+      }
       const payload = {
         userId: cookiesuserId,
         placeId :place?.id,
@@ -133,6 +140,13 @@ const PlaceDetails = ({ params }) => {
     };
 
     const handleSaveBucketList = async () => {
+      if (!cookiesuserId) {
+        toast.error("You need to log in first to add to bucket list.");
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+        return;
+      }
       const payload = {
         userId: cookiesuserId,
         placeId :place?.id,
@@ -190,7 +204,16 @@ const PlaceDetails = ({ params }) => {
 
       const handleSpotSubmit = async () => {
        
-    
+        if (!cookiesuserId) {
+          toast.error("You need to log first in to add a spot.");
+          
+          setTimeout(() => {
+            router.push("/login");
+          }, 3000); 
+        
+          return;
+        }
+        
         const payload = {
           userId : cookiesuserId,
           listId: selectedList,
@@ -230,8 +253,18 @@ const PlaceDetails = ({ params }) => {
  const router = useRouter(); // Add this at top of component
 
  const handleVisitToggle = async () => {
+  if (!cookiesuserId) {
+    toast.error("You need to log in first to mark as visited.");
+    
+    setTimeout(() => {
+      router.push("/login");
+    }, 3000); 
+  
+    return;
+  }
   if (!placeId || !userId) return;
   setLoading(true);
+  
 
   const payload = { placeId, userId };
 
