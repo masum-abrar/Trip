@@ -91,7 +91,7 @@ function Footer() {
       <div className="text-left">
         <h2 className="text-3xl font-bold  mb-4">Parjatak</h2>
         <p className="text-gray-300 text-sm leading-relaxed max-w-sm">
-          Discover hidden treasures, connect with fellow explorers, and plan your next adventure. Parjatak is your travel companion for the modern world.
+        Bangladesh’s First Social Network for Travel Enthusiasts - Empowering Local Tourism Across  the Country.
         </p>
       </div>
 
@@ -121,7 +121,7 @@ function Footer() {
 
     {/* Footer Bottom */}
     <div className="relative z-10 border-t border-gray-800 py-4 text-center text-sm text-gray-500">
-      © {new Date().getFullYear()} Parjatak. Built with passion for modern-day wanderers.
+      © {new Date().getFullYear()} Parjatak. Promote your local tourism".
     </div>
   </footer>
   );

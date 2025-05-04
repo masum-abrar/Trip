@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 
 const PlaceTabSec = ({PlaceData}) => {
@@ -163,7 +165,7 @@ const [previewImages, setPreviewImages] = useState([]);
     formData.append("isActive",  "false");
   
     images.forEach((img, i) => {
-      formData.append(`images`, img); // backend should parse array of images from `images`
+      formData.append(`images`, img); 
     });
   
     try {
@@ -205,27 +207,42 @@ const [previewImages, setPreviewImages] = useState([]);
 
         {/* Grid of Places */}
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {locationData?.map((spot) => (
-            <Link key={spot.slug} href={`/PlaceDetails/${spot.slug}`}>
-              <div className="group relative overflow-hidden rounded-xl aspect-[4/3] transform hover:scale-105 transition-all duration-300 shadow-lg cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10" />
-                <img
-                  src={spot.images[0]?.image || "https://via.placeholder.com/600x400"}
-                  alt={spot.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                  <h3 className="text-lg font-semibold text-white">{spot.name}</h3>
-                  <div className="flex items-center space-x-2 text-sm text-white/80">
-                    <Star className="w-4 h-4 text-yellow-400" />
-                    <span>{spot.review?.[0]?.rating ?? 0}</span>
-                    <MapPin className="w-4 h-4 text-emerald-400 ml-2" />
-                    <span>{spot.address}</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+        {locationData?.map((spot) => (
+  <Link key={spot.slug} href={`/PlaceDetails/${spot.slug}`}>
+    <div className="group relative overflow-hidden rounded-xl aspect-[4/3] transform hover:scale-105 transition-all duration-300 shadow-lg cursor-pointer">
+      
+      {/* Swiper for multiple images */}
+      <Swiper
+        spaceBetween={10}
+        slidesPerView={1}
+        pagination={{ clickable: true }}
+        className="w-full h-full"
+      >
+        {spot.images.map((img, idx) => (
+          <SwiperSlide key={idx}>
+            <img
+              src={img.image || "https://via.placeholder.com/600x400"}
+              alt={spot.name}
+              className="w-full h-full object-cover absolute inset-0"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10" />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      {/* Info Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
+        <h3 className="text-lg font-semibold text-white">{spot.name}</h3>
+        <div className="flex items-center space-x-2 text-sm text-white/80">
+          <Star className="w-4 h-4 text-yellow-400" />
+          <span>{spot.review?.[0]?.rating ?? 0}</span>
+          <MapPin className="w-4 h-4 text-emerald-400 ml-2" />
+          <span>{spot.address}</span>
+        </div>
+      </div>
+    </div>
+  </Link>
+))}
         </div>
       </section>
 

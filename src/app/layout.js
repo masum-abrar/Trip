@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Parjatak",
-  description: "Discover hidden treasures, connect with fellow explorers, and plan your next adventure. Parjatak is your travel companion for the modern world.",
+  description: "Bangladesh’s First Social Network for Travel Enthusiasts - Empowering Local Tourism Across  the Country.",
 };
 
 export default function RootLayout({ children }) {

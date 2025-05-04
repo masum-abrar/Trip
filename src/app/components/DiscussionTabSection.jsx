@@ -242,8 +242,9 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
     // Fetch places
     useEffect(() => {
       const fetchPlaces = async () => {
+        const districtId = PostData?.id;
         try {
-          const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/places");
+          const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
           const data = await response.json();
           setPlaces(data.data);
         } catch (error) {
@@ -251,7 +252,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         }
       };
       fetchPlaces();
-    }, []);
+    }, [districtId]);
   
     // Handle image change
     const handleImageChange = (e) => {

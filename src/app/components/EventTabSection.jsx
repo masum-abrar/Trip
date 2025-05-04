@@ -80,19 +80,19 @@ const districtId = PostData?.id;
   Array.isArray(locationData?.like) &&
   locationData.like.some((like) => like.user?.id === cookiesuserId);
 
-  useEffect(() => {
-    const fetchPlaces = async () => {
-      try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/places");
-        const data = await response.json();
-        setPlaces(data.data); // API structure onujayi 'data' array access kortesi
-      } catch (error) {
-        console.error("Error fetching places:", error);
-      }
-    };
-
-    fetchPlaces();
-  }, []);
+ useEffect(() => {
+      const fetchPlaces = async () => {
+        const districtId = PostData?.id;
+        try {
+          const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
+          const data = await response.json();
+          setPlaces(data.data);
+        } catch (error) {
+          console.error("Failed to fetch places:", error);
+        }
+      };
+      fetchPlaces();
+    }, [districtId]);
   // const handleImageChange = (e) => {
   //   if (!e.target.files) return;  // Ensure files exist
   

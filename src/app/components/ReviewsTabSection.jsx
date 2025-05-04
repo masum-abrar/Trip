@@ -64,19 +64,21 @@ const ReviewsTabSection = ({locationData}) => {
         return;
       }
   
-      const payload = {
-        placeId: locationData?.id,
-        userId,
-        rating: newReview.rating,
-        comment: newReview.comment,
-      };
+      const formData = new FormData();
+      formData.append("placeId", locationData?.id);
+      formData.append("userId", userId);
+      formData.append("rating", newReview.rating);
+      formData.append("comment", newReview.comment);
+  
+      if (newReview.images?.length > 0) {
+        newReview.images.forEach((file, index) => {
+          formData.append("images", file); 
+        });
+      }
   
       const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-place-review", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       });
   
       if (!res.ok) throw new Error("Failed to submit review");
@@ -84,14 +86,13 @@ const ReviewsTabSection = ({locationData}) => {
       toast.success("✅ You have reviewed this place!");
       setIsModalOpen(false);
       setNewReview({ rating: 0, comment: "", images: [] });
-  
-      // Optionally reload reviews
-      
     } catch (error) {
       console.error(error);
-      toast.error("❌ Failed to submit review");
+      toast.error(" Failed to submit review");
     }
   };
+  
+  
   const handleDeleteReview = async (reviewId) => {
     const userId = Cookies.get("userId"); // Current user's ID
     const accessToken = Cookies.get("token"); // JWT Token
@@ -130,41 +131,55 @@ const ReviewsTabSection = ({locationData}) => {
 
       {/* Reviews List */}
       <div className="space-y-4">
-    {locationData?.review?.map((review, index) => (
-      <div key={index} className="bg-white p-4 rounded-lg shadow-md">
-        <div className="flex items-center space-x-3">
-          <Avatar />
-          <div>
-           <Link href={`/userprofile/${review.user.id}`} className="text-blue-500 hover:underline">
-           <h3 className="font-semibold text-gray-900">{review.user.name || "Anonymous"}</h3>
-           </Link>
-            <div className="flex">
-              {[...Array(10)].map((_, i) =>
-                i < review.rating ? (
-                  <FaStar key={i} className="text-yellow-500" />
-                ) : (
-                  <FaRegStar key={i} className="text-gray-300" />
-                )
-              )}
-            </div>
-          </div>
-          
-          {/* Delete button */}
-          {review.user.id === Cookies.get("userId") && (
-            <button
-              onClick={() => handleDeleteReview(review.id)}
-              className="text-red-500 hover:text-red-700 ml-28"
-              aria-label="Delete review"
-            >
-              <FaTrashAlt />
-            </button>
+      {locationData?.review?.map((review, index) => (
+  <div key={index} className="bg-white p-4 rounded-lg shadow-md">
+    <div className="flex items-center space-x-3">
+      <Avatar />
+      <div>
+        <Link href={`/userprofile/${review.user.id}`} className="text-blue-500 hover:underline">
+          <h3 className="font-semibold text-gray-900">{review.user.name || "Anonymous"}</h3>
+        </Link>
+        <div className="flex">
+          {[...Array(10)].map((_, i) =>
+            i < review.rating ? (
+              <FaStar key={i} className="text-yellow-500" />
+            ) : (
+              <FaRegStar key={i} className="text-gray-300" />
+            )
           )}
         </div>
-
-        {/* Review Content */}
-        <p className="text-gray-700 mt-2">{review.comment}</p>
       </div>
-    ))}
+
+      {review.user.id === Cookies.get("userId") && (
+        <button
+          onClick={() => handleDeleteReview(review.id)}
+          className="text-red-500 hover:text-red-700 ml-28"
+          aria-label="Delete review"
+        >
+          <FaTrashAlt />
+        </button>
+      )}
+    </div>
+
+    {/* Review Comment */}
+    <p className="text-gray-700 mt-2">{review.comment}</p>
+
+    {/* Review Images */}
+    {review.images?.length > 0 && (
+      <div className="flex flex-wrap gap-2 mt-3">
+        {review.images.map((img, i) => (
+          <img
+            key={i}
+            src={img.image}
+            alt={`review-img-${i}`}
+            className="w-24 h-24 object-cover rounded-md border"
+          />
+        ))}
+      </div>
+    )}
+  </div>
+))}
+
   </div>
 
 
@@ -204,20 +219,51 @@ const ReviewsTabSection = ({locationData}) => {
 
         
         {/* Image Upload */}
-        <div className="mt-3 ">
-        <Button sx={{
-        backgroundColor: "#8cc163",
-        color: "white",
-        "&:hover": {
-          backgroundColor: "#7aad58", // Slightly darker green on hover
-        },
-      }} component="label" startIcon={<FaImage /> }>
-              Upload Images
-              <input type="file" hidden multiple onChange={(e) => setNewReview({ ...newReview, images: [...e.target.files].slice(0, 7) })} />
-            </Button> 
+        <div className="mt-3">
+  <Button
+    sx={{
+      backgroundColor: "#8cc163",
+      color: "white",
+      "&:hover": {
+        backgroundColor: "#7aad58",
+      },
+    }}
+    component="label"
+    startIcon={<FaImage />}
+  >
+    Upload Images
+    <input
+      type="file"
+      hidden
+      multiple
+      accept="image/*"
+      onChange={(e) =>
+        setNewReview({
+          ...newReview,
+          images: [...e.target.files].slice(0, 7),
+        })
+      }
+    />
+  </Button>
 
-            <p className="text-xs text-gray-500 mt-1">Max 7 images</p>
-          </div>
+  <p className="text-xs text-gray-500 mt-1">Max 7 images</p>
+
+  {/* Preview Selected Images */}
+  {newReview.images?.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {newReview.images.map((file, index) => (
+        <div key={index} className="w-20 h-20 border rounded overflow-hidden">
+          <img
+            src={URL.createObjectURL(file)}
+            alt={`preview-${index}`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsModalOpen(false)} color="secondary">

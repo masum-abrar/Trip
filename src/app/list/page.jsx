@@ -8,6 +8,10 @@ import 'slick-carousel/slick/slick-theme.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import Cookies from 'js-cookie';
+import { Swiper, SwiperSlide } from "swiper/react";
+import  { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 function App() {
   const [sections, setSections] = useState([]);
@@ -17,17 +21,37 @@ function App() {
   const userId = Cookies.get("userId"); 
 
   const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 4,
-    slidesToScroll: 1,
+    dots: true,  // Enable navigation dots
+    infinite: sections?.listPlace?.length > 1,  // Enable infinite loop if there are more than 1 item
+    speed: 500,  // Transition speed in milliseconds
+    slidesToShow: sections?.listPlace?.length <= 1 ? 1 : 4,  // Show 1 slide if 1 item, 4 slides if more
+    slidesToScroll: 1,  // Scroll 1 slide at a time
     responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
+      {
+        breakpoint: 1024,  // For larger screens
+        settings: {
+          slidesToShow: sections?.listPlace?.length <= 1 ? 1 : 4,  // 4 slides on larger screens if more than 1 item
+        },
+      },
+      {
+        breakpoint: 768,  // For tablets and smaller screens
+        settings: {
+          slidesToShow: sections?.listPlace?.length <= 1 ? 1 : 2,  // 2 slides if multiple items, 1 if only 1
+        },
+      },
+      {
+        breakpoint: 480,  // For mobile screens
+        settings: {
+          slidesToShow: 1,  // 1 slide for mobile devices
+        },
+      },
     ],
   };
+  
+  
+  
+  
+  
 
   // List fetch
   const fetchLists = async () => {
@@ -196,33 +220,45 @@ function App() {
 
       {/* Slider */}
       {section?.listPlace?.length > 0 ? (
-        <Slider {...settings}>
-          {section.listPlace.map((spot) => (
-            <div key={spot.id} className="group relative overflow-hidden rounded-xl aspect-[4/3] transform hover:scale-105 transition-all duration-300 shadow-lg">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10" />
-              <img
-                src={spot.place?.images?.[0]?.image || "https://via.placeholder.com/600x400"}
-                alt={spot.place?.name || "No Image Available"}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                <h3 className="text-lg font-semibold text-white">{spot.place?.name}</h3>
-                <div className="flex items-center space-x-2 text-sm text-white/80">
-                  <Star className="w-4 h-4 text-yellow-400" />
-                  <span>
-                    {spot.place?.review?.length > 0
-                      ? (
-                          spot.place.review.reduce((acc, curr) => acc + curr.rating, 0) / spot.place.review.length
-                        ).toFixed(1)
-                      : "0.0"}
-                  </span>
-                  <MapPin className="w-4 h-4 text-emerald-400 ml-2" />
-                  <span>{spot.place?.address}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </Slider>
+   <Swiper
+   spaceBetween={10} // Space between slides
+   slidesPerView={1} // Default 1 slide per view for mobile
+   breakpoints={{
+     640: { slidesPerView: 1, spaceBetween: 10 },   // For screens ≥ 640px, show 1 slide
+     768: { slidesPerView: 2, spaceBetween: 15 },   // For screens ≥ 768px, show 2 slides
+     1024: { slidesPerView: 3, spaceBetween: 20 },  // For screens ≥ 1024px, show 3 slides
+     1200: { slidesPerView: 4, spaceBetween: 20 },  // For screens ≥ 1200px, show 4 slides
+   }}
+   className="mySwiper"
+ >
+   {section.listPlace.map((spot) => (
+     <SwiperSlide key={spot.id} className="group relative overflow-hidden rounded-xl max-w-[350px] w-full aspect-[4/3] transform hover:scale-105 transition-all duration-300 shadow-lg">
+       {/* Image */}
+       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10" />
+       <img
+         src={spot.place?.images?.[0]?.image || "https://via.placeholder.com/600x400"}
+         alt={spot.place?.name || "No Image Available"}
+         className="absolute inset-0 w-full h-full object-cover"
+       />
+       {/* Content */}
+       <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
+         <h3 className="text-lg font-semibold text-white">{spot.place?.name}</h3>
+         <div className="flex items-center space-x-2 text-sm text-white/80">
+           <Star className="w-4 h-4 text-yellow-400" />
+           <span>
+             {spot.place?.review?.length > 0
+               ? (
+                   spot.place.review.reduce((acc, curr) => acc + curr.rating, 0) / spot.place.review.length
+                 ).toFixed(1)
+               : "0.0"}
+           </span>
+           <MapPin className="w-4 h-4 text-emerald-400 ml-2" />
+           <span>{spot.place?.address}</span>
+         </div>
+       </div>
+     </SwiperSlide>
+   ))}
+ </Swiper>
       ) : (
         <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
           <p className="text-gray-500">No Places Added</p>

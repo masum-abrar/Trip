@@ -35,7 +35,7 @@ const Category = () => {
     if (!divisionId) return;
     const fetchDistricts = async () => {
       try {
-        const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts?divisionId=${divisionId}`);
+        const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-by-division-id/${divisionId}`);
         const data = await res.json();
         setDistricts(data.data || []);
       } catch (error) {
@@ -50,7 +50,7 @@ const Category = () => {
     if (!districtId) return;
     const fetchPlaces = async () => {
       try {
-        const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places?districtId=${districtId}`);
+        const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
         const data = await res.json();
         setPlaces(data.data || []);
       } catch (error) {
