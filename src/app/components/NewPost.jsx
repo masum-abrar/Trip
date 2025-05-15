@@ -75,6 +75,8 @@ const PopularPost = () => {
   return (
     <div className="container mx-auto max-w-6xl py-8 p-2">
     <h2 className="text-2xl text-black mb-6">New Posts </h2>
+
+{posts?.length > 0 ? (
     <Slider {...settings}>
       {posts.map((post) => (
         <div key={post.id} className="p-2">
@@ -138,6 +140,9 @@ const PopularPost = () => {
         </div>
       ))}
     </Slider>
+    ) : (
+  <div className="text-center text-gray-500 py-8 text-lg">No posts available</div>
+)}
   
     {/* Modal */}
     {isModalOpen && selectedPost && (
