@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import  { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus ,FaUserAltSlash  } from "react-icons/fa";
 import Cookies from "js-cookie";
 import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
@@ -27,6 +27,7 @@ const ProfilePage = () => {
     const [division, setDivision] = useState("");
     const [district, setDistrict] = useState("");
     const [password, setPassword] = useState("");
+    const [bio , setBio] = useState("")
   
     const [userId, setUserId] = useState("");
     const [divisions, setDivisions] = useState([]);
@@ -205,6 +206,7 @@ useEffect(() => {
     const userDistrict = Cookies.get("userDistrict");
     const userPassword = Cookies.get("userPassword");
     const userImage = Cookies.get("userImage");
+    const billingAddress = userData.billingAddress
 
     if (id) setUserId(id);
     if (name) setName(name);
@@ -215,6 +217,7 @@ useEffect(() => {
     if (userDistrict) setDistrict(userDistrict);
     if (userPassword) setPassword(userPassword);
     if (userImage) setImage(userImage);
+    if (billingAddress) setBio(billingAddress)
   }
 }, [showModal]);
 
@@ -254,13 +257,14 @@ useEffect(() => {
   const handleUpdate = async () => {
     try {
       const formData = new FormData();
-      formData.append("fullname", fullname);
+      // formData.append("fullname", fullname);
       formData.append("name", name);
-      formData.append("email", email);
-      formData.append("phone", phone);
-      formData.append("divisionId", division);
-      formData.append("districtId", district);
-      formData.append("password", password);
+      formData.append("billingAddress", bio)
+      // formData.append("email", email);
+      // formData.append("phone", phone);
+      // formData.append("divisionId", division);
+      // formData.append("districtId", district);
+      // formData.append("password", password);
       formData.append("image", image); 
   
       const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userId}`, {
@@ -482,7 +486,16 @@ useEffect(() => {
             <div>
               <h1 className="text-3xl font-bold">{userName}</h1>
               {/* <p className="text-lg text-gray-600">ID: {userId}</p> */}
-              <p className="text-gray-500 text-sm mt-1">{billingAddress}</p> 
+             <p className="text-gray-500 text-sm mt-1 flex items-center gap-2">
+  {billingAddress?.trim() ? (
+    billingAddress
+  ) : (
+    <>
+      <FaUserAltSlash className="text-gray-400" />
+      <span className="italic text-gray-400">No bio added yet</span>
+    </>
+  )}
+</p>
               <button
         onClick={() => setShowModal(true)}
         className="mt-2 px-4 py-2 bg-[#8cc163] text-white rounded hover:bg-green-500 text-sm"
@@ -508,13 +521,13 @@ useEffect(() => {
               Edit Profile
             </h2>
 
-            <input
+            {/* <input
               type="text"
               placeholder="Full Name"
               className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
               value={fullname}
               onChange={(e) => setFullname(e.target.value)}
-            />
+            /> */}
             <input
               type="text"
               placeholder="Username"
@@ -522,7 +535,14 @@ useEffect(() => {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <input
+             <input
+              type="text"
+              placeholder="bio"
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+            />
+            {/* <input
               type="email"
               placeholder="Email"
               className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
@@ -535,9 +555,9 @@ useEffect(() => {
               className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-            />
+            /> */}
 
-            <select
+            {/* <select
               className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
               value={division}
               onChange={(e) => {
@@ -572,21 +592,28 @@ useEffect(() => {
   className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
   value={password}
   onChange={(e) => setPassword(e.target.value)}
-/>
+/> */}
+<div className="flex flex-col items-start gap-2">
+  <p className="text-gray-800 font-medium">Change Profile Picture</p>
 
-             <input
-    type="file"
-    accept="image/*"
-    onChange={(e) => {
-      const file = e.target.files[0];
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
-    }}
-    className="text-sm text-gray-500"
-  />
+  <label className="inline-block px-4 py-2 bg-white text-gray-700 text-sm border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 transition duration-200">
+    Upload Image
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) => {
+        const file = e.target.files[0];
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+      }}
+      className="hidden "
+    />
+  </label>
+</div>
+
 
             <button
-              className="w-full p-2 bg-[#8cc163] text-white rounded"
+              className="w-full p-2 bg-[#8cc163] text-white rounded mt-4"
               onClick={handleUpdate}
             >
               Update Profile
