@@ -206,7 +206,7 @@ useEffect(() => {
     const userDistrict = Cookies.get("userDistrict");
     const userPassword = Cookies.get("userPassword");
     const userImage = Cookies.get("userImage");
-    const billingAddress = userData.billingAddress
+    const billingAddress = userData?.billingAddress
 
     if (id) setUserId(id);
     if (name) setName(name);
@@ -286,6 +286,7 @@ useEffect(() => {
        
         toast.success("Profile updated successfully!");
         setShowModal(false);
+        fetchUserData();
       } else {
         alert("Failed to update: " + result.message);
       }
@@ -410,15 +411,7 @@ useEffect(() => {
 
 
   //New Api
-
-  useEffect(() => {
-    if (!userIdFromCookie) {
-      setError("User not logged in.");
-      setLoading(false);
-      return;
-    }
-
-    const fetchUserData = async () => {
+ const fetchUserData = async () => {
       try {
         const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userIdFromCookie}`);
         const data = await response.json();
@@ -440,6 +433,16 @@ useEffect(() => {
       }
     };
 
+  useEffect(() => {
+    if (!userIdFromCookie) {
+      setError("User not logged in.");
+      setLoading(false);
+      return;
+    }
+    
+
+   
+
     fetchUserData();
   }, [userIdFromCookie]);
 
@@ -447,7 +450,7 @@ useEffect(() => {
   if (error) return <div>{error}</div>;
 
   // Destructure the user data
-  const {   billingAddress, following, followers } = userData || {};
+  const { billingAddress, following , followers ,  } = userData || {};
 
   return (
     <div className="bg-white text-gray-900 min-h-screen">
@@ -484,7 +487,7 @@ useEffect(() => {
 </div>
 
             <div>
-              <h1 className="text-3xl font-bold">{userName}</h1>
+              <h1 className="text-3xl font-bold">{userData?.name}</h1>
               {/* <p className="text-lg text-gray-600">ID: {userId}</p> */}
              <p className="text-gray-500 text-sm mt-1 flex items-center gap-2">
   {billingAddress?.trim() ? (
@@ -606,7 +609,7 @@ useEffect(() => {
         setImage(file);
         setPreview(URL.createObjectURL(file));
       }}
-      className="hidden "
+      className="hidden"
     />
   </label>
 </div>
@@ -646,12 +649,12 @@ useEffect(() => {
         userData?.following.map((f, index) => (
           <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
             <img
-              src={f.otherUser?.image || "https://via.placeholder.com/40"}
-              alt={f.otherUser?.name || "User"}
+              src={f?.otherUser?.image || "https://via.placeholder.com/40"}
+              alt={f?.otherUser?.name || "User"}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
-              <p className="font-medium">{f.otherUser?.fullname || f.otherUser?.name}</p>
+              <p className="font-medium">{f?.otherUser?.fullname || f?.otherUser?.name}</p>
               {/* <p className="text-sm text-gray-500">{f.otherUser?.name}</p> */}
             </div>
           </div>
@@ -683,12 +686,12 @@ useEffect(() => {
         userData?.follower?.map((f, index) => (
           <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
             <img
-              src={f.meUser?.image || "https://via.placeholder.com/40"}
-              alt={f.meUser?.name || "User"}
+              src={f?.meUser?.image || "https://via.placeholder.com/40"}
+              alt={f?.meUser?.name || "User"}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
-              <p className="font-medium">{f.meUser?.fullname || f.meUser?.name}</p>
+              <p className="font-medium">{f?.meUser?.fullname || f?.meUser?.name}</p>
              
             </div>
           </div>
@@ -808,13 +811,13 @@ useEffect(() => {
 
     {/* Activity List */}
     <div>
-      {activities.length === 0 ? (
+      {activities?.length === 0 ? (
         <p>No recent activity found.</p>
       ) : (
-        activities.filter(item => item.type === "activity").map((activity) => (
-          <div key={activity.id} className="border-b py-3">
-            <p className="text-gray-800">{activity.message}</p>
-            <p className="text-xs text-gray-500">{new Date(activity.createdAt).toLocaleString()}</p>
+        activities?.filter(item => item.type === "activity").map((activity) => (
+          <div key={activity?.id} className="border-b py-3">
+            <p className="text-gray-800">{activity?.message}</p>
+            <p className="text-xs text-gray-500">{new Date(activity?.createdAt).toLocaleString()}</p>
           </div>
         ))
       )}
@@ -877,8 +880,8 @@ useEffect(() => {
              alt={diary.place?.name || "Diary Image"}
            />
            <div className="p-6">
-             <h3 className="text-xl font-semibold text-gray-700">{diary.title}</h3>
-             <p className="text-gray-600">{diary.description}</p>
+             <h3 className="text-xl font-semibold text-gray-700">{diary?.title}</h3>
+             <p className="text-gray-600">{diary?.description}</p>
            </div>
          </div>
        ))
