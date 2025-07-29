@@ -20,7 +20,7 @@ const Category = () => {
   useEffect(() => {
     const fetchDivisions = async () => {
       try {
-        const res = await fetch('https://parjatak-core.vercel.app/api/v1/customer/divisions');
+        const res = await fetch('https://parjatak-backend.vercel.app/api/v1/customer/divisions');
         const data = await res.json();
         setDivisions(data.data || []);
       } catch (error) {
@@ -35,7 +35,7 @@ const Category = () => {
     if (!divisionId) return;
     const fetchDistricts = async () => {
       try {
-        const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-by-division-id/${divisionId}`);
+        const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-by-division-id/${divisionId}`);
         const data = await res.json();
         setDistricts(data.data || []);
       } catch (error) {
@@ -50,7 +50,7 @@ const Category = () => {
     if (!districtId) return;
     const fetchPlaces = async () => {
       try {
-        const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
+        const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
         const data = await res.json();
         setPlaces(data.data || []);
       } catch (error) {
@@ -64,7 +64,7 @@ const Category = () => {
   const handleSearch = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/posts?divisionId=${divisionId}&districtId=${districtId}&placeId=${placeId}&limit=6&page=1`);
+      const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/posts?divisionId=${divisionId}&districtId=${districtId}&placeId=${placeId}&limit=6&page=1`);
       const data = await res.json();
       setPosts(data.data || []);
       setPage(1);
@@ -91,7 +91,7 @@ const Category = () => {
   const handleLoadMore = async () => {
     const nextPage = page + 1;
     try {
-      const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/posts?divisionId=${divisionId}&districtId=${districtId}&placeId=${placeId}&limit=6&page=${nextPage}`);
+      const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/posts?divisionId=${divisionId}&districtId=${districtId}&placeId=${placeId}&limit=6&page=${nextPage}`);
       const data = await res.json();
       setPosts((prev) => [...prev, ...(data.data || [])]);
       setPage(nextPage);

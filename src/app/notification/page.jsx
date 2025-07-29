@@ -26,7 +26,7 @@ const Notification = () => {
       }
 
       try {
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/activities/${userId}`);
+        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/activities/${userId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch notifications');
         }

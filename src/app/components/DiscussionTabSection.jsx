@@ -172,7 +172,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
   //   };
   
   //   try {
-  //     const response = await fetch("https://parjatak-core.vercel.app/api/v1/posts", {
+  //     const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
   //       method: "POST",
   //       headers: {
   //         "Content-Type": "application/json",
@@ -211,7 +211,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
     useEffect(() => {
       const fetchDivisions = async () => {
         try {
-          const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/divisions");
+          const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/divisions");
           const data = await response.json();
           setDivisions(data.data);
         } catch (error) {
@@ -227,7 +227,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         const fetchDistricts = async () => {
           try {
             const response = await fetch(
-              `https://parjatak-core.vercel.app/api/v1/customer/districts?division=${newPost.divisionId}`
+              `https://parjatak-backend.vercel.app/api/v1/customer/districts?division=${newPost.divisionId}`
             );
             const data = await response.json();
             setDistricts(data.data);
@@ -244,7 +244,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
       const fetchPlaces = async () => {
         const districtId = PostData?.id;
         try {
-          const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
+          const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
           const data = await response.json();
           setPlaces(data.data);
         } catch (error) {
@@ -293,7 +293,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
       });
     
       try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/posts", {
+        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
           method: "POST",
           body: formData,
         });
@@ -317,7 +317,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         };
     
         // Send notification to the backend API
-        await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+        await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -347,7 +347,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
     const fetchCommunity = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-posts-discussion/${districtId}`);
+        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-posts-discussion/${districtId}`);
         const data = await response.json();
         setLocationData(data.data);
         setIsLoading(false);
@@ -369,7 +369,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         try {
           const userName = Cookies.get("userName"); 
       
-          await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-like", {
+          await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-like", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -380,7 +380,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
           });
       
          
-          await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+          await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -392,7 +392,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
           });
       
           
-          await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+          await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -416,7 +416,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
     
       const handleUnlike = async (postId, parentUserId) => {
         try {
-          const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-post-like", {
+          const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/delete-post-like", {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -459,7 +459,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         
           setLoading(true);
           try {
-            const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-comment", {
+            const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -482,7 +482,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
             }));
         
            
-            await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+            await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -494,7 +494,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
             });
         
             
-            await fetch("https://parjatak-core.vercel.app/api/v1/create-notification", {
+            await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -537,7 +537,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
           if (!reply?.trim()) return;
         
           try {
-            const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-comment-reply", {
+            const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment-reply", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -563,7 +563,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         
         const handleDeleteComment = async (commentId, postId, parentUserId) => {
           try {
-            const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/delete-post-comment/${commentId}`, {
+            const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/delete-post-comment/${commentId}`, {
               method: "DELETE",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -584,7 +584,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         
         const handleDeleteReply = async (replyId, postId, postCommentId, parentUserId) => {
           try {
-            const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/delete-post-comment-reply/${replyId}`, {
+            const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/delete-post-comment-reply/${replyId}`, {
               method: "DELETE",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -629,7 +629,7 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
         
           if (result.isConfirmed) {
             try {
-              const res = await fetch(`https://parjatak-core.vercel.app/api/v1/posts/${postId}`, {
+              const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/posts/${postId}`, {
                 method: "DELETE",
               });
         

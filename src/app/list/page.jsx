@@ -58,7 +58,7 @@ const [searchQuery, setSearchQuery] = useState("");
   // List fetch
   const fetchLists = async () => {
     try {
-      const response = await fetch('https://parjatak-core.vercel.app/api/v1/customer/lists');
+      const response = await fetch('https://parjatak-backend.vercel.app/api/v1/customer/lists');
       const data = await response.json();
       
       if (data && data.data) {
@@ -88,13 +88,13 @@ const [searchQuery, setSearchQuery] = useState("");
 
       const alreadyLiked = section.like?.some((like) => like.userId === userId);
       if (!alreadyLiked) {
-        await fetch('https://parjatak-core.vercel.app/api/v1/customer/create-list-like', {
+        await fetch('https://parjatak-backend.vercel.app/api/v1/customer/create-list-like', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ listId, userId }),
         });
       } else {
-        await fetch('https://parjatak-core.vercel.app/api/v1/customer/delete-list-like', {
+        await fetch('https://parjatak-backend.vercel.app/api/v1/customer/delete-list-like', {
           method: 'delete',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ listId, userId  }),
@@ -109,7 +109,7 @@ const [searchQuery, setSearchQuery] = useState("");
   const handleCommentPost = async (listId) => {
     if (newComments[listId]?.trim()) {
       try {
-        await fetch('https://parjatak-core.vercel.app/api/v1/customer/create-list-review', {
+        await fetch('https://parjatak-backend.vercel.app/api/v1/customer/create-list-review', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -132,7 +132,7 @@ const [searchQuery, setSearchQuery] = useState("");
 
   const handleCommentDelete = async (commentId) => {
     try {
-      const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/delete-list-review/${commentId}`, {
+      const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/delete-list-review/${commentId}`, {
         method: 'POST',
       });
   

@@ -62,7 +62,7 @@ const DistrictPage  = ({ params }) => {
   ]);
   const fetchCommunity = async () => {
     try {
-      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts/${districtName}`);
+      const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts/${districtName}`);
       const data = await response.json();
       setCommunity(data.data); 
     } catch (error) {
@@ -94,7 +94,7 @@ const DistrictPage  = ({ params }) => {
   
       if (isAlreadyJoined) {
         const response = await fetch(
-          "https://parjatak-core.vercel.app/api/v1/customer/delete-district-follower",
+          "https://parjatak-backend.vercel.app/api/v1/customer/delete-district-follower",
           {
             method: "DELETE",
             headers: {
@@ -124,7 +124,7 @@ const DistrictPage  = ({ params }) => {
         }
       } else {
         const response = await fetch(
-          "https://parjatak-core.vercel.app/api/v1/customer/create-district-follower",
+          "https://parjatak-backend.vercel.app/api/v1/customer/create-district-follower",
           {
             method: "POST",
             headers: {

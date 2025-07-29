@@ -20,7 +20,7 @@ const PopularPost = () => {
     const fetchPosts = async () => {
       try {
         const userId = Cookies.get('userId');
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/new-posts-from-friends?userId=${userId}`);
+        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/new-posts-from-friends?userId=${userId}`);
         const data = await response.json(); 
   
         if (data.success) {

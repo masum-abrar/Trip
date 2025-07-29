@@ -14,7 +14,7 @@ const Page = ({ params }) => {
 
   useEffect(() => {
     const fetchPost = async () => {
-      const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/posts-by-id/${params.id}`);
+      const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/posts-by-id/${params.id}`);
       const data = await res.json();
       setPost(data.data);
     };
@@ -35,7 +35,7 @@ const Page = ({ params }) => {
 
     setLoading(true);
     try {
-      await fetch(`https://parjatak-core.vercel.app/api/v1/customer/create-post-comment`, {
+      await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId, userId, parentUserId: null, comment }),
@@ -44,7 +44,7 @@ const Page = ({ params }) => {
       setComments((prev) => ({ ...prev, [postId]: '' }));
 
       // Notifications
-      await fetch(`https://parjatak-core.vercel.app/api/v1/create-notification`, {
+      await fetch(`https://parjatak-backend.vercel.app/api/v1/create-notification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -55,7 +55,7 @@ const Page = ({ params }) => {
         }),
       });
 
-      await fetch(`https://parjatak-core.vercel.app/api/v1/create-notification`, {
+      await fetch(`https://parjatak-backend.vercel.app/api/v1/create-notification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -67,7 +67,7 @@ const Page = ({ params }) => {
       });
 
       // Refetch post
-      const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/posts-by-id/${params.id}`);
+      const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/posts-by-id/${params.id}`);
       const data = await res.json();
       setPost(data.data);
     } catch (err) {
@@ -83,7 +83,7 @@ const Page = ({ params }) => {
 
     setLoading(true);
     try {
-      await fetch(`https://parjatak-core.vercel.app/api/v1/customer/create-post-comment-reply`, {
+      await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment-reply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId, postCommentId: commentId, parentUserId, userId, reply }),
@@ -92,7 +92,7 @@ const Page = ({ params }) => {
       setReplyTexts((prev) => ({ ...prev, [commentId]: '' }));
       setShowReplyInput((prev) => ({ ...prev, [commentId]: false }));
 
-      const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/posts-by-id/${params.id}`);
+      const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/posts-by-id/${params.id}`);
       const data = await res.json();
       setPost(data.data);
     } catch (err) {

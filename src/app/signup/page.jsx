@@ -21,7 +21,7 @@ const SignUpPage = () => {
   useEffect(() => {
     const fetchDivisions = async () => {
       try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/divisions");
+        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/divisions");
         const data = await response.json();
         setDivisions(data.data);
       } catch (error) {
@@ -36,7 +36,7 @@ const SignUpPage = () => {
     const fetchDistricts = async () => {
       try {
         const response = await fetch(
-          `https://parjatak-core.vercel.app/api/v1/customer/districts?division=${division}`
+          `https://parjatak-backend.vercel.app/api/v1/customer/districts?division=${division}`
         );
         const data = await response.json();
         setDistricts(data.data);
@@ -62,7 +62,7 @@ const SignUpPage = () => {
     };
 
     try {
-      const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/auth/register", {
+      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

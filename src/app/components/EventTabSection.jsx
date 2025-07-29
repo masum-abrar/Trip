@@ -84,7 +84,7 @@ const districtId = PostData?.id;
       const fetchPlaces = async () => {
         const districtId = PostData?.id;
         try {
-          const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
+          const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
           const data = await response.json();
           setPlaces(data.data);
         } catch (error) {
@@ -224,7 +224,7 @@ const districtId = PostData?.id;
         });
     
         try {
-          const response = await fetch("https://parjatak-core.vercel.app/api/v1/posts", {
+          const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
             method: "POST",
             body: formData,
           });
@@ -264,7 +264,7 @@ const districtId = PostData?.id;
   
     setLoading(true);
     try {
-      const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-comment", {
+      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -319,7 +319,7 @@ const districtId = PostData?.id;
     if (!reply?.trim()) return;
   
     try {
-      const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-comment-reply", {
+      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment-reply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -348,7 +348,7 @@ const districtId = PostData?.id;
     const fetchCommunity = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
+        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
         const data = await response.json();
         setLocationData(data.data);
         setIsLoading(false);
@@ -376,7 +376,7 @@ const districtId = PostData?.id;
 
   const handleLike = async (postId) => {
     try {
-      await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-post-like", {
+      await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-like", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -396,7 +396,7 @@ const districtId = PostData?.id;
 
 const handleUnlike = async (postId, parentUserId) => {
   try {
-    const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-post-like", {
+    const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/delete-post-like", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -421,7 +421,7 @@ const handleUnlike = async (postId, parentUserId) => {
   
 const handleDeleteComment = async (commentId, postId, parentUserId) => {
   try {
-    const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/delete-post-comment/${commentId}`, {
+    const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/delete-post-comment/${commentId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -442,7 +442,7 @@ const handleDeleteComment = async (commentId, postId, parentUserId) => {
 
 const handleDeleteReply = async (replyId, postId, postCommentId, parentUserId) => {
   try {
-    const res = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/delete-post-comment-reply/${replyId}`, {
+    const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/delete-post-comment-reply/${replyId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -12,7 +12,7 @@ const PopularReviews = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch("https://parjatak-core.vercel.app/api/v1/customer/popular-place-reviews");
+        const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/popular-place-reviews");
         const result = await res.json();
         setReviews(result?.data || []);
       } catch (err) {

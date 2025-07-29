@@ -42,7 +42,7 @@ export default function EditProfileModal() {
   useEffect(() => {
     const fetchDivisions = async () => {
       try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/divisions");
+        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/divisions");
         const data = await response.json();
         setDivisions(data.data);
       } catch (error) {
@@ -57,7 +57,7 @@ export default function EditProfileModal() {
     const fetchDistricts = async () => {
       try {
         const response = await fetch(
-          `https://parjatak-core.vercel.app/api/v1/customer/districts?division=${division}`
+          `https://parjatak-backend.vercel.app/api/v1/customer/districts?division=${division}`
         );
         const data = await response.json();
         setDistricts(data.data);
@@ -81,7 +81,7 @@ export default function EditProfileModal() {
         password,
       };
 
-      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userId}`, {
+      const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/users/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

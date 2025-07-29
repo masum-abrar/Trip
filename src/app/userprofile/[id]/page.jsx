@@ -43,7 +43,7 @@ const UserProfile = () => {
     //  useEffect(() => {
     //   const checkIfFollowing = async () => {
     //     try {
-    //       const res = await axios.get(`https://parjatak-core.vercel.app/api/v1/customer/check-follow-status?userId=${cookiesUserId}&parentUserId=${id}`);
+    //       const res = await axios.get(`https://parjatak-backend.vercel.app/api/v1/customer/check-follow-status?userId=${cookiesUserId}&parentUserId=${id}`);
     //       if (res.data.success && res.data.data) {
     //         setIsFollowing(true);
     //       } else {
@@ -66,7 +66,7 @@ const UserProfile = () => {
         (f) => f.userId === id && f.parentUserId === cookiesUserId
       );
       try {
-        const res = await fetch('https://parjatak-core.vercel.app/api/v1/customer/create-followers', {
+        const res = await fetch('https://parjatak-backend.vercel.app/api/v1/customer/create-followers', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ const UserProfile = () => {
 
 const createBucketList = async (payload) => {
   try {
-    const res = await fetch("https://parjatak-core.vercel.app/api/v1/lists", {
+    const res = await fetch("https://parjatak-backend.vercel.app/api/v1/lists", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -116,7 +116,7 @@ const createBucketList = async (payload) => {
   
 const fetchBucketList = async () => {
   try {
-    const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/bucketLists");
+    const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/bucketLists");
     const result = await response.json();
 
     if (result?.data?.length > 0) {
@@ -140,7 +140,7 @@ useEffect(() => {
  // Diary List Fetch
  const fetchDiaryList = async () => {
   try {
-    const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/diaries");
+    const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/diaries");
     const result = await response.json();
 
     if (result?.data?.length > 0) {
@@ -187,7 +187,7 @@ const handleSubmit = async (e) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${id}`);
+        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/users/${id}`);
         const data = await response.json();
         setUser(data.data);
       } catch (error) {
@@ -206,7 +206,7 @@ const handleSubmit = async (e) => {
     // Fetch places function
     const fetchPlaces = async () => {
       try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/places");
+        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/places");
         const data = await response.json();
         setPlaces(data.data); 
       } catch (error) {
@@ -217,7 +217,7 @@ const handleSubmit = async (e) => {
     // Fetch lists function
     const fetchLists = async () => {
       try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/lists");
+        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/lists");
         const data = await response.json();
         const userLists = data.data.filter((list) => list.user.id === id);
         setLists(userLists);
@@ -248,7 +248,7 @@ const handleSubmit = async (e) => {
       };
   
       try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/add-lists-places", {
+        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/add-lists-places", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

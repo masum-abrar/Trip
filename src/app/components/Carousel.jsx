@@ -31,7 +31,7 @@ const Carousel = () => {
 const handleSearch = async () => {
   try {
     setLoading(true);
-    const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places?name=${searchText}`);
+    const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/places?name=${searchText}`);
     const data = await response.json();
 
     setPlaces(data.data || []);

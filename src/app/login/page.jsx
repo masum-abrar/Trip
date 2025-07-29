@@ -19,7 +19,7 @@ const LoginPage = () => {
     const payload = { email, password };
 
     try {
-      const res = await fetch("https://parjatak-core.vercel.app/api/v1/auth/login", {
+      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

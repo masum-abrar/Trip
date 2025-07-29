@@ -79,7 +79,7 @@ const Navbar = ({ href, children }) => {
     const fetchDistricts = async () => {
       try {
         const response = await fetch(
-          `https://parjatak-core.vercel.app/api/v1/customer/districts`
+          `https://parjatak-backend.vercel.app/api/v1/customer/districts`
         );
         const data = await response.json();
         setDistricts(data.data);

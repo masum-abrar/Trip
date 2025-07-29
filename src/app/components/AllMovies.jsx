@@ -54,7 +54,7 @@ const AllPlaces = () => {
   useEffect(() => {
     const fetchPopularPlaces = async () => {
       try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/popular-places");
+        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/popular-places");
         const data = await response.json();
         setPlaces(data.data);
       } catch (error) {

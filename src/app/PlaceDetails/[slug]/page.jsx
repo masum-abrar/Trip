@@ -1,7 +1,7 @@
 'use client'
 import Navbar from "@/app/components/Navbar";
 import React, { useState ,useEffect} from "react";
-import { Dialog, DialogContent, DialogTitle } from "@mui/material"; // Using Material UI for Modal
+import { Dialog, DialogContent, DialogTitle ,IconButton,TextField ,Button , Avatar, DialogActions } from "@mui/material"; // Using Material UI for Modal
 import { FaStar, FaRegStar,FaImage } from "react-icons/fa"; // Star rating icons
 import DiscussTabSection from "@/app/components/DiscussionTabSection";
 import EventTabSection from "@/app/components/EventTabSection";
@@ -64,13 +64,103 @@ const PlaceDetails = ({ params }) => {
   // const params = useParams();
 
 
+//new code for review 
+
+ const [newReview, setNewReview] = useState({
+    rating: 0,
+    comment: "",
+    privacy: "Public",
+    date: "",
+    images: [],
+    replies: [],
+    likes: 0,
+    user: ["User"],
+  });
+
+  const handleReviewSubmit = async () => {
+      try {
+        const userId = Cookies.get("userId");
+        if (!userId) {
+          toast.error("User not logged in!");
+          return;
+        }
+  
+        const formData = new FormData();
+        formData.append("placeId", place?.id);
+        formData.append("userId", userId);
+        formData.append("rating", newReview.rating);
+        formData.append("comment", newReview.comment);
+        formData.append("date", newReview.date);
+  
+        if (newReview.images?.length > 0) {
+          newReview.images.forEach((file, index) => {
+            formData.append("images", file);
+          });
+        }
+  
+        const res = await fetch(
+          "https://parjatak-backend.vercel.app/api/v1/customer/create-place-review",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+  
+        if (!res.ok) throw new Error("Failed to submit review");
+  
+        toast.success("✅ Diary has been created!");
+        setModalOpen(false);
+        setNewReview({ rating: 0, comment: "", images: [] });
+      } catch (error) {
+        console.error(error);
+        toast.error(" Failed to submit review");
+      }
+    };
+
+      const handleDeleteReview = async (reviewId) => {
+        const userId = Cookies.get("userId"); // Current user's ID
+        const accessToken = Cookies.get("token"); // JWT Token
+    
+        if (!userId || !accessToken) {
+          toast.error("User not authenticated!");
+          return;
+        }
+    
+        try {
+          const response = await fetch(
+            `https://parjatak-backend.vercel.app/api/v1/customer/delete-place-review/${reviewId}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+    
+          const data = await response.json();
+    
+          if (data.success) {
+            toast.success("Review deleted successfully!");
+            // Optionally, update the state to reflect the deletion (e.g., remove the review from the list)
+            // For example: setLocationData(prevData => ({ ...prevData, review: prevData.review.filter(r => r.id !== reviewId) }));
+          } else {
+            toast.error(data.message || "Failed to delete review");
+          }
+        } catch (error) {
+          console.error("Error deleting review:", error);
+          toast.error("An error occurred while deleting the review.");
+        }
+      };
+
+
  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPlace = async () => {
       try {
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/places/${slug}`);
+        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`);
        
         const data = await response.json();
         setPlace(data.data);
@@ -91,7 +181,7 @@ const PlaceDetails = ({ params }) => {
         // Get the district name from the place object
         if (!districtName) return; // Exit if district name is not available
         try {
-          const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts/${districtName}`);
+          const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts/${districtName}`);
           const data = await response.json();
           setCommunity(data.data); 
         } catch (error) {
@@ -122,7 +212,7 @@ const PlaceDetails = ({ params }) => {
       };
   
       try {
-        const res = await fetch("https://parjatak-core.vercel.app/api/v1/diaries", {
+        const res = await fetch("https://parjatak-backend.vercel.app/api/v1/diaries", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -158,7 +248,7 @@ const PlaceDetails = ({ params }) => {
       };
     
       try {
-        const res = await fetch("https://parjatak-core.vercel.app/api/v1/bucketLists", {
+        const res = await fetch("https://parjatak-backend.vercel.app/api/v1/bucketLists", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -184,7 +274,7 @@ const PlaceDetails = ({ params }) => {
      // Fetch lists function
       const fetchLists = async () => {
         try {
-          const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/lists");
+          const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/lists");
           const data = await response.json();
           const userLists = data.data.filter((list) => list.user.id === cookiesuserId);
           setLists(userLists);
@@ -222,7 +312,7 @@ const PlaceDetails = ({ params }) => {
         };
     
         try {
-          const response = await fetch("https://parjatak-core.vercel.app/api/v1/add-lists-places", {
+          const response = await fetch("https://parjatak-backend.vercel.app/api/v1/add-lists-places", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -272,7 +362,7 @@ const PlaceDetails = ({ params }) => {
     const hasVisited = place.visitor.some(v => v.userId === userId);
 
     if (!hasVisited) {
-      await fetch("https://parjatak-core.vercel.app/api/v1/customer/create-visitor", {
+      await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-visitor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -281,7 +371,7 @@ const PlaceDetails = ({ params }) => {
       place.visitor.push({ userId }); // ✅ manually add visitor
       setVisited(true);
     } else {
-      await fetch("https://parjatak-core.vercel.app/api/v1/customer/delete-visitor", {
+      await fetch("https://parjatak-backend.vercel.app/api/v1/customer/delete-visitor", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -429,87 +519,114 @@ const PlaceDetails = ({ params }) => {
 
       {/* Modal for Adding to Diary */}
       <Dialog className="max-w-[500px] mx-auto p-6" open={isModalOpen} onClose={() => setModalOpen(false)}>
-  <DialogTitle className="text-center font-bold text-gray-900">📖 Add to Diary</DialogTitle>
-  <DialogContent className="lg:w-[350px]">
+ <DialogTitle className="text-center">Add Your Diary</DialogTitle>
+        <DialogContent>
+          {/* Star Rating */}
+          <div className="flex space-x-1">
+            {[...Array(10)].map((_, index) => (
+              <IconButton
+                key={index}
+                onClick={() =>
+                  setNewReview({ ...newReview, rating: index + 1 })
+                }
+              >
+                {index < newReview.rating ? (
+                  <FaStar className="text-yellow-500 text-xl" />
+                ) : (
+                  <FaRegStar className="text-gray-300 text-sm" />
+                )}
+              </IconButton>
+            ))}
+          </div>
 
-    {/* Form Start */}
-    <form
-      onSubmit={(e) => {
-        e.preventDefault(); // prevent page reload
-        handleSave();
-      }}
-    >
-      {/* Title Input */}
-      <div className="mt-3">
-        <label className="font-semibold text-gray-800">Title:</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
-          placeholder="Enter diary title..."
-          required
-        />
-      </div>
+          {/* Review Input */}
+          <TextField
+            multiline
+            rows={3}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            label="Write your review..."
+            className="bg-white"
+            value={newReview.comment}
+            onChange={(e) =>
+              setNewReview({ ...newReview, comment: e.target.value })
+            }
+          />
+          {/* Date */}
+          <div className="mt-3">
+            <label className="font-semibold text-gray-800">Date:</label>
+            <input
+              type="date"
+              value={newReview.date}
+              onChange={(e) =>
+                setNewReview({ ...newReview, date: e.target.value })
+              }
+              className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
+              required
+            />
+          </div>
 
-      {/* Description Input */}
-      <div className="mt-3">
-        <label className="font-semibold text-gray-800">Description:</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
-          placeholder="Write your description..."
-          required
-        />
-      </div>
+          {/* Image Upload */}
+          <div className="mt-3">
+            <Button
+              sx={{
+                backgroundColor: "#8cc163",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#7aad58",
+                },
+              }}
+              component="label"
+              startIcon={<FaImage />}
+            >
+              Upload Images
+              <input
+                type="file"
+                hidden
+                multiple
+                accept="image/*"
+                onChange={(e) =>
+                  setNewReview({
+                    ...newReview,
+                    images: [...e.target.files].slice(0, 7),
+                  })
+                }
+              />
+            </Button>
 
-      {/* Date Picker */}
-      <div className="mt-3">
-        <label className="font-semibold text-gray-800">Date:</label>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
-          required
-        />
-      </div>
+            <p className="text-xs text-gray-500 mt-1">Max 7 images</p>
 
-      {/* Privacy Options */}
-      <div className="mt-3">
-        <label className="font-semibold text-gray-800">Privacy:</label>
-        <select
-          className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white text-gray-800"
-          value={privacy}
-          onChange={(e) => setPrivacy(e.target.value)}
-          required
-        >
-          <option value="Public">🌍 Public</option>
-          <option value="Private">🔒 Private</option>
-        </select>
-      </div>
-
-      {/* Save & Cancel Buttons */}
-      <div className="flex justify-end mt-4">
-        <button
-          type="button"
-          onClick={() => setModalOpen(false)}
-          className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 ml-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340]"
-        >
-          Save
-        </button>
-      </div>
-    </form>
-    {/* Form End */}
-
-  </DialogContent>
+            {/* Preview Selected Images */}
+            {newReview.images?.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {newReview.images.map((file, index) => (
+                  <div
+                    key={index}
+                    className="w-20 h-20 border rounded overflow-hidden"
+                  >
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`preview-${index}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <button
+            onClick={handleReviewSubmit}
+            className="bg-[#8cc163] px-4 py-2 text-white rounded-md"
+          >
+            ✅ Submit
+          </button>
+        </DialogActions>
 </Dialog>
 
   {/* Modal for Adding to BucketList */}

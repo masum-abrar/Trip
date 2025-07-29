@@ -10,7 +10,7 @@ const Page = ({ params }) => {
     useEffect(() => {
         const fetchSectionData = async () => {
             try {
-                const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/lists/${params.title}`);
+                const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/lists/${params.title}`);
                 const result = await response.json();
                 setSection(result.data);
             } catch (error) {

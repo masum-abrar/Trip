@@ -119,7 +119,7 @@ const [previewImages, setPreviewImages] = useState([]);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("https://parjatak-core.vercel.app/api/v1/place-categories");
+        const res = await fetch("https://parjatak-backend.vercel.app/api/v1/place-categories");
         const data = await res.json();
         setCategories(data?.data || []);
       } catch (err) {
@@ -132,7 +132,7 @@ const [previewImages, setPreviewImages] = useState([]);
   useEffect(() => {
     const fetchCommunity = async () => {
       try {
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/districts-places/${districtId}`);
+        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-places/${districtId}`);
         const data = await response.json();
         setLocationData(data.data);
       } catch (error) {
@@ -169,7 +169,7 @@ const [previewImages, setPreviewImages] = useState([]);
     });
   
     try {
-      const res = await fetch("https://parjatak-core.vercel.app/api/v1/places", {
+      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/places", {
         method: "POST",
         body: formData,
       });

@@ -30,7 +30,7 @@ const handlePost = async () => {
   }
 
   try {
-    const response = await axios.post("https://parjatak-core.vercel.app/v1/posts", formData, {
+    const response = await axios.post("https://parjatak-backend.vercel.app/v1/posts", formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       }

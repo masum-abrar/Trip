@@ -1,5 +1,6 @@
 'use client'
 import React, { useState,useEffect } from 'react';
+import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -49,7 +50,7 @@ const [places, setPlaces] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [image, setImage] = useState(null);
 const [preview, setPreview] = useState(null);
-
+ const [reviews, setReviews] = useState([]);
       const [showFollowers, setShowFollowers] = useState(false);
       const [showFollowing, setShowFollowing] = useState(false);
 const userImage = Cookies.get("userImage") 
@@ -79,7 +80,7 @@ useEffect(() => {
     }
 
     try {
-      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/activities/${userId}`);
+      const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/activities/${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch activities");
       }
@@ -98,7 +99,7 @@ useEffect(() => {
 //  const [userId, setUserId] = useState("");
 const createBucketList = async (payload) => {
   try {
-    const res = await fetch("https://parjatak-core.vercel.app/api/v1/lists", {
+    const res = await fetch("https://parjatak-backend.vercel.app/api/v1/lists", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -117,10 +118,32 @@ const createBucketList = async (payload) => {
   }
 };
   
+
+
+useEffect(() => {
+    if (!userIdFromCookie) return;
+
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get(
+          `https://parjatak-backend.vercel.app/api/v1/customer/place-reviews/user/${userIdFromCookie}`
+        );
+        if (res.data.success) {
+          setReviews(res.data.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching user reviews:", error);
+      }
+    };
+
+    fetchReviews();
+  }, [userIdFromCookie]);
+
+
 const fetchBucketList = async () => {
   try {
     setLoading(true);
-    const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/bucketLists");
+    const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/bucketLists");
     const result = await response.json();
 
     if (result?.data?.length > 0) {
@@ -145,7 +168,7 @@ useEffect(() => {
  // Diary List Fetch
  const fetchDiaryList = async () => {
   try {
-    const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/diaries");
+    const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/diaries");
     const result = await response.json();
 
     if (result?.data?.length > 0) {
@@ -226,7 +249,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchDivisions = async () => {
       try {
-        const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/divisions");
+        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/divisions");
         const data = await response.json();
         setDivisions(data.data);
       } catch (error) {
@@ -241,7 +264,7 @@ useEffect(() => {
     const fetchDistricts = async () => {
       try {
         const response = await fetch(
-          `https://parjatak-core.vercel.app/api/v1/customer/districts?division=${division}`
+          `https://parjatak-backend.vercel.app/api/v1/customer/districts?division=${division}`
         );
         const data = await response.json();
         setDistricts(data.data);
@@ -267,7 +290,7 @@ useEffect(() => {
       // formData.append("password", password);
       formData.append("image", image); 
   
-      const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userId}`, {
+      const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/users/${userId}`, {
         method: "PUT",
         body: formData,
       });
@@ -343,7 +366,7 @@ useEffect(() => {
   // Fetch places function
   const fetchPlaces = async () => {
     try {
-      const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/places");
+      const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/places");
       const data = await response.json();
       setPlaces(data.data); // API response structure anujayi
     } catch (error) {
@@ -354,7 +377,7 @@ useEffect(() => {
   // Fetch lists function
   const fetchLists = async () => {
     try {
-      const response = await fetch("https://parjatak-core.vercel.app/api/v1/customer/lists");
+      const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/lists");
       const data = await response.json();
       const userLists = data.data.filter((list) => list.user.id === userId);
       setLists(userLists);
@@ -386,7 +409,7 @@ useEffect(() => {
     };
 
     try {
-      const response = await fetch("https://parjatak-core.vercel.app/api/v1/add-lists-places", {
+      const response = await fetch("https://parjatak-backend.vercel.app/api/v1/add-lists-places", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -413,7 +436,7 @@ useEffect(() => {
   //New Api
  const fetchUserData = async () => {
       try {
-        const response = await fetch(`https://parjatak-core.vercel.app/api/v1/customer/users/${userIdFromCookie}`);
+        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/users/${userIdFromCookie}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -451,6 +474,12 @@ useEffect(() => {
 
   // Destructure the user data
   const { billingAddress, following , followers ,  } = userData || {};
+
+
+
+
+
+
 
   return (
     <div className="bg-white text-gray-900 min-h-screen">
@@ -872,19 +901,32 @@ useEffect(() => {
        ))
      ) : (
        // Render actual data once it's loaded
-       diaryList.map((diary) => (
-         <div key={diary.id} className="bg-white rounded shadow-md overflow-hidden">
-           <img
-             className="w-full h-48 object-cover"
-             src={diary.place?.images?.[0]?.image || "https://via.placeholder.com/300x200"}
-             alt={diary.place?.name || "Diary Image"}
-           />
-           <div className="p-6">
-             <h3 className="text-xl font-semibold text-gray-700">{diary?.title}</h3>
-             <p className="text-gray-600">{diary?.description}</p>
-           </div>
-         </div>
-       ))
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {reviews.map((review) => (
+        <div
+          key={review.id}
+          className="bg-white rounded shadow-md overflow-hidden"
+        >
+          <img
+            className="w-full h-48 object-cover"
+            src={
+              review.images?.[0]?.image ||
+              "https://via.placeholder.com/300x200"
+            }
+            alt={review.place?.name || "Review Image"}
+          />
+          <div className="p-4">
+            <h3 className="text-lg font-semibold text-gray-800">
+              {review.place?.name || "Unknown Place"}
+            </h3>
+            <p className="text-sm text-gray-500 mb-2">
+              {new Date(review.reviewDate).toLocaleDateString()}
+            </p>
+            <p className="text-gray-700">{review.comment}</p>
+          </div>
+        </div>
+      ))}
+    </div>
      )}
    </div>
  </div>
