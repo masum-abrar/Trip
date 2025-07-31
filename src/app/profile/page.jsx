@@ -14,6 +14,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Image from 'next/image';
+import Link from 'next/link';
 
 
 
@@ -903,6 +904,8 @@ useEffect(() => {
        // Render actual data once it's loaded
        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {reviews.map((review) => (
+       <Link href={`/PlaceDetails/${review.place?.slug}`} key={review.id}>
+       
         <div
           key={review.id}
           className="bg-white rounded shadow-md overflow-hidden"
@@ -925,6 +928,8 @@ useEffect(() => {
             <p className="text-gray-700">{review.comment}</p>
           </div>
         </div>
+       
+       </Link>
       ))}
     </div>
      )}
@@ -995,6 +1000,7 @@ useEffect(() => {
     ) : (
       // Render actual data once it's loaded
       bucketList.map((item) => (
+       <Link href={`/PlaceDetails/${item.place?.slug}`} key={item.id}>
         <div key={item.id} className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
           <img
             className="w-full h-48 object-cover"
@@ -1010,6 +1016,7 @@ useEffect(() => {
             </p>
           </div>
         </div>
+       </Link>
       ))
     )}
   </div>
@@ -1139,7 +1146,9 @@ useEffect(() => {
 {lists.map((spot, index) => (
   <div key={index} className="mb-8">
     {/* List Title */}
-    <h2 className="text-lg lg:text-3xl font-bold text-gray-800 mb-4">{spot.title}</h2>
+    <Link href={`/list/${(spot.slug)}`}>
+             <h2 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2">{spot.title}</h2>
+           </Link>
 
     {/* Swiper for places */}
     {spot.listPlace.length > 0 ? (
@@ -1152,27 +1161,25 @@ useEffect(() => {
           1024: { slidesPerView: 4 },
         }}
       >
-        {spot.listPlace.map((listPlaceItem, idx) => (
-          <SwiperSlide key={idx} className="w-[250px]">
-            <a
-              href={listPlaceItem.place?.images[0]?.image}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block mb-4"
-            >
-              <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
-                <img
-                  src={listPlaceItem.place?.images[0]?.image}
-                  alt={listPlaceItem.place?.name || "Place Image"}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <p className="text-center mt-2 font-medium text-gray-700">
-                {listPlaceItem.place?.name}
-              </p>
-            </a>
-          </SwiperSlide>
-        ))}
+       {spot.listPlace.map((listPlaceItem, idx) => (
+  <SwiperSlide key={idx} className="w-[250px]">
+    <Link
+      href={`/PlaceDetails/${listPlaceItem.place?.slug}`}
+      className="block mb-4"
+    >
+      <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+        <img
+          src={listPlaceItem.place?.images[0]?.image}
+          alt={listPlaceItem.place?.name || "Place Image"}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <p className="text-center mt-2 font-medium text-gray-700">
+        {listPlaceItem.place?.name}
+      </p>
+    </Link>
+  </SwiperSlide>
+))}
       </Swiper>
     ) : (
       <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
