@@ -54,7 +54,7 @@ const PopularReviews = () => {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {visibleReviews.map((review) => (
-                  <Link key={review.id} href={``} className="block">
+                  <Link key={review.id} href={`/PlaceDetails/${review.place?.slug}`} className="block">
                     <div className="w-full h-[380px] p-3 rounded-lg shadow-lg hover:shadow-2xl transition mb-4 bg-white">
                       <div className="mb-4">
                         <img
