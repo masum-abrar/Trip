@@ -882,7 +882,13 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
 
 
 {/* Like Button */}
-            <button  className="flex items-center gap-1 text-black mt-2" >
+            <button  className="flex items-center gap-1 text-black mt-2"
+            
+onClick={(e) => {
+  e.stopPropagation(); // stop bubbling up
+  e.preventDefault();  // stop navigation
+}}
+            >
 {post.like.some(like => like.user?.id === cookiesuserId) ? (
   <FaHeart 
     className="text-red-500 cursor-pointer"

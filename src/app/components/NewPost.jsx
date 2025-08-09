@@ -79,7 +79,8 @@ const PopularPost = () => {
 {posts?.length > 0 ? (
     <Slider {...settings}>
       {posts.map((post) => (
-        <div key={post.id} className="p-2">
+       <Link href={`/PostDetails/${post?.id}`} key={post?.id} className="block">
+         <div key={post.id} className="p-2">
           <div
             className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
             onClick={() => openModal(post)}
@@ -107,7 +108,7 @@ const PopularPost = () => {
             </div>
             <div className="p-4">
               <div className="flex items-center mb-2" onClick={handleDistrictClick}>
-                <Link href='/profile'>
+                <Link href={`/userprofile/${post.user?.id}`}>
                   <img
                     src={post.user?.image || '/avatar.png'}
                     alt={post.user?.name || 'User'}
@@ -138,6 +139,7 @@ const PopularPost = () => {
             </div>
           </div>
         </div>
+        </Link>
       ))}
     </Slider>
     ) : (

@@ -509,7 +509,7 @@ const handleSubmit = async (e) => {
                       }`}
                       onClick={() => handleTabClick('list')}
                     >
-                      Your List
+                     List
                     </li>
                     <li
                       className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${

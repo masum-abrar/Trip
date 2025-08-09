@@ -1,6 +1,6 @@
 'use client'
 import Navbar from "@/app/components/Navbar";
-import React, { useState ,useEffect} from "react";
+import React, { useState ,useEffect, use} from "react";
 import { Dialog, DialogContent, DialogTitle ,IconButton,TextField ,Button , Avatar, DialogActions } from "@mui/material"; // Using Material UI for Modal
 import { FaStar, FaRegStar,FaImage } from "react-icons/fa"; // Star rating icons
 import DiscussTabSection from "@/app/components/DiscussionTabSection";
@@ -23,7 +23,8 @@ import { useRouter } from "next/navigation"; // ✅ correct for App Router
 // ];
 
 const PlaceDetails = ({ params }) => {
-  const slug = params.slug;
+  const resolvedParams = use(params)
+  const slug = resolvedParams.slug;
  
   const cookiesuserId = Cookies.get("userId");
 

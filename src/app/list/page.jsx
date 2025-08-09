@@ -82,29 +82,72 @@ const [searchQuery, setSearchQuery] = useState("");
     fetchLists();
   }, []);
 
-  const handleLike = async (listId) => {
-    try {
-      const section = sections.find((s) => s.id === listId);
+const handleLike = async (listId) => {
+  try {
+    const sectionIndex = sections.findIndex((s) => s.id === listId);
+    if (sectionIndex === -1) return;
 
-      const alreadyLiked = section.like?.some((like) => like.userId === userId);
-      if (!alreadyLiked) {
-        await fetch('https://parjatak-backend.vercel.app/api/v1/customer/create-list-like', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ listId, userId }),
-        });
-      } else {
-        await fetch('https://parjatak-backend.vercel.app/api/v1/customer/delete-list-like', {
-          method: 'delete',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ listId, userId  }),
-        });
-      }
-      setLikes({ ...likes, [listId]: !likes[listId] });
-    } catch (error) {
-      console.error('Like error:', error);
+    // পুরানো state রক্ষা রাখি
+    const oldSections = [...sections];
+
+    // বর্তমান সেকশনের জন্য immutable copy
+    const oldSection = oldSections[sectionIndex];
+    const oldLikes = oldSection.like ? [...oldSection.like] : [];
+
+    // চেক করো কি userId already liked আছে কিনা
+    const isLiked = oldLikes.some((like) => like.userId === userId);
+
+    let newLikes;
+    if (isLiked) {
+      // Unlike: remove userId
+      newLikes = oldLikes.filter((like) => like.userId !== userId);
+    } else {
+      // Like: add userId
+      newLikes = [...oldLikes, { userId }];
     }
-  };
+
+    // নতুন সেকশন অবজেক্ট তৈরি
+    const updatedSection = {
+      ...oldSection,
+      like: newLikes,
+    };
+
+    // immutable ভাবে পুরো sections আপডেট করো
+    const updatedSections = [...sections];
+    updatedSections[sectionIndex] = updatedSection;
+
+    // স্টেট আপডেট
+    setSections(updatedSections);
+
+    // API কল
+    const url = isLiked
+      ? "https://parjatak-backend.vercel.app/api/v1/customer/delete-list-like"
+      : "https://parjatak-backend.vercel.app/api/v1/customer/create-list-like";
+
+    const method = isLiked ? "DELETE" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ listId, userId }),
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      // সার্ভারে সমস্যা হলে পুরানো স্টেটে revert করো
+      setSections(oldSections);
+      console.error("Server error:", data.message);
+    }
+  } catch (error) {
+    console.error("Like error:", error);
+    // error হলে revert করো
+    setSections(oldSections);
+  }
+};
+
+
+
 
   const handleCommentPost = async (listId) => {
     if (newComments[listId]?.trim()) {
@@ -272,14 +315,17 @@ const [searchQuery, setSearchQuery] = useState("");
    className="mySwiper"
  >
    {section.listPlace.map((spot) => (
-     <SwiperSlide key={spot.id} className="group relative overflow-hidden rounded-xl max-w-[350px] w-full aspect-[4/3] transform hover:scale-105 transition-all duration-300 shadow-lg">
+   
+       <SwiperSlide key={spot.id} className="group relative overflow-hidden rounded-xl max-w-[350px] w-full aspect-[4/3] transform hover:scale-105 transition-all duration-300 shadow-lg">
        {/* Image */}
-       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10" />
+       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10 pointer-events-none" />
+        <Link href={`/PlaceDetails/${spot.place.slug}`} key={spot.id} className="block">
        <img
          src={spot.place?.images?.[0]?.image || "https://via.placeholder.com/600x400"}
          alt={spot.place?.name || "No Image Available"}
          className="absolute inset-0 w-full h-full object-cover"
        />
+       </Link>
        {/* Content */}
        <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
          <h3 className="text-lg font-semibold text-white">{spot.place?.name}</h3>
@@ -297,6 +343,7 @@ const [searchQuery, setSearchQuery] = useState("");
          </div>
        </div>
      </SwiperSlide>
+    
    ))}
  </Swiper>
       ) : (
@@ -331,16 +378,18 @@ const [searchQuery, setSearchQuery] = useState("");
         {section.review?.map((comment) => (
           <div key={comment.id} className="flex items-start space-x-4 mb-5">
             <img 
-              src={comment.userAvatar || "https://i.pravatar.cc/300"} 
+              src={comment.user?.image || "https://i.pravatar.cc/300"} 
               alt={comment.name || "User"} 
               className="w-10 h-10 rounded-full object-cover" 
             />
             <div className="flex-1">
               <div className="flex items-center justify-between">
+               <Link href={`/userprofile/${comment.user?.id}`}>
                 <div className="flex items-center space-x-2">
                   <p className="font-semibold text-gray-800">{comment.user?.name || "Anonymous"}</p>
-                  <p className="text-xs text-gray-400">{comment.timestamp || "Just now"}</p>
+                  {/* <p className="text-xs text-gray-400">{comment.timestamp || "Just now"}</p> */}
                 </div>
+               </Link>
                 {comment.userId === userId && (
                   <button onClick={() => handleCommentDelete(comment.id)} className="text-red-500 hover:text-red-700">
                     <Trash2 size={18} />
@@ -354,11 +403,7 @@ const [searchQuery, setSearchQuery] = useState("");
 
         {/* Comment Box */}
         <div className="mt-4 flex items-start space-x-3 border-t pt-4">
-          <img
-            src="https://a.ltrbxd.com/resized/avatar/upload/1/6/4/9/8/2/8/0/shard/avtr-0-48-0-48-crop.jpg?v=f09b89dacb"
-            alt="Your Avatar"
-            className="w-10 h-10 rounded-full object-cover"
-          />
+        
           <textarea
             className="w-full p-3 bg-gray-100 text-gray-700 placeholder-gray-400 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none transition"
             placeholder="Add a comment..."

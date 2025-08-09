@@ -49,49 +49,86 @@ const SignUpPage = () => {
   }, [division]);
 
   // ✅ Handle Sign Up
-  const handleSignUp = async () => {
-    const payload = {
-      divisionId: division,
-      districtId: district,
-      name,
-      fullname,
-      email,
-      phone,
-      password,
-      type: "customer",
-    };
+  // ✅ Handle Sign Up
+const handleSignUp = async () => {
+  // Email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Phone validation regex (Bangladesh format: starts with 01, total 11 digits)
+  const phoneRegex = /^01[0-9]{9}$/;
 
-    try {
-      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+  // --- Validation checks ---
+  if (!fullname.trim()) {
+    toast.error("Full name is required");
+    return;
+  }
+  if (!name.trim()) {
+    toast.error("Username is required");
+    return;
+  }
+  if (!emailRegex.test(email)) {
+    toast.error("Please enter a valid email address");
+    return;
+  }
+  if (!phoneRegex.test(phone)) {
+    toast.error("Please enter a valid phone number (e.g. 017XXXXXXXX)");
+    return;
+  }
+  if (!division) {
+    toast.error("Please select a division");
+    return;
+  }
+  if (!district) {
+    toast.error("Please select a district");
+    return;
+  }
+  if (password.length < 6) {
+    toast.error("Password must be at least 6 characters long");
+    return;
+  }
 
-      const data = await res.json();
-      console.log("Signup Response:", data);
-
-      if (res.ok) {
-        toast.success("Registration successful!");
-        // Redirect or clear form if needed
-      } else {
-        toast.error(data.message || "Registration failed");
-      }
-    } catch (err) {
-      console.error("Error signing up:", err);
-      alert("Something went wrong");
-    }
+  const payload = {
+    divisionId: division,
+    districtId: district,
+    name,
+    fullname,
+    email,
+    phone,
+    password,
+    type: "customer",
   };
 
+  try {
+    const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    console.log("Signup Response:", data);
+
+    if (res.ok) {
+      toast.success("Registration successful!");
+      // Redirect or clear form if needed
+    } else {
+      toast.error(data.message || "Registration failed");
+    }
+  } catch (err) {
+    console.error("Error signing up:", err);
+    toast.error("Something went wrong");
+  }
+};
+
+
   return (
-    <div className="bg-white">
+    <div className="">
       <div className="mb-2 shadow-lg">
         <Navbar />
       </div>
-      <motion.div className="flex h-screen w-full items-center justify-center p-4">
-        <div className="flex flex-col md:flex-row w-full md:w-[800px] h-auto md:h-[500px] bg-white rounded-lg shadow-lg overflow-hidden relative">
+      <motion.div className="flex h-screen w-full items-center justify-center ">
+        <div className="flex flex-col md:flex-row w-full md:w-[800px] h-auto md:h-[550px] rounded-lg shadow-lg overflow-hidden relative">
           {/* Left Side - Image */}
           <motion.div
             className="w-full md:w-1/2 h-[250px] md:h-full bg-cover bg-center"
