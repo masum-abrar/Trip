@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { FaImage, FaRegHeart, FaHeart, FaUserCircle, FaPaperPlane } from 'react-icons/fa';
 import Navbar from "@/app/components/Navbar";
 import EventTabSection from '@/app/components/EventTabSection';
@@ -13,7 +13,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
 const DistrictPage  = ({ params }) => {
-  const districtName = params?.districtName ?? '';
+   const resolvedParams = use(params)
+  const districtName = resolvedParams?.districtName ?? '';
   const [community, setCommunity] = useState(null);
   const [activeTab, setActiveTab] = useState('Discussion');
   // const [hasJoined, setHasJoined] = useState(false);

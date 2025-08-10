@@ -70,7 +70,7 @@ const handleSignUp = async () => {
     return;
   }
   if (!phoneRegex.test(phone)) {
-    toast.error("Please enter a valid phone number (e.g. 017XXXXXXXX)");
+    toast.error("Please enter a valid phone number");
     return;
   }
   if (!division) {

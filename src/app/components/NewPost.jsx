@@ -115,7 +115,7 @@ const PopularPost = () => {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 </Link>
-                <Link href='/profile'>
+                <Link  href={`/userprofile/${post.user?.id}`}>
                   <h4 className="ml-3 text-sm font-medium text-gray-800">{post.user?.name}</h4>
                 </Link>
                 <FiMoreVertical className="ml-auto text-gray-500" />
