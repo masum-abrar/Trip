@@ -82,8 +82,8 @@ const PopularReviews = () => {
                           </Link>
 
                           <p className="text-gray-400 text-sm mt-2">
-                            ⭐ {review.rating} &nbsp; 
-                            👀 {review.place.viewCount || 0} &nbsp; 🗨️ {review.comment?.length || 0}
+                            ⭐ {review?.rating} &nbsp; 
+                            👀 {review?.place?.viewCount || 0} &nbsp; 🗨️ {review.comment?.length || 0}
                           </p>
 
                           <p className="text-black mt-2 line-clamp-3">
