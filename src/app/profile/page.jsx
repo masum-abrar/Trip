@@ -15,6 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FaFacebookF, FaInstagram, FaWhatsapp, FaLink } from "react-icons/fa";
 
 
 
@@ -1176,18 +1177,54 @@ useEffect(() => {
           {spot.title}
         </h2>
       </Link>
-      <button
-        onClick={() => {
-          if (typeof window !== "undefined") {
-            const shareUrl = `${window.location.origin}/list/${spot.slug}`;
-            navigator.clipboard.writeText(shareUrl);
-            toast.success("Link copied to clipboard!");
-          }
-        }}
-        className="text-blue-500 text-sm underline"
-      >
-        Share
-      </button>
+
+      <div className="flex items-center gap-2">
+        {/* Copy Link */}
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              const shareUrl = `${window.location.origin}/list/${spot.slug}`;
+              navigator.clipboard.writeText(shareUrl);
+              toast.success("Link copied to clipboard!");
+            }
+          }}
+          className="text-green-500 p-2 rounded hover:bg-green-100 transition"
+        >
+          <FaLink />
+        </button>
+
+        {/* Facebook Share */}
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/list/${spot.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-700 p-2 rounded hover:bg-blue-100 transition"
+        >
+          <FaFacebookF />
+        </a>
+
+        {/* Instagram (copy text for post) */}
+        <button
+          onClick={() => {
+            const instaText = `Check out my visited places: ${window.location.origin}/list/${spot.slug}`;
+            navigator.clipboard.writeText(instaText);
+            toast.success("Text copied for Instagram!");
+          }}
+          className="text-pink-500 p-2 rounded hover:bg-pink-100 transition"
+        >
+          <FaInstagram />
+        </button>
+
+        {/* WhatsApp Share */}
+        <a
+          href={`https://api.whatsapp.com/send?text=Check out my visited places: ${window.location.origin}/list/${spot.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-green-600 p-2 rounded hover:bg-green-100 transition"
+        >
+          <FaWhatsapp />
+        </a>
+      </div>
     </div>
 
     {/* Swiper for places */}
@@ -1203,11 +1240,9 @@ useEffect(() => {
       >
         {spot.listPlace.map((listPlaceItem, idx) => (
           <SwiperSlide key={idx} className="w-[250px]">
-            <Link
-              href={`/PlaceDetails/${listPlaceItem.place?.slug}`}
-              className="block mb-4"
-            >
-              <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+            {/* Clickable place */}
+            <Link key={spot.slug} href={`/PlaceDetails/${spot.slug}`}>
+              <div className="w-full h-[200px] bg-green-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
                 <img
                   src={listPlaceItem.place?.images[0]?.image}
                   alt={listPlaceItem.place?.name || "Place Image"}
