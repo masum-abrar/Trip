@@ -674,24 +674,25 @@ useEffect(() => {
       </button>
 
       <h3 className="text-xl font-semibold mb-4 text-center">Following</h3>
-
       {userData?.following?.length > 0 ? (
-        userData?.following.map((f, index) => (
-          <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
-            <img
-              src={f?.otherUser?.image || "https://via.placeholder.com/40"}
-              alt={f?.otherUser?.name || "User"}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-            <div>
-              <p className="font-medium">{f?.otherUser?.fullname || f?.otherUser?.name}</p>
-              {/* <p className="text-sm text-gray-500">{f.otherUser?.name}</p> */}
-            </div>
-          </div>
-        ))
-      ) : (
-        <p className="text-gray-600 text-sm">No following found.</p>
-      )}
+  userData.following.map((f, index) => (
+    <Link key={index} href={`/userprofile/${f?.otherUser?.id}`}>
+      <div className="flex items-center gap-3 mb-4 border-b pb-2 cursor-pointer">
+        <img
+          src={f?.otherUser?.image || "https://via.placeholder.com/40"}
+          alt={f?.otherUser?.name || "User"}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+        <div>
+          <p className="font-medium">{f?.otherUser?.fullname || f?.otherUser?.name || "User"}</p>
+        </div>
+      </div>
+    </Link>
+  ))
+) : (
+  <p className="text-gray-600 text-sm">No following found.</p>
+)}
+
     </div>
   </div>
 )}
