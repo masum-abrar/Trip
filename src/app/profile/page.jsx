@@ -1169,10 +1169,26 @@ useEffect(() => {
 
 {lists.map((spot, index) => (
   <div key={index} className="mb-8">
-    {/* List Title */}
-    <Link href={`/list/${(spot.slug)}`}>
-             <h2 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2">{spot.title}</h2>
-           </Link>
+    {/* List Title with Share */}
+    <div className="flex items-center justify-between mb-2">
+      <Link href={`/list/${spot.slug}`}>
+        <h2 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2">
+          {spot.title}
+        </h2>
+      </Link>
+      <button
+        onClick={() => {
+          if (typeof window !== "undefined") {
+            const shareUrl = `${window.location.origin}/list/${spot.slug}`;
+            navigator.clipboard.writeText(shareUrl);
+            toast.success("Link copied to clipboard!");
+          }
+        }}
+        className="text-blue-500 text-sm underline"
+      >
+        Share
+      </button>
+    </div>
 
     {/* Swiper for places */}
     {spot.listPlace.length > 0 ? (
@@ -1185,25 +1201,25 @@ useEffect(() => {
           1024: { slidesPerView: 4 },
         }}
       >
-       {spot.listPlace.map((listPlaceItem, idx) => (
-  <SwiperSlide key={idx} className="w-[250px]">
-    <Link
-      href={`/PlaceDetails/${listPlaceItem.place?.slug}`}
-      className="block mb-4"
-    >
-      <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
-        <img
-          src={listPlaceItem.place?.images[0]?.image}
-          alt={listPlaceItem.place?.name || "Place Image"}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <p className="text-center mt-2 font-medium text-gray-700">
-        {listPlaceItem.place?.name}
-      </p>
-    </Link>
-  </SwiperSlide>
-))}
+        {spot.listPlace.map((listPlaceItem, idx) => (
+          <SwiperSlide key={idx} className="w-[250px]">
+            <Link
+              href={`/PlaceDetails/${listPlaceItem.place?.slug}`}
+              className="block mb-4"
+            >
+              <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+                <img
+                  src={listPlaceItem.place?.images[0]?.image}
+                  alt={listPlaceItem.place?.name || "Place Image"}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p className="text-center mt-2 font-medium text-gray-700">
+                {listPlaceItem.place?.name}
+              </p>
+            </Link>
+          </SwiperSlide>
+        ))}
       </Swiper>
     ) : (
       <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
@@ -1212,6 +1228,7 @@ useEffect(() => {
     )}
   </div>
 ))}
+
 
 
 
