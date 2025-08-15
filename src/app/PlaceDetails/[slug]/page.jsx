@@ -53,18 +53,6 @@ const PlaceDetails = ({ params }) => {
      const [lists, setLists] = useState([]);
   
 
-  // if (!place) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <h1 className="text-2xl font-bold text-red-500">Place not found!</h1>
-  //     </div>
-  //   );
-  // }
-
-
-  // const params = useParams();
-
-
 //new code for review 
 
  const [newReview, setNewReview] = useState({
@@ -79,44 +67,61 @@ const PlaceDetails = ({ params }) => {
   });
 
   const handleReviewSubmit = async () => {
-      try {
-        const userId = Cookies.get("userId");
-        if (!userId) {
-          toast.error("User not logged in!");
-          return;
-        }
-  
-        const formData = new FormData();
-        formData.append("placeId", place?.id);
-        formData.append("userId", userId);
-        formData.append("rating", newReview.rating);
-        formData.append("comment", newReview.comment);
-        formData.append("date", newReview.date);
-  
-        if (newReview.images?.length > 0) {
-          newReview.images.forEach((file, index) => {
-            formData.append("images", file);
-          });
-        }
-  
-        const res = await fetch(
-          "https://parjatak-backend.vercel.app/api/v1/customer/create-place-review",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-  
-        if (!res.ok) throw new Error("Failed to submit review");
-  
-        toast.success("✅ Diary has been created!");
-        setModalOpen(false);
-        setNewReview({ rating: 0, comment: "", images: [] });
-      } catch (error) {
-        console.error(error);
-        toast.error(" Failed to submit review");
+  try {
+    const userId = Cookies.get("userId");
+
+    // Login check
+    if (!userId) {
+      toast.error("You need to log in first to add a diary.");
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
+      return;
+    }
+
+    // Validation: check required fields
+    if (!newReview.comment?.trim()) {
+      toast.error("Please write a comment for your diary.");
+      return;
+    }
+    if (!newReview.rating || newReview.rating < 1) {
+      toast.error("Please select a rating.");
+      return;
+    }
+    if (!newReview.date) {
+      toast.error("Please select a date.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("placeId", place?.id);
+    formData.append("userId", userId);
+    formData.append("rating", newReview.rating);
+    formData.append("comment", newReview.comment);
+    formData.append("date", newReview.date);
+
+    if (newReview.images?.length > 0) {
+      newReview.images.forEach((file) => formData.append("images", file));
+    }
+
+    const res = await fetch(
+      "https://parjatak-backend.vercel.app/api/v1/customer/create-place-review",
+      {
+        method: "POST",
+        body: formData,
       }
-    };
+    );
+
+    if (!res.ok) throw new Error("Failed to submit review");
+
+    toast.success("✅ Diary has been created!");
+    setModalOpen(false);
+    setNewReview({ rating: 0, comment: "", date: "", images: [] }); // Reset form
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to submit review");
+  }
+};
 
       const handleDeleteReview = async (reviewId) => {
         const userId = Cookies.get("userId"); // Current user's ID

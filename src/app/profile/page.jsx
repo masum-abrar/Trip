@@ -478,6 +478,28 @@ useEffect(() => {
 
 
 
+  const fetchUserEvents = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(
+        `https://parjatak-backend.vercel.app/api/v1/customer/user-events/${userId}`
+      );
+      const data = await res.json();
+      setUserEvents(data.data || []);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch user events:", error);
+      setIsLoading(false);
+    }
+  };
+
+  // useEffect(() => {
+  //   if (activeTab === "events") {
+  //     fetchUserEvents();
+  //   }
+  // }, [activeTab]);
+
+  // if (activeTab !== "events") return null;
 
 
 
@@ -715,21 +737,18 @@ useEffect(() => {
 
       {userData?.follower?.length > 0 ? (
         userData?.follower?.map((f, index) => (
-
-              <Link key={index} href={`/userprofile/${f?.meUser?.id}`}>
-          <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
-            <img
-              src={f?.meUser?.image || "https://via.placeholder.com/40"}
-              alt={f?.meUser?.name || "User"}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-            <div>
-              <p className="font-medium">{f?.meUser?.fullname || f?.meUser?.name}</p>
-             
-            </div>
-          </div>
-
-          </Link>
+      <Link key={index} href={`/userprofile/${f?.otherUser?.id}`}>
+      <div className="flex items-center gap-3 mb-4 border-b pb-2 cursor-pointer">
+        <img
+          src={f?.otherUser?.image || "https://via.placeholder.com/40"}
+          alt={f?.otherUser?.name || "User"}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+        <div>
+          <p className="font-medium">{f?.meUser?.fullname || f?.me?.name || "User"}</p>
+        </div>
+      </div>
+    </Link>
         ))
       ) : (
         <p className="text-gray-600 text-sm">No followers found.</p>

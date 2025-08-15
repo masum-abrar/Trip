@@ -384,7 +384,7 @@ const Page = ({ params }) => {
         )}
 
         <h1 className="text-2xl font-bold mb-2">{post.title || 'Untitled'}</h1>
-        <p className="text-gray-600 mb-4">{post.description}</p>
+        {/* <p className="text-gray-600 mb-4">{post.description}</p> */}
 
         {/* Like and Comment Count */}
         <div className="flex items-center gap-4 border-t border-b py-2 mb-4">

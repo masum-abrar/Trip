@@ -365,82 +365,98 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
 
 
       //Post Like and Unlike
-      const handleLike = async (postId, postOwnerUserId) => {
-        try {
-          const userName = Cookies.get("userName"); 
-      
-          await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-like", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              postId,
-              userId: cookiesuserId,  
-              parentUserId: null, 
-            }),
-          });
-      
-         
-          await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: cookiesuserId, 
-              message: `You liked a post.`,
-              type: "activity",
-              link: `/post/${postId}`,
-            }),
-          });
-      
-          
-          await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: postOwnerUserId, 
-             
-              message: `${userName} liked your post.`,
-              type: "notification",
-              link: `/post/${postId}`,
-            }),
-          });
-      
-          // UI update
-          setLiked((prev) => !prev);
-          fetchCommunity();
-      
-        } catch (error) {
-          console.error("Error liking post:", error);
-        }
-      };
+    
+
       
     
-      const handleUnlike = async (postId, parentUserId) => {
-        try {
-          const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/delete-post-like", {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              postId: postId,
-              userId: cookiesuserId,
-            }),
-          });
-      
-          if (!res.ok) {
-            throw new Error("Failed to unlike the post");
+  // Like Post
+// Like / Unlike Handler
+const handleLikeToggle = async (postId, postOwnerUserId) => {
+  try {
+    const userName = Cookies.get("userName");
+
+    setPosts(prevPosts =>
+      prevPosts.map(p => {
+        if (p.id === postId) {
+          const alreadyLiked = p.likes.some(like => like.userId === cookiesuserId);
+
+          // Instant UI update
+          if (alreadyLiked) {
+            // Unlike instantly
+            unlikePostBackend(postId);
+            return { ...p, likes: p.likes.filter(like => like.userId !== cookiesuserId) };
+          } else {
+            // Like instantly
+            likePostBackend(postId, postOwnerUserId, userName);
+            return { ...p, likes: [...p.likes, { userId: cookiesuserId }] };
           }
-      
-          console.log("Successfully unliked the post");
-        } catch (error) {
-          console.error("Error unliking post:", error);
         }
-      };
+        return p;
+      })
+    );
 
+  } catch (error) {
+    console.error("Error toggling like:", error);
+  }
+};
 
+// Backend Like Request
+const likePostBackend = async (postId, postOwnerUserId, userName) => {
+  try {
+    await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-like", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        postId,
+        userId: cookiesuserId,
+        parentUserId: null,
+      }),
+    });
 
+    // Self activity log
+    await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: cookiesuserId,
+        message: `You liked a post.`,
+        type: "activity",
+        link: `/post/${postId}`,
+      }),
+    });
 
+    // Notify post owner
+    await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: postOwnerUserId,
+        message: `${userName} liked your post.`,
+        type: "notification",
+        link: `/post/${postId}`,
+      }),
+    });
 
+  } catch (error) {
+    console.error("Error liking post:", error);
+  }
+};
+
+// Backend Unlike Request
+const unlikePostBackend = async (postId) => {
+  try {
+    await fetch("https://parjatak-backend.vercel.app/api/v1/customer/delete-post-like", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        postId: postId,
+        userId: cookiesuserId,
+      }),
+    });
+  } catch (error) {
+    console.error("Error unliking post:", error);
+  }
+};
 
 
 
@@ -750,9 +766,18 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
     
     <div className="flex items-center justify-between mb-2 relative">
   <Link href={`/userprofile/${post.userId}`} className="flex items-center gap-2">
+  {post?.user?.image ? (
+    <img
+      src={post.user.image}
+      alt={post.user.name || "User"}
+      className="w-8 h-8 rounded-full object-cover"
+    />
+  ) : (
     <FaUserCircle className="text-2xl text-gray-600" />
-    <span className="font-semibold text-gray-800">{post?.user?.name}</span>
-  </Link>
+  )}
+  <span className="font-semibold text-gray-800">{post?.user?.name}</span>
+</Link>
+
 
   {post.user.id === cookiesuserId && (
     <div className="relative">
@@ -944,27 +969,31 @@ onClick={(e) => {
 {(post.comment.slice(0, showAllCommentsForPost[post.id] ? post.comment.length : 2)).map((comment) => (
   <div key={comment.id} className="flex flex-col gap-1 mt-2 ml-4 bg-gray-100 p-2 rounded-md">
     
+    {/* Comment Header */}
     <div className="flex justify-between items-center mb-2">
       <Link href={`/userprofile/${comment.user.id}`} className="flex items-center space-x-2">
         <div className="flex items-center gap-2">
-          <FaUserCircle className="text-xl text-gray-600" />
-          <span className="font-semibold text-gray-800">{comment.user.name}</span>
+          <img
+            src={comment.user?.image ? comment.user.image : "https://cdn-icons-png.flaticon.com/512/9368/9368192.png"}
+            alt={comment.user?.name || "User"}
+            className="w-6 h-6 rounded-full object-cover"
+          />
+          <span className="font-semibold text-gray-800">{comment.user?.name || "Anonymous"}</span>
         </div>
       </Link>
 
       {/* Comment Delete Icon */}
       {(comment.user.id === cookiesuserId || post.userId === cookiesuserId) && (
-  <FaTrash
-    className="text-red-500 cursor-pointer text-sm"
-    onClick={() => handleDeleteComment(comment.id, post.id, comment.user.id)}
-  />
-)}
+        <FaTrash
+          className="text-red-500 cursor-pointer text-sm"
+          onClick={() => handleDeleteComment(comment.id, post.id, comment.user.id)}
+        />
+      )}
     </div>
 
+    {/* Comment Text & Reply Button */}
     <div className="flex justify-between items-center">
       <p className="text-gray-700 ml-7">{comment.comment}</p>
-
-      {/* Reply Button */}
       <button
         onClick={() => handleReplyToggle(comment.id)}
         className="text-blue-500 text-sm mr-3"
@@ -975,32 +1004,37 @@ onClick={(e) => {
 
     {/* Replies Section */}
     {comment.reply?.length > 0 && (
-      <div className="mt-2">
+      <div className="mt-2 ml-7">
         {comment.reply.map((reply) => (
-          <div key={reply.id} className="flex flex-col gap-1 mt-1 bg-white p-2 rounded-md border-l-4 border-[#8cc163] w-full">
+          <div
+            key={reply.id}
+            className="flex flex-col gap-1 mt-1 bg-white p-2 rounded-md border-l-4 border-[#8cc163] w-full"
+          >
             <div className="flex justify-between items-center">
-              <Link href={`/userprofile/${reply.user.id}`} className="flex items-center space-x-2 mb-2">
+              <Link
+                href={`/userprofile/${reply.user.id}`}
+                className="flex items-center space-x-2 mb-2"
+              >
                 <div className="flex items-center gap-2">
                   <img
-                    src={reply.user?.image || "https://cdn-icons-png.flaticon.com/512/9368/9368192.png"}
-                    alt={reply.user?.name}
+                    src={reply.user?.image ? reply.user.image : "https://cdn-icons-png.flaticon.com/512/9368/9368192.png"}
+                    alt={reply.user?.name || "User"}
                     className="w-6 h-6 rounded-full object-cover"
                   />
-                  <span className="text-sm font-medium text-gray-800">{reply.user?.name}</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    {reply.user?.name || "Anonymous"}
+                  </span>
                 </div>
               </Link>
 
               {/* Reply Delete Icon */}
               {(reply.user.id === cookiesuserId || post.userId === cookiesuserId) && (
-  <FaTrash
-    className="text-red-500 cursor-pointer text-sm mr-2"
-    onClick={() => handleDeleteReply(reply.id, post.id, comment.id, reply.user.id)}
-  />
-)}
-
+                <FaTrash
+                  className="text-red-500 cursor-pointer text-sm mr-2"
+                  onClick={() => handleDeleteReply(reply.id, post.id, comment.id, reply.user.id)}
+                />
+              )}
             </div>
-
-            <p className="ml-7 text-sm text-gray-700">{reply.reply}</p>
           </div>
         ))}
       </div>
@@ -1025,6 +1059,7 @@ onClick={(e) => {
 
   </div>
 ))}
+
 
 {/* Only show the button if there are more than 2 comments */}
 {post.comment.length > 2 && (

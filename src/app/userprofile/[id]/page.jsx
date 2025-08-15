@@ -13,6 +13,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import Link from "next/link";
+
 
 
 const UserProfile = () => {
@@ -62,6 +64,14 @@ const UserProfile = () => {
     );
 
     const handleFollowToggle = async () => {
+
+       if (!cookiesUserId) {
+    toast.error("You need to login first to follow someone.");
+    setTimeout(() => {
+      router.push("/login"); // Ensure useRouter() is imported
+    }, 2000);
+    return;
+  }
       const isFollowing = user?.follower?.some(
         (f) => f.userId === id && f.parentUserId === cookiesUserId
       );
@@ -400,17 +410,18 @@ const handleSubmit = async (e) => {
 
       {user.following?.length > 0 ? (
         user.following.map((f, index) => (
-          <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
-            <img
-              src={f.otherUser?.image || "https://via.placeholder.com/40"}
-              alt={f.otherUser?.name || "User"}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-            <div>
-              <p className="font-medium">{f.otherUser?.fullname || f.otherUser?.name}</p>
-              {/* <p className="text-sm text-gray-500">{f.otherUser?.name}</p> */}
-            </div>
-          </div>
+          <Link key={index} href={`/userprofile/${f?.otherUser?.id}`}>
+      <div className="flex items-center gap-3 mb-4 border-b pb-2 cursor-pointer">
+        <img
+          src={f?.otherUser?.image || "https://via.placeholder.com/40"}
+          alt={f?.otherUser?.name || "User"}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+        <div>
+          <p className="font-medium">{f?.otherUser?.fullname || f?.otherUser?.name || "User"}</p>
+        </div>
+      </div>
+    </Link>
         ))
       ) : (
         <p className="text-gray-600 text-sm">No following found.</p>
@@ -437,17 +448,20 @@ const handleSubmit = async (e) => {
 
       {user.follower?.length > 0 ? (
         user.follower.map((f, index) => (
+               <Link key={index} href={`/userprofile/${f?.meUser?.id}`}>
           <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
             <img
-              src={f.meUser?.image || "https://via.placeholder.com/40"}
-              alt={f.meUser?.name || "User"}
+              src={f?.meUser?.image || "https://via.placeholder.com/40"}
+              alt={f?.meUser?.name || "User"}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
-              <p className="font-medium">{f.meUser?.fullname || f.meUser?.name}</p>
+              <p className="font-medium">{f?.meUser?.fullname || f?.meUser?.name}</p>
              
             </div>
           </div>
+
+          </Link>
         ))
       ) : (
         <p className="text-gray-600 text-sm">No followers found.</p>
@@ -667,34 +681,38 @@ const handleSubmit = async (e) => {
         
         
         
-        {/* Bucket List Section */}
-        {activeTab === 'bucket' && (
-         <div className="p-6">
-         <h2 className="text-3xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2 text-center">
-           Bucket List
-         </h2>
-        
-         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-           {bucketList.map((item) => (
-             <div key={item.id} className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-               <img
-                 className="w-full h-48 object-cover"
-                 src={item.place?.images[0]?.image || 'https://via.placeholder.com/400x300'}
-                 alt={item.place?.name || "Place Image"}
-               />
-               <div className="px-6 py-4">
-                 <div className="font-bold text-xl mb-2 text-gray-700">
-                   {item.place?.name || item.title}
-                 </div>
-                 <p className="text-gray-600 text-base">
-                   {item.description || 'No Description'}
-                 </p>
-               </div>
-             </div>
-           ))}
-         </div>
-        </div>
-        )}
+    {/* Bucket List Section */}
+{activeTab === 'bucket' && (
+  <div className="p-6">
+    {/* <h2 className="text-3xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2 text-center">
+      Bucket List
+    </h2> */}
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {bucketList.map((item) => (
+        <Link
+          
+         href={`/PlaceDetails/${item.place?.slug}`} key={item.id}// আপনার route অনুযায়ী adjust করুন
+          className="max-w-sm rounded overflow-hidden shadow-lg bg-white hover:shadow-xl transition-shadow"
+        >
+          <img
+            className="w-full h-48 object-cover"
+            src={item.place?.images[0]?.image || 'https://via.placeholder.com/400x300'}
+            alt={item.place?.name || "Place Image"}
+          />
+          <div className="px-6 py-4">
+            <div className="font-bold text-xl mb-2 text-gray-700">
+              {item.place?.name || item.title}
+            </div>
+            <p className="text-gray-600 text-base">
+              {item.description || 'No Description'}
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  </div>
+)}
         
         {/* Events Section */}
         {activeTab === 'events' && (
@@ -806,54 +824,52 @@ const handleSubmit = async (e) => {
         
          {/* First Row - Best Camping Spots */}
         
-        {lists.map((spot, index) => (
-          <div key={index} className="mb-8">
-            {/* List Title */}
-            <h2 className="text-lg lg:text-3xl font-bold text-gray-800 mb-4">{spot.title}</h2>
-        
-            {/* Swiper for places */}
-            {spot.listPlace.length > 0 ? (
-              <Swiper
-                spaceBetween={20}
-                slidesPerView={2}
-                breakpoints={{
-                  640: { slidesPerView: 2 },
-                  768: { slidesPerView: 3 },
-                  1024: { slidesPerView: 4 },
-                }}
+      {lists.map((spot, index) => (
+  <div key={index} className="mb-8">
+    {/* List Title */}
+    <h2 className="text-lg lg:text-3xl font-bold text-gray-800 mb-4">{spot.title}</h2>
+
+    {/* Swiper for places */}
+    {spot.listPlace.length > 0 ? (
+      typeof window !== "undefined" && ( // client-side only to avoid hydration issues
+        <Swiper
+          spaceBetween={20}
+          slidesPerView={2}
+          breakpoints={{
+            640: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+            1024: { slidesPerView: 4 },
+          }}
+        >
+          {spot.listPlace.map((listPlaceItem, idx) => (
+            <SwiperSlide key={idx} className="w-[250px]">
+              <Link
+                href={`/PlaceDetails/${listPlaceItem.place?.slug}`}
+                key={listPlaceItem.id}
+                className="block mb-4"
               >
-                {spot.listPlace.map((listPlaceItem, idx) => (
-                  <SwiperSlide key={idx} className="w-[250px]">
-                    <a
-                      href={listPlaceItem.place?.images[0]?.image}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block mb-4"
-                    >
-                      <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
-                        <img
-                          src={listPlaceItem.place?.images[0]?.image}
-                          alt={listPlaceItem.place?.name || "Place Image"}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <p className="text-center mt-2 font-medium text-gray-700">
-                        {listPlaceItem.place?.name}
-                      </p>
-                    </a>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            ) : (
-              <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
-                <p>No Places Added</p>
-              </div>
-            )}
-          </div>
-        ))}
-        
-        
-        
+                <div className="w-full h-[200px] bg-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+                  <img
+                    src={listPlaceItem.place?.images[0]?.image || "/placeholder.png"}
+                    alt={listPlaceItem.place?.name || "Place Image"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <p className="text-center mt-2 font-medium text-gray-700">
+                  {listPlaceItem.place?.name}
+                </p>
+              </Link>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )
+    ) : (
+      <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
+        <p>No Places Added</p>
+      </div>
+    )}
+  </div>
+))}
         
         
         
