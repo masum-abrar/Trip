@@ -12,9 +12,15 @@ const PopularReviews = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/popular-place-reviews");
+        const res = await fetch(
+          "https://parjatak-backend.vercel.app/api/v1/customer/popular-place-reviews"
+        );
         const result = await res.json();
-        setReviews(result?.data || []);
+        const sortedReviews = (result?.data || []).sort(
+          (a, b) =>
+            (b.rating || 0) - (a.rating || 0) || (b.like?.length || 0) - (a.like?.length || 0)
+        );
+        setReviews(sortedReviews);
       } catch (err) {
         setError("Failed to load reviews");
       } finally {
@@ -26,7 +32,7 @@ const PopularReviews = () => {
   }, []);
 
   const handleLoadMore = () => {
-    setVisibleCount(prev => prev + 3); // Protibar 3 ta kore barabe
+    setVisibleCount((prev) => prev + 3); // Protibar 3 ta kore barabe
   };
 
   const visibleReviews = reviews.slice(0, visibleCount);
@@ -35,81 +41,90 @@ const PopularReviews = () => {
 
   return (
     <div className="container max-w-5xl mx-auto mt-20 p-3">
-      <div className="">
-        <div className="w-full">
-          <div className="flex justify-between text-gray-400 mb-4">
-            <h1 className="text-sm lg:text-lg font-bold">POPULAR REVIEWS </h1>
-            <p className="cursor-pointer hover:underline">More</p>
-          </div>
-          <hr className="border-t border-gray-400 mb-6" />
+      <div className="w-full">
+        <h1 className="text-sm lg:text-lg font-bold text-gray-400 mb-4">
+          POPULAR REVIEWS
+        </h1>
+        <hr className="border-t border-gray-400 mb-6" />
 
-          {/* Loading skeleton */}
-          {loading ? (
+        {/* Loading skeleton */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="w-full h-[380px] p-3 rounded-lg shadow-lg bg-gray-200 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : (
+          <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="w-full h-[380px] p-3 rounded-lg shadow-lg bg-gray-200 animate-pulse" />
-              ))}
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {visibleReviews.map((review) => (
-                  <Link key={review.id} href={`/PlaceDetails/${review.place?.slug}`} className="block">
-                    <div className="w-full h-[380px] p-3 rounded-lg shadow-lg hover:shadow-2xl transition mb-4 bg-white">
-                      <div className="mb-4">
+              {visibleReviews.map((review) => (
+                <Link
+                  key={review.id}
+                  href={`/PlaceDetails/${review.place?.slug}`}
+                  className="block"
+                >
+                  <div className="w-full h-[380px] p-3 rounded-lg shadow-lg hover:shadow-2xl transition mb-4 bg-white">
+                    <div className="mb-4">
+                      {review.place?.images?.[0]?.image ? (
                         <img
-                          src={review.place?.images?.[0]?.image || "https://via.placeholder.com/300"}
+                          src={review.place.images[0].image}
                           alt={review.place?.name}
                           className="w-full h-48 object-cover rounded-lg"
                         />
-                      </div>
-
-                      <div className="flex flex-col justify-between">
-                        <div>
-                          <h2 className="text-black font-bold text-lg truncate">
-                            {review.place?.name || "Unknown Place"}
-                          </h2>
-
-                          <Link href={`/userprofile/${review.user?.id}`}>
-                            <div className="flex items-center text-gray-400 text-sm mt-2 cursor-pointer">
-                              <img
-                                src={review.user?.image || "https://via.placeholder.com/50"}
-                                alt={review.user?.name}
-                                className="w-6 h-6 rounded-full mr-2"
-                              />
-                              <span className="text-black">{review.user?.name}</span>
-                            </div>
-                          </Link>
-
-                          <p className="text-gray-400 text-sm mt-2">
-                            ⭐ {review?.rating} &nbsp; 
-                            👀 {review?.place?.viewCount || 0} &nbsp; 🗨️ {review.comment?.length || 0}
-                          </p>
-
-                          <p className="text-black mt-2 line-clamp-3">
-                            {review.comment}
-                          </p>
+                      ) : (
+                        <div className="w-full h-48 flex items-center justify-center bg-gray-200 rounded-lg">
+                          <span className="text-gray-500 font-medium">No Image</span>
                         </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col justify-between h-full">
+                      <div>
+                        <h2 className="text-black font-bold text-lg truncate">
+                          {review.place?.name || "Unknown Place"}
+                        </h2>
+
+                        <Link href={`/userprofile/${review.user?.id}`}>
+                          <div className="flex items-center text-gray-400 text-sm mt-2 cursor-pointer">
+                            <img
+                              src={review.user?.image || "https://via.placeholder.com/50"}
+                              alt={review.user?.name}
+                              className="w-6 h-6 rounded-full mr-2"
+                            />
+                            <span className="text-black">{review.user?.name}</span>
+                          </div>
+                        </Link>
+
+                        <p className="text-gray-400 text-sm mt-2">
+                          ⭐ {review?.rating} &nbsp;
+                          👀 {review?.place?.viewCount || 0} &nbsp; 🗨️{" "}
+                          {review.comment?.length || 0} &nbsp; ❤️ {review.like?.length || 0}
+                        </p>
+
+                        <p className="text-black mt-2 line-clamp-3">{review.comment}</p>
                       </div>
                     </div>
-                  </Link>
-                ))}
-              </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
 
-              {/* Load More Button */}
-              {visibleCount < reviews.length && (
-                <div className="text-center mt-6">
-                  <button
-                    onClick={handleLoadMore}
-                    className="px-6 py-2 bg-[#8cc163] hover:bg-green-600 text-white rounded-lg transition"
-                  >
-                    See More
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+            {/* Load More Button */}
+            {visibleCount < reviews.length && (
+              <div className="text-center mt-6">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-6 py-2 bg-[#8cc163] hover:bg-green-600 text-white rounded-lg transition"
+                >
+                  See More
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

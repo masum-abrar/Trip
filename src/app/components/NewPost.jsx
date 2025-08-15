@@ -1,50 +1,32 @@
-"use client";
+'use client';
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import Slider from "react-slick";
 import { FaHeart, FaComment } from "react-icons/fa";
 import { FiMoreVertical } from "react-icons/fi";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import Cookies from "js-cookie";
 
-const PopularPost = () => {
+const NewPost = () => {
   const [posts, setPosts] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(6); // Initially 6 posts
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const userId = Cookies.get("userId");
-        if (!userId) return;
         const response = await fetch(
-          `https://parjatak-backend.vercel.app/api/v1/customer/new-posts-from-users?userId=${userId}`
-        );
+          `https://parjatak-backend.vercel.app/api/v1/customer/posts`
+        ); // This API should return all users' new posts
         const data = await response.json();
         if (data.success) setPosts(data.data);
       } catch (error) {
         console.error("Error fetching posts:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchPosts();
   }, []);
-
-  const settings = {
-    dots: true,
-    infinite: posts.length > 5,
-    speed: 500,
-    slidesToShow: Math.min(posts.length, 5),
-    slidesToScroll: 1,
-    arrows: true,
-    swipeToSlide: true,
-    responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: Math.min(posts.length, 4) } },
-      { breakpoint: 1024, settings: { slidesToShow: Math.min(posts.length, 3) } },
-      { breakpoint: 768, settings: { slidesToShow: Math.min(posts.length, 2) } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
-    ],
-  };
 
   const openModal = (post) => {
     setSelectedPost(post);
@@ -58,24 +40,46 @@ const PopularPost = () => {
 
   const handleDistrictClick = (e) => e.stopPropagation();
 
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 3);
+  };
+
+  const visiblePosts = posts.slice(0, visibleCount);
+
   return (
     <div className="container mx-auto max-w-6xl py-8 px-2">
       <h2 className="text-2xl text-black mb-6">New Posts</h2>
-      {posts?.length > 0 ? (
-        <Slider {...settings}>
-          {posts.map((post) => (
-            <Link href={`/PostDetails/${post?.id}`} key={post?.id} className="block">
-              <div className="p-2">
+
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="w-full h-[360px] p-2 rounded-lg shadow-lg bg-gray-200 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : posts.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {visiblePosts.map((post) => (
+              <Link href={`/PostDetails/${post?.id}`} key={post?.id} className="block">
                 <div
-                  className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col cursor-pointer w-[240px] h-[360px]"
+                  className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col cursor-pointer w-full h-[360px] hover:shadow-2xl transition"
                   onClick={() => openModal(post)}
                 >
                   <div className="relative h-[180px]">
-                    <img
-                      src={post.images?.[0]?.image || post.image}
-                      alt={post.heading}
-                      className="w-full h-full object-cover"
-                    />
+                    {post.images?.[0]?.image || post.image ? (
+                      <img
+                        src={post.images?.[0]?.image || post.image}
+                        alt={post.heading}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500">No Image</span>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
                     <div className="absolute bottom-2 left-2 text-white">
                       <h4 className="text-lg font-bold">{post.heading}</h4>
@@ -120,10 +124,21 @@ const PopularPost = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </Slider>
+              </Link>
+            ))}
+          </div>
+
+          {visibleCount < posts.length && (
+            <div className="text-center mt-6">
+              <button
+                onClick={handleLoadMore}
+                className="px-6 py-2 bg-[#8cc163] hover:bg-green-600 text-white rounded-lg transition"
+              >
+                See More
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="text-center text-gray-500 py-8 text-lg">No posts available</div>
       )}
@@ -182,4 +197,4 @@ const PopularPost = () => {
   );
 };
 
-export default PopularPost;
+export default NewPost;
