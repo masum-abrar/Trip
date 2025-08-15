@@ -715,6 +715,8 @@ useEffect(() => {
 
       {userData?.follower?.length > 0 ? (
         userData?.follower?.map((f, index) => (
+
+              <Link key={index} href={`/userprofile/${f?.meUser?.id}`}>
           <div key={index} className="flex items-center gap-3 mb-4 border-b pb-2">
             <img
               src={f?.meUser?.image || "https://via.placeholder.com/40"}
@@ -726,6 +728,8 @@ useEffect(() => {
              
             </div>
           </div>
+
+          </Link>
         ))
       ) : (
         <p className="text-gray-600 text-sm">No followers found.</p>

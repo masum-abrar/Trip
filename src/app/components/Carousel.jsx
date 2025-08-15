@@ -4,51 +4,47 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import { useState ,useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import { X } from 'lucide-react';
 
 const Carousel = () => {
-
-
   const [searchText, setSearchText] = useState('');
   const [places, setPlaces] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
- // Live search with debounce
- useEffect(() => {
-  const delayDebounceFn = setTimeout(() => {
-    if (searchText.trim() !== '') {
-      handleSearch();
-    } else {
-      setPlaces([]);
-      setShowDropdown(false);
-    }
-  }, 500); // 500ms delay
+  const [showModal, setShowModal] = useState(false);
+  const [searched, setSearched] = useState(false);
 
-  return () => clearTimeout(delayDebounceFn);
-}, [searchText]);
-
-const handleSearch = async () => {
-  try {
+  const handleSearch = async () => {
+    if (!searchText.trim()) return;
     setLoading(true);
-    const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/places?name=${searchText}`);
-    const data = await response.json();
+    setShowModal(true);
+    setSearched(true);
+    setPlaces([]);
+    try {
+      const response = await fetch(
+        `https://parjatak-backend.vercel.app/api/v1/customer/places?name=${searchText}`
+      );
+      const data = await response.json();
+      setPlaces(data.data || []);
+    } catch (error) {
+      console.error('Error fetching places:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setPlaces(data.data || []);
-    setShowDropdown(true);
-  } catch (error) {
-    console.error('Error fetching places:', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const slides = [
     {
       id: 1,
       image:
-        'https://content.r9cdn.net/rimg/dimg/c9/06/8d4fe0d8-city-28030-164fcc85915.jpg?width=1200&height=630&xhint=1477&yhint=1081&crop=true',
+        'https://wallpapers.com/images/hd/ahsan-manzil-museum-in-dhaka-nw0sfyt8x4ibglxq.jpg',
       title: 'Dhaka',
       description:
         'Discover Dhaka, the bustling capital of Bangladesh, where vibrant markets, rich history, and warm hospitality blend to create an unforgettable journey.',
@@ -56,104 +52,119 @@ const handleSearch = async () => {
     {
       id: 2,
       image:
-        'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg',
+        'https://images.unsplash.com/photo-1619177383949-f03975e50b19?fm=jpg&q=60&w=3000',
       title: 'Coxs Bazar',
       description:
-        'Coxs Bazar Beach The beach in Coxs Bazar is the main attraction of the town with an unbroken length of 150 km (93 mi) also termed the longest natural unbroken sea beach" in the world.',
+        'Coxs Bazar Beach is the main attraction of the town with an unbroken length of 150 km, also termed the longest natural unbroken sea beach in the world.',
     },
     {
       id: 3,
       image:
-        'https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg',
+        'https://live.staticflickr.com/4852/31056385007_f81c1aebbb_b.jpg',
       title: 'Sylhet',
       description:
-        'Sylhet sits on the River Surma’s banks in northeastern Bengal, known for its mountain views and wooden houses. It has serene parks and cobblestone streets, like a fairytale. We will look at Sylhet, its top sights, and fun activities.',
+        'Sylhet sits on the River Surma’s banks in northeastern Bengal, known for its mountain views and wooden houses.',
     },
   ];
 
   return (
     <div className="relative">
-    {/* Swiper Slider */}
-    <Swiper
-      modules={[Navigation, Pagination, Autoplay]}
-      navigation
-      pagination={{ clickable: true }}
-      autoplay={{ delay: 5000, disableOnInteraction: false }}
-      loop={true}
-      className="w-full"
-    >
-      {slides.map((slide) => (
-        <SwiperSlide key={slide.id}>
-          <div className="relative w-full h-[60vh] md:h-[80vh] lg:h-[80vh]">
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-              {slide.title && (
-                <h1 className="text-white font-extrabold text-2xl sm:text-3xl lg:text-5xl mb-4 lg:mb-8">
+      {/* Swiper Slider */}
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        navigation
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        loop={true}
+        className="w-full"
+      >
+        {slides.map((slide) => (
+          <SwiperSlide key={slide.id}>
+            <div className="relative w-full h-[70vh] md:h-[80vh]">
+              {/* Blurred Image */}
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover filter blur-sm"
+              />
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+
+              {/* Text & Search */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <h1 className="text-white font-extrabold tracking-wide text-3xl sm:text-4xl lg:text-6xl mb-4 drop-shadow-2xl">
                   {slide.title}
                 </h1>
-              )}
-              <p className="text-white text-sm sm:text-base lg:text-lg max-w-lg lg:max-w-[1020px] mb-6 lg:mb-10 p-3">
-                {slide.description}
-              </p>
+                <p className="text-white text-sm sm:text-base lg:text-lg max-w-[700px] mb-6 leading-relaxed drop-shadow-xl">
+                  {slide.description}
+                </p>
+                <div className="w-full max-w-[500px]">
+                  <input
+                    type="text"
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="🔍 Search destination or place..."
+                    className="w-full py-3 px-5 bg-white/90 backdrop-blur-md border border-gray-300 rounded-full text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8cc163] shadow-lg text-base transition-all duration-300"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </SwiperSlide>
-      ))}
-    </Swiper>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
-    {/* Search Bar */}
-    <div className="absolute bottom-16 sm:bottom-24 md:bottom-28 lg:bottom-32 left-1/2 transform -translate-x-1/2 w-full max-w-[90%] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px] px-4 z-10">
-      <div className="relative w-full">
-        {/* Input */}
-        <input
-          type="text"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          placeholder="Search destination, places"
-          className="w-full py-3 pl-4 pr-20 bg-[#FCF0DC] backdrop-blur-md border border-gray-300 rounded-3xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8cc163] focus:border-[#8cc163] shadow-md text-sm sm:text-base transition-all duration-300"
-        />
+      {/* Modal */}
+ {/* Modal */}
+{showModal && (
+  <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-4">
+    <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full transform scale-95 animate-[zoomIn_0.3s_ease_forwards] relative">
+      {/* Close Button */}
+      <button
+        onClick={() => {
+          setShowModal(false);
+          setSearchText('');
+          setSearched(false);
+        }}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+      >
+        <X size={28} />
+      </button>
 
-        {/* Search Button */}
-        <button
-          onClick={handleSearch}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 py-2 px-5 sm:px-6 bg-gradient-to-r from-[#8cc163] to-[#6aa84f] text-white font-semibold rounded-full text-sm sm:text-base hover:from-gray-700 hover:to-gray-900 transition-all duration-300 shadow-lg"
-        >
-          Search
-        </button>
-
-        {/* Dropdown */}
-        {showDropdown && (
-          <div className="absolute mt-1 w-full bg-[#FCF0DC] shadow-2xl rounded-3xl  max-h-60 overflow-y-auto z-20 animate-fade-in-up border border-gray-200">
-            {loading ? (
-             <div className="flex justify-center py-4 text-gray-600 font-semibold">
-             {/* Spinner */}
-             <div className="w-6 h-6 border-4 border-t-[#8cc163] border-gray-300 rounded-full animate-spin"></div>
-           </div>
-            ) : places.length > 0 ? (
-              places.map((spot) => (
-                <Link
-                  key={spot.slug}
-                  href={`/PlaceDetails/${spot.slug}`}
-                  className="block px-4 py-2 hover:bg-[#FCF0DC] hover:text-[#256029] text-gray-700 font-medium transition-all duration-200"
-                  onClick={() => setShowDropdown(false)}
-                >
-                  {spot.name}
-                </Link>
-              ))
-            ) : (
-              <div className="text-center py-4 text-gray-500">No places found</div>
-            )}
-          </div>
-        )}
-      </div>
+      {/* Modal Content */}
+      {loading ? (
+        <div className="text-lg font-semibold text-center py-6">
+          Searching...
+        </div>
+      ) : searched && places.length === 0 ? (
+        <div className="text-lg font-semibold text-center py-6 text-red-500">
+          No place found
+        </div>
+      ) : (
+        places.length > 0 && (
+          <Link href={`/PlaceDetails/${places[0].slug}`}>
+            <div className="cursor-pointer">
+              <img
+                src={
+                  places[0].images && places[0].images.length > 0
+                    ? places[0].images[0]?.image
+                    : 'https://via.placeholder.com/600x400?text=No+Image'
+                }
+                alt={places[0].name}
+                className="w-full h-52 object-cover rounded-xl shadow-lg"
+              />
+              <h2 className="text-xl font-semibold text-gray-800 mt-4 text-center">
+                {places[0].name}
+              </h2>
+            </div>
+          </Link>
+        )
+      )}
     </div>
-
   </div>
-  
+)}
+
+    </div>
   );
 };
 
