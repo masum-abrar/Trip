@@ -170,7 +170,7 @@ const handlePost = async () => {
   formData.append("description", newPost.text);
   formData.append("type", "event");
   formData.append("eventStartDate", newPost.startDate || "");
-  formData.append("eventEndDate", newPost.endDate || "");
+  formData.append("evenetEndDate", newPost.endDate || "");
   formData.append("isActive", "true");
   formData.append("slug", "");
 
@@ -343,25 +343,54 @@ const handleCommentSubmit = async (postId) => {
 };
 
     // Display the posts
-    const fetchCommunity = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
-        const data = await response.json();
-        setLocationData(data.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch community:', error);
-      }
-    };
+    // const fetchCommunity = async () => {
+    //   try {
+    //     setIsLoading(true);
+    //     const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
+    //     const data = await response.json();
+    //     setLocationData(data.data);
+    //     setIsLoading(false);
+    //   } catch (error) {
+    //     console.error('Failed to fetch community:', error);
+    //   }
+    // };
+    
 
-    useEffect(() => {
+    // useEffect(() => {
     
     
-      if (districtId) {
-        fetchCommunity();
-      }
-    }, [districtId]);
+    //   if (districtId) {
+    //     fetchCommunity();
+    //   }
+    // }, [districtId]);
+
+
+
+    // display the events
+   const fetchCommunity = async () => {
+  try {
+    setIsLoading(true);
+
+    if (events && events.length > 1) {
+      setLocationData(events);
+    } else {
+      const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
+      const data = await response.json();
+      setLocationData(data.data);
+    }
+
+    setIsLoading(false);
+  } catch (error) {
+    console.error('Failed to fetch community:', error);
+    setIsLoading(false);
+  }
+};
+
+useEffect(() => {
+  if (districtId || (events && events.length > 1)) {
+    fetchCommunity();
+  }
+}, [districtId, events]);
 
 
 

@@ -191,25 +191,55 @@ const PlaceDetails = ({ params }) => {
   useEffect(() => setMounted(true), []);
 
 
-    const fetchPlace = async () => {
-    try {
-      const response = await fetch(
-        `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
-      );
-      const data = await response.json();
-      setPlace(data.data);
-    } catch (err) {
-      console.error("Failed to fetch place:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   const fetchPlace = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
+  //     );
+  //     const data = await response.json();
+  //     setPlace(data.data);
+  //   } catch (err) {
+  //     console.error("Failed to fetch place:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (slug) {
-      fetchPlace();
-    }
-  }, [slug]);
+  // useEffect(() => {
+  //   if (slug) {
+  //     fetchPlace();
+  //   }
+  // }, [slug]);
+
+
+  // fetch place details
+const fetchPlace = async () => {
+  try {
+    const response = await fetch(
+      `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
+    );
+    const data = await response.json();
+    setPlace(data.data);
+
+    // 🔹 fetch only events
+    setEvents(data?.data?.post?.filter((p) => p?.type === "event") || []);
+  } catch (err) {
+    console.error("Failed to fetch place or events:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// fetch when slug
+useEffect(() => {
+  if (slug) {
+    fetchPlace();
+  }
+}, [slug]);
+
+// if (!mounted || loading) return <p>Loading...</p>;
+// if (!place) return <p>No place data found</p>;
+
 
 
 // // fetch place details
