@@ -159,7 +159,7 @@ const handlePost = async () => {
   const userId = Cookies.get("userId");
 
   if (!userId) {
-    toast.error("Please login first!"); // red toast
+    toast.error("Please login first"); // red toast
     return;
   }
 

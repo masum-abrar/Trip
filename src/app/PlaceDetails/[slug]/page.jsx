@@ -41,8 +41,7 @@ const PlaceDetails = ({ params }) => {
  
   const [place, setPlace] = useState(null);
   const [community, setCommunity] = useState(null);
-   const [events, setEvents] = useState(null);
-
+  
 
   // State for Active Tab
   const [activeTab, setActiveTab] = useState('Reviews');
@@ -53,6 +52,8 @@ const PlaceDetails = ({ params }) => {
   const [spotModalOpen, setSpotModalOpen] = useState(false);
    const [selectedList, setSelectedList] = useState("");
      const [lists, setLists] = useState([]);
+
+     const [events, setEvents] = useState([]);
   
 
 //new code for review 

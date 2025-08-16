@@ -5,35 +5,49 @@ import Navbar from '@/app/components/Navbar';
 import Link from 'next/link';
 
 const Page = ({ params }) => {
-  const decodedTitle = decodeURIComponent(params.slug);
   const [section, setSection] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null); 
+  const [placeDetails, setPlaceDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  // Section fetch
   useEffect(() => {
     const fetchSectionData = async () => {
       try {
-        const response = await fetch(
-          `https://parjatak-backend.vercel.app/api/v1/customer/lists/${params.title}`
-        );
-        const result = await response.json();
-        setSection(result.data);
+        const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/lists/${params.title}`);
+        const data = await res.json();
+        setSection(data.data);
       } catch (error) {
-        console.error('Error fetching section data:', error);
+        console.error(error);
+      }
+    };
+    fetchSectionData();
+  }, [params.title]);
+
+  // Place details fetch
+  useEffect(() => {
+    if (!selectedPlace) return;
+
+    const fetchPlaceDetails = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/popular-places`);
+        const data = await res.json();
+        const place = data.data.find(p => p.id === selectedPlace.id);
+        setPlaceDetails(place);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchSectionData();
-  }, [params.slug]);
+    fetchPlaceDetails();
+  }, [selectedPlace]);
 
-  if (!section) {
-    return <div>Loading...</div>;
-  }
+  if (!section) return <div>Loading...</div>;
 
-  const user = section.user;
   const places = section.listPlace || [];
-
-  const uniqueLocations = [
-    ...new Set(places.map((p) => p.place?.address).filter(Boolean)),
-  ];
 
   return (
     <div className="bg-white text-black">
@@ -45,70 +59,68 @@ const Page = ({ params }) => {
       <div className="relative w-full h-[60vh] md:h-96">
         <Image
           src={places[0]?.place?.images?.[0]?.image || '/placeholder.jpg'}
-          alt="Cover Image"
+          alt="Cover"
           fill
           objectFit="cover"
-          objectPosition="center"
-          priority
-          quality={100}
           className="brightness-75"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent flex items-center justify-center">
-          <h1 className="text-white text-4xl md:text-5xl font-bold text-center">
-            {section?.title}
-          </h1>
+          <h1 className="text-white text-4xl md:text-5xl font-bold text-center">{section.title}</h1>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {/* User info */}
         <div className="flex items-center space-x-3">
-          <Image
-            src={user?.image || '/avatar.png'}
-            alt={user?.fullname}
-            width={48}
-            height={48}
-            className="rounded-full"
-          />
-          <h1 className="font-semibold">{user?.fullname}</h1>
+          <Image src={section.user?.image || '/avatar.png'} alt={section.user?.fullname} width={48} height={48} className="rounded-full"/>
+          <h1 className="font-semibold">{section.user?.fullname}</h1>
         </div>
 
         <p className="mt-2 text-gray-800">{section.description}</p>
 
-        {/* Location Tags */}
-        <div className="flex flex-wrap gap-3 mt-4">
-          {uniqueLocations.map((location, index) => (
-            <span
-              key={index}
-              className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium cursor-pointer transform hover:scale-105 transition duration-300"
-            >
-              {location}
-            </span>
-          ))}
-        </div>
-
-        {/* Spots Cards */}
+        {/* Places cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
-          {places.map(({ id, place }) => (
-            <Link
-              key={place.id}
-              href={`/PlaceDetails/${place?.slug}`}
-              className="rounded-lg overflow-hidden shadow-lg hover:scale-105 transition transform duration-300 block"
-            >
-              <Image
-                src={place?.images?.[0]?.image || '/placeholder.jpg'}
-                alt={place?.name || 'Spot'}
-                width={400}
-                height={300}
-                className="w-full h-40 object-cover"
-              />
+          {places.map(({ place }) => (
+            <div key={place.id} onClick={() => setSelectedPlace(place)} className="cursor-pointer rounded-lg overflow-hidden shadow-lg hover:scale-105 transition transform duration-300">
+              <Image src={place.images?.[0]?.image || '/placeholder.jpg'} alt={place.name} width={400} height={300} className="w-full h-40 object-cover"/>
               <div className="p-3 text-black bg-white bg-opacity-10">
-                <h3 className="font-semibold text-lg">{place?.name}</h3>
-                <p className="text-sm text-gray-600">{place?.address}</p>
+                <h3 className="font-semibold text-sm md:text-base">{place.name}</h3>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>
+
+      {/* Modal */}
+      {selectedPlace && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-2xl font-bold" onClick={() => { setSelectedPlace(null); setPlaceDetails(null); }}>✕</button>
+
+            {loading && (
+              <div className="text-center py-20 text-lg md:text-xl">
+                Preparing your place details... ⏳
+              </div>
+            )}
+
+            {placeDetails && !loading && (
+              <div className="space-y-4">
+                <Image src={placeDetails.images?.[0]?.image || '/placeholder.jpg'} alt={placeDetails.name} width={500} height={300} className="w-full h-56 object-cover rounded-lg"/>
+                <h2 className="text-xl md:text-2xl font-bold">{placeDetails.name}</h2>
+                <p className="text-gray-700 text-sm md:text-base"><span className="font-bold">Price Range:</span> {placeDetails.priceRange || 'Not Available'}</p>
+                <p className="text-gray-700 text-sm md:text-base"><span className="font-bold">Direction:</span> {placeDetails.direction}</p>
+                <p className="text-gray-700 text-sm md:text-base"><span className="font-bold">Map:</span> <a href={placeDetails.mapLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View on Map</a></p>
+                
+                <div className="flex justify-center mt-4">
+                  <Link href={`/PlaceDetails/${placeDetails.slug || placeDetails.id}`} className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition text-sm md:text-base">
+                    View Place
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
