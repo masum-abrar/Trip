@@ -583,7 +583,7 @@ const unlikePostBackend = async (postId) => {
   const userName = Cookies.get("userName");
 
   if (!cookiesuserId) {
-    toast.error("Please login first"); // Red toast for not logged in
+    toast.error("Please login first!"); // Red toast for not logged in
     return;
   }
 

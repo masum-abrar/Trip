@@ -1240,11 +1240,11 @@ useEffect(() => {
       >
         {spot.listPlace.map((listPlaceItem, idx) => (
           <SwiperSlide key={idx} className="w-[250px]">
-            {/* Clickable place */}
-            <Link key={spot.slug} href={`/PlaceDetails/${spot.slug}`}>
+            {/* ✅ Correct Place Link */}
+            <Link href={`/PlaceDetails/${listPlaceItem.place?.slug}`}>
               <div className="w-full h-[200px] bg-green-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
                 <img
-                  src={listPlaceItem.place?.images[0]?.image}
+                  src={listPlaceItem.place?.images?.[0]?.image || "/placeholder.jpg"}
                   alt={listPlaceItem.place?.name || "Place Image"}
                   className="w-full h-full object-cover"
                 />
