@@ -41,6 +41,8 @@ const PlaceDetails = ({ params }) => {
  
   const [place, setPlace] = useState(null);
   const [community, setCommunity] = useState(null);
+   const [events, setEvents] = useState(null);
+
 
   // State for Active Tab
   const [activeTab, setActiveTab] = useState('Reviews');
@@ -181,6 +183,63 @@ const PlaceDetails = ({ params }) => {
       fetchPlace();
     }
   }, [slug]);
+
+   const [mounted, setMounted] = useState(false);
+
+  // ensure client-only rendering
+  useEffect(() => setMounted(true), []);
+
+
+    const fetchPlace = async () => {
+    try {
+      const response = await fetch(
+        `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
+      );
+      const data = await response.json();
+      setPlace(data.data);
+    } catch (err) {
+      console.error("Failed to fetch place:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (slug) {
+      fetchPlace();
+    }
+  }, [slug]);
+
+
+// // fetch place details
+//   const fetchPlace = async () => {
+//     try {
+//       const response = await fetch(
+//         `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
+//       );
+//       const data = await response.json();
+//       setPlace(data.data);
+
+//       // 🔹 fetch only events for this place
+//       const placeEvents = data.data.post?.filter((p) => p.type === "event") || [];
+//       setEvents(placeEvents);
+//     } catch (err) {
+//       console.error("Failed to fetch place or events:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // fetch when slug changes
+//   useEffect(() => {
+//     if (slug) {
+//       fetchPlace();
+//     }
+//   }, [slug]);
+
+//   if (!mounted || loading) return <p>Loading...</p>;
+//   if (!place) return <p>No place data found</p>;
+
   const districtName = place?.district?.slug;
     useEffect(() => {
       const fetchCommunity = async () => {
@@ -786,11 +845,27 @@ const PlaceDetails = ({ params }) => {
         ))}
       </div>
 
-      {activeTab === 'Events' && (
+      {/* {activeTab === 'Events' && (
          <div className="max-w-3xl mx-auto mt-6">
         <EventTabSection hidePlaceSelection={true} />
           </div>
+        )} */}
+
+
+           {activeTab === 'Events' && (
+            <div className="max-w-3xl mx-auto mt-6">
+          <EventTabSection
+            hidePlaceSelection={true}
+            PostData={place}
+            events={events}   // 🔹 pass events state
+            setEvents={setEvents} // 🔹 optional, if EventTabSection can update
+            fetchPlace={fetchPlace} // 🔹 pass fetchPlace if you want refresh
+          />
+
+          </div>
+        
         )}
+
          {activeTab === 'Discussion' && (
          <div className="max-w-3xl mx-auto mt-6">
         <DiscussTabSection hidePlaceSelection={true} locationData={community} />

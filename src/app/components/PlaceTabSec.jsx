@@ -145,48 +145,58 @@ const [previewImages, setPreviewImages] = useState([]);
     }
   }, [districtId]);
   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    const formData = new FormData();
-  
-    formData.append("name", name);
-    formData.append("divisionId", divisionId);
-    formData.append("districtId", districtId);
-    formData.append("categoryId", categoryId);
-    formData.append("address", address);
-    formData.append("description", description);
-    formData.append("tag", tag);
-    formData.append("priceRange", priceRange);
-    formData.append("phone", phone);
-    formData.append("openingHour", openingHour);
-    formData.append("mapLink", mapLink);
-    formData.append("direction", direction);
-    formData.append("isActive",  "false");
-  
-    images.forEach((img, i) => {
-      formData.append(`images`, img); 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const userId = Cookies.get("userId");
+  if (!userId) {
+    toast.error("Please login first", { autoClose: 3000 });
+    return;
+  }
+
+  // ✅ Prevent blank submissions
+  if (!name?.trim() || !address?.trim() || !divisionId || !districtId || !categoryId) {
+    toast.error("Please fill all required fields", { autoClose: 3000 });
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("userId", userId);
+  formData.append("name", name);
+  formData.append("divisionId", divisionId);
+  formData.append("districtId", districtId);
+  formData.append("categoryId", categoryId);
+  formData.append("address", address);
+  formData.append("description", description || "");
+  formData.append("tag", tag || "");
+  formData.append("priceRange", priceRange || "");
+  formData.append("phone", phone || "");
+  formData.append("openingHour", openingHour || "");
+  formData.append("mapLink", mapLink || "");
+  formData.append("direction", direction || "");
+  formData.append("isActive", "false");
+
+  images.forEach((img) => formData.append("images", img));
+
+  try {
+    const res = await fetch("https://parjatak-backend.vercel.app/api/v1/places", {
+      method: "POST",
+      body: formData,
     });
-  
-    try {
-      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/places", {
-        method: "POST",
-        body: formData,
-      });
-  
-      if (res.ok) {
-        toast.success("Place added successfully! Wait for admin approval.");
-        setShowModal(false);
-      } else {
-        const err = await res.json();
-        console.error("Failed to submit:", err);
-        toast.error("Submission failed.");
-      }
-    } catch (error) {
-      console.error("Error submitting:", error);
+
+    if (res.ok) {
+      toast.success("Place added successfully! Wait for admin approval.", { autoClose: 3000 });
+      setShowModal(false);
+    } else {
+      const err = await res.json();
+      console.error("Failed to submit:", err);
+      toast.error("Submission failed.", { autoClose: 3000 });
     }
-  };
-  
+  } catch (error) {
+    console.error("Error submitting:", error);
+    toast.error("Submission failed due to network error.", { autoClose: 3000 });
+  }
+};
      
   return (
     <div>

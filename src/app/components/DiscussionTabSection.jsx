@@ -272,65 +272,69 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
     };
   
     const handlePost = async () => {
-      const userId = Cookies.get("userId");
-      
-      const formData = new FormData();
-      
-      formData.append("userId", userId);
-      formData.append("divisionId", PostData.division.id);
-      formData.append("districtId", PostData.id); 
-      formData.append("placeId", newPost.placeId);
-      formData.append("title", newPost.text);
-      formData.append("description", newPost.text);
-      formData.append("type", "discussion");
-      formData.append("eventStartDate", "");
-      formData.append("eventEndDate", "");
-      formData.append("isActive", "true");
-      formData.append("slug", "");
-      
-      selectedFiles.forEach((file) => {
-        formData.append("images", file);
-      });
-    
-      try {
-        const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
-          method: "POST",
-          body: formData,
-        });
-    
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-    
-        const data = await response.json();
-        console.log("Post created successfully:", data);
-        toast.success("Post has been created");
-        setNewPost({ text: "", images: [], placeId: "" }); // Reset the form
-        fetchCommunity();
-    
-        // Step 2: Trigger Notification after successful post creation
-        const notificationPayload = {
-          userId: userId, // You can change this to the user who should receive the notification
-          message: `New post created: ${newPost.text}`, // Customize the message as needed
-          type: "post",  // Notification type (could be 'post', 'comment', etc.)
-          link: `https://example.com`,  // Link to the newly created post
-        };
-    
-        // Send notification to the backend API
-        await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(notificationPayload),
-        });
-    
-        console.log("Notification sent successfully");
-    
-      } catch (error) {
-        console.error("Post creation failed:", error);
-      }
+  const userId = Cookies.get("userId");
+
+  if (!userId) {
+    toast.error("Please login first!");
+    return; // Prevent further execution
+  }
+
+  const formData = new FormData();
+  
+  formData.append("userId", userId);
+  formData.append("divisionId", PostData.division.id);
+  formData.append("districtId", PostData.id); 
+  formData.append("placeId", newPost.placeId);
+  formData.append("title", newPost.text);
+  formData.append("description", newPost.text);
+  formData.append("type", "discussion");
+  formData.append("eventStartDate", "");
+  formData.append("eventEndDate", "");
+  formData.append("isActive", "true");
+  formData.append("slug", "");
+  
+  selectedFiles.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  try {
+    const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Post created successfully:", data);
+    toast.success("Post has been created");
+    setNewPost({ text: "", images: [], placeId: "" }); // Reset the form
+    fetchCommunity();
+
+    // Trigger Notification after successful post creation
+    const notificationPayload = {
+      userId: userId,
+      message: `New post created: ${newPost.text}`,
+      type: "post",
+      link: `https://example.com`,
     };
+
+    await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(notificationPayload),
+    });
+
+    console.log("Notification sent successfully");
+
+  } catch (error) {
+    console.error("Post creation failed:", error);
+    toast.error("Failed to create post");
+  }
+};
+
     
 
     
@@ -372,6 +376,13 @@ const DiscussTabSection = ({hidePlaceSelection , PostData}) => {
   // Like Post
 // Like / Unlike Handler
 const handleLikeToggle = async (postId, postOwnerUserId) => {
+  const cookiesuserId = Cookies.get("userId"); // Check login
+
+  if (!cookiesuserId) {
+    toast.error("Please login first!"); // Red toast
+    return; // Stop further execution
+  }
+
   try {
     const userName = Cookies.get("userName");
 
@@ -397,6 +408,7 @@ const handleLikeToggle = async (postId, postOwnerUserId) => {
 
   } catch (error) {
     console.error("Error toggling like:", error);
+    toast.error("Failed to update like"); // Optional toast on error
   }
 };
 
@@ -468,67 +480,85 @@ const unlikePostBackend = async (postId) => {
           }));
         };
       
-        const handleCommentSubmit = async (postId , postOwnerUserId) => {
-          const comment = comments[postId];
-          if (!comment?.trim()) return;
-          const userName = Cookies.get("userName");
-        
-          setLoading(true);
-          try {
-            const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                postId: postId,
-                parentUserId: null,
-                userId,
-                comment,
-              }),
-            });
-        
-            const data = await res.json();
-           toast.success("Comment posted successfully!");
-        
-           
-            setComments(prev => ({
-              ...prev,
-              [postId]: "",
-            }));
-        
-           
-            await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: cookiesuserId, 
-                message: `You Comment on a post.`,
-                type: "activity",
-                link: ``,
-              }),
-            });
-        
-            
-            await fetch("https://parjatak-backend.vercel.app/api/v1/create-notification", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: postOwnerUserId, 
-               
-                message: `${userName} liked your post.`,
-                type: "notification",
-                link: ``,
-              }),
-            });
+     const handleCommentSubmit = async (postId, postOwnerUserId) => {
+  const cookiesuserId = Cookies.get("userId"); // Login check
+  const userName = Cookies.get("userName");
 
-            fetchCommunity() 
-          } catch (err) {
-            console.error("Failed to post comment:", err);
-          } finally {
-            setLoading(false);
-          }
-        };
+  if (!cookiesuserId) {
+    toast.error("Please login first"); // Red toast for not logged in
+    return;
+  }
+
+  const comment = comments[postId];
+  if (!comment?.trim()) return;
+
+  setLoading(true);
+
+  try {
+    // Create comment
+    const res = await fetch(
+      "https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: postId,
+          parentUserId: null,
+          userId: cookiesuserId,
+          comment,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      toast.success("Comment posted successfully!");
+      setComments(prev => ({ ...prev, [postId]: "" }));
+
+      // Notify post owner about comment
+      await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/create-notification",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: postOwnerUserId,
+            message: `${userName} commented on your post.`,
+            type: "notification",
+            link: `/PostDetails/${postId}`,
+          }),
+        }
+      );
+
+      // Optionally, notify self or other users
+      await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/create-notification",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: cookiesuserId,
+            message: `You commented: "${comment}"`,
+            type: "activity",
+            link: `/PostDetails/${postId}`,
+          }),
+        }
+      );
+
+      fetchCommunity(); // Refresh posts/comments
+    } else {
+      toast.error(data.message || "Failed to post comment");
+    }
+  } catch (err) {
+    console.error("Failed to post comment:", err);
+    toast.error("Error occurred while posting comment");
+  } finally {
+    setLoading(false);
+  }
+};
         
       
         const handleReplyToggle = (commentId) => {
@@ -548,34 +578,55 @@ const unlikePostBackend = async (postId) => {
           }));
         };
         
-        const handleReply = async (postId, commentId, parentUserId) => {
-          const reply = replyTexts[commentId];
-          if (!reply?.trim()) return;
-        
-          try {
-            const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment-reply", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                postId,
-                postCommentId: commentId,
-                parentUserId,
-                userId,
-                reply
-              }),
-            });
-        
-            const data = await res.json();
-            toast.success("Reply posted successfully!");
-        
-            setReplyTexts(prev => ({ ...prev, [commentId]: "" }));
-            setShowReplyInput(prev => ({ ...prev, [commentId]: false }));
-           
-            fetchCommunity() 
-          } catch (error) {
-            console.error("Reply failed:", error);
-          }
-        };
+     const handleReply = async (postId, commentId, parentUserId) => {
+  const cookiesuserId = Cookies.get("userId"); // Login check
+  const userName = Cookies.get("userName");
+
+  if (!cookiesuserId) {
+    toast.error("Please login first"); // Red toast for not logged in
+    return;
+  }
+
+  const reply = replyTexts[commentId];
+  if (!reply?.trim()) return;
+
+  setLoading(true);
+
+  try {
+    const res = await fetch(
+      "https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment-reply",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId,
+          postCommentId: commentId,
+          parentUserId,
+          userId: cookiesuserId,
+          reply,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      toast.success("Reply posted successfully!");
+
+      setReplyTexts(prev => ({ ...prev, [commentId]: "" }));
+      setShowReplyInput(prev => ({ ...prev, [commentId]: false }));
+
+      fetchCommunity(); // Refresh posts/comments
+    } else {
+      toast.error(data.message || "Failed to post reply");
+    }
+  } catch (error) {
+    console.error("Reply failed:", error);
+    toast.error("Error occurred while posting reply");
+  } finally {
+    setLoading(false);
+  }
+};
         
         const handleDeleteComment = async (commentId, postId, parentUserId) => {
           try {

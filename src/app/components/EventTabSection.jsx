@@ -9,7 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 
-const EventTabSection = ({ hidePlaceSelection , PostData  }) => {
+const EventTabSection = ({ hidePlaceSelection , PostData,events, setEvents  }) => {
   const router = useRouter();
   const [showAllImages, setShowAllImages] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -26,56 +26,13 @@ const [liked, setLiked] = useState(false);
    const [isLoading, setIsLoading] = useState(true);
    const [visiblePosts, setVisiblePosts] = useState(10);
    const [showAllCommentsForPost, setShowAllCommentsForPost] = useState({});
+  
+   
 
 
 const districtId = PostData?.id;
   // const [newPost, setNewPost] = useState({ text: '', images: [], place: '', startDate: "", endDate: "", subdistrict: '' });
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      user: "Rakib Hasan",
-      text: "Sunset Music Festival is happening this weekend! Don’t miss out!",
-      replies: [],
-      images: ["https://media.istockphoto.com/id/497039777/photo/wedding-setting.jpg?s=612x612&w=0&k=20&c=uHwz_57iBRVXrUPacCiLTuTPYyZS1az9GA0sCDeMP5U="], // Change `image` to `images`
- startDate: "2025-03-01",
-  endDate: "2025-03-02",
-      place: "Beach",
-      subdistrict: "North",
-      likes: 2,
-      liked: false,
-      comments: [
-        { id: 1, user: "Raihan", text: "Looking forward to this event! What’s the schedule?", replies: [] },
-        { id: 2, user: "Sakib", text: "Can anyone join, or do I need to register first?", replies: [] },
-        { id: 3, user: "Rihan", text: "This is going to be so much fun! Who else is coming?", replies: [] },
-        { id: 4, user: "Saad", text: "Will there be any guest speakers or special activities?", replies: [] },
-      ],
-      
-      newComment: '',
-      showAllComments: false,
-    },
-    {
-      id: 2,
-      user: "Sakib Hasan",
-      text: "Let's gather for a beach cleanup drive followed by a sunset picnic!",
-      replies: [],
-      images: ["https://media-api.xogrp.com/images/b9a84d67-c58e-4c08-aa9c-33e43ac93ebd"], // Change `image` to `images`
-      startDate: "2025-03-01",
-      endDate: "2025-03-02",
-      place: "Hill",
-      subdistrict: "South",
-      likes: 5,
-      liked: false,
-      comments: [
-        { id: 5, user: "Rihan", text: "This event sounds exciting! Can't wait to join.", replies: [] },
-        { id: 6, user: "Sohel", text: "Is there any registration process for this event?", replies: [] },
-        { id: 7, user: "Omar", text: "Looking forward to meeting new people at this event.", replies: [] },
-        { id: 8, user: "Imran", text: "What’s the exact location? I’d love to participate!", replies: [] },
-      ],
-      
-      newComment: '',
-      showAllComments: false,
-    },
-  ]);
+  const [posts, setPosts] = useState();
   const isLiked =
   Array.isArray(locationData?.like) &&
   locationData.like.some((like) => like.user?.id === cookiesuserId);
@@ -93,57 +50,6 @@ const districtId = PostData?.id;
       };
       fetchPlaces();
     }, [districtId]);
-  // const handleImageChange = (e) => {
-  //   if (!e.target.files) return;  // Ensure files exist
-  
-  //   const files = Array.from(e.target.files);
-  //   const imageUrls = files.map(file => URL.createObjectURL(file));
-  
-  //   setNewPost(prevState => ({
-  //     ...prevState,
-  //     images: [...(prevState.images || []), ...imageUrls]  // Ensure it's always an array
-  //   }));
-  // };
-  
-  
-  // const removeImage = (index) => {
-  //   setNewPost(prevState => ({
-  //     ...prevState,
-  //     images: prevState.images.filter((_, i) => i !== index)
-  //   }));
-  // };
-  
-  
-  
-
-  // const handleReplyToggle = (postId, commentId) => {
-  //   setShowReplyInput(prev => ({ ...prev, [commentId]: !prev[commentId] }));
-  // };
-
-
-
-  // const handlePost = () => {
-  //   if (!newPost.text.trim() && newPost.images.length === 0) {
-  //     alert("Please write something or add an image.");
-  //     return;
-  //   }
-  
-  //   const newPostData = {
-  //     id: Date.now(),
-  //     user: "User Name",
-  //     text: newPost.text,
-  //     images: [...(newPost.images || [])], // Ensure images is an array
-  //     startDate: newPost.startDate, // Add start date
-  //     endDate: newPost.endDate, // Add end date
-  //     comments: [],
-  //     likes: 0,
-  //     liked: false
-  //   };
-    
-  
-  //   setPosts([newPostData, ...posts]);
-  //   setNewPost({ text: "", images: [], place: "" });  // Reset state after posting
-  // };
   
 
   const toggleComments = (postId) => {
@@ -201,55 +107,110 @@ const districtId = PostData?.id;
       setNewPost({ ...newPost, images: newImages });
       setSelectedFiles(newFiles);
     };
-    const handlePost = async () => {
+  //   const handlePost = async () => {
        
-        const userId = Cookies.get("userId");
+  //       const userId = Cookies.get("userId");
     
-        const formData = new FormData();
+  //       const formData = new FormData();
     
-        formData.append("userId", userId);
-      formData.append("divisionId", PostData.division.id);
-      formData.append("districtId", PostData.id); 
-      formData.append("placeId", newPost.placeId);
-      formData.append("title", newPost.text);
-      formData.append("description", newPost.text);
-      formData.append("type", "event");
-      formData.append("eventStartDate", newPost.startDate || "");
-      formData.append("eventEndDate", newPost.endDate || "");
-      formData.append("isActive", "true");
-        formData.append("slug", "");
+  //       formData.append("userId", userId);
+  //     formData.append("divisionId", PostData.division.id);
+  //     formData.append("districtId", PostData.id); 
+  //     formData.append("placeId", newPost.placeId);
+  //     formData.append("title", newPost.text);
+  //     formData.append("description", newPost.text);
+  //     formData.append("type", "event");
+  //     formData.append("eventStartDate", newPost.startDate || "");
+  //     formData.append("eventEndDate", newPost.endDate || "");
+  //     formData.append("isActive", "true");
+  //       formData.append("slug", "");
     
-        selectedFiles.forEach((file, index) => {
-          formData.append(`images`, file);
-        });
+  //       selectedFiles.forEach((file, index) => {
+  //         formData.append(`images`, file);
+  //       });
     
-        try {
-          const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
-            method: "POST",
-            body: formData,
-          });
+  //       try {
+  //         const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
+  //           method: "POST",
+  //           body: formData,
+  //         });
     
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+  //         if (!response.ok) {
+  //           throw new Error(`HTTP error! Status: ${response.status}`);
+  //         }
     
-          const data = await response.json();
-          console.log("Post created successfully:", data);
-          toast.success("Post has been created");
-          router.refresh();
-          fetchCommunity() // Refresh the page or fetch new posts
-        } catch (error) {
-          console.error("Post creation failed:", error);
-        }
-      }
+  //         const data = await response.json();
+  //         console.log("Post created successfully:", data);
+  //         toast.success("Post has been created");
+  //         router.refresh();
+  //         fetchCommunity() // Refresh the page or fetch new posts
+  //       } catch (error) {
+  //         console.error("Post creation failed:", error);
+  //       }
+  //     }
 
-       useEffect(() => {
-    const idFromCookie = Cookies.get("userId");
-    if (idFromCookie) {
-      setUserId(idFromCookie);
+  //      useEffect(() => {
+  //   const idFromCookie = Cookies.get("userId");
+  //   if (idFromCookie) {
+  //     setUserId(idFromCookie);
+  //   }
+  // }, []);
+const handlePost = async () => {
+  const userId = Cookies.get("userId");
+
+  if (!userId) {
+    toast.error("Please login first!"); // red toast
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append("userId", userId);
+  formData.append("title", newPost.text);
+  formData.append("description", newPost.text);
+  formData.append("type", "event");
+  formData.append("eventStartDate", newPost.startDate || "");
+  formData.append("eventEndDate", newPost.endDate || "");
+  formData.append("isActive", "true");
+  formData.append("slug", "");
+
+  // Only attach place info if NOT hiding place selection
+  if (!hidePlaceSelection) {
+    formData.append("divisionId", PostData.division?.id || "");
+    formData.append("districtId", PostData.id || "");
+    formData.append("placeId", newPost.placeId || "");
+  }
+
+  // Images
+  selectedFiles.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  try {
+    const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
     }
-  }, []);
 
+    const data = await response.json();
+    console.log("Post created successfully:", data);
+    toast.success("Post has been created");
+
+    // Refresh UI
+    router.refresh();
+    if (typeof fetchCommunity === "function") fetchCommunity();
+    if (typeof fetchPlace === "function") fetchPlace();
+
+  } catch (error) {
+    console.error("Post creation failed:", error);
+    toast.error("Failed to create post"); // red toast on failure
+  }
+};
 
   const handleCommentChange = (postId, value) => {
     setComments(prev => ({
@@ -258,13 +219,24 @@ const districtId = PostData?.id;
     }));
   };
 
-  const handleCommentSubmit = async (postId) => {
-    const comment = comments[postId];
-    if (!comment?.trim()) return;
-  
-    setLoading(true);
-    try {
-      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment", {
+const handleCommentSubmit = async (postId) => {
+  const cookiesuserId = Cookies.get("userId"); // check login
+  const userName = Cookies.get("userName");
+
+  if (!cookiesuserId) {
+    toast.error("Please login first!"); // red toast
+    return;
+  }
+
+  const comment = comments[postId];
+  if (!comment?.trim()) return;
+
+  setLoading(true);
+
+  try {
+    const res = await fetch(
+      "https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -272,29 +244,35 @@ const districtId = PostData?.id;
         body: JSON.stringify({
           postId: postId,
           parentUserId: null,
-          userId,
+          userId: cookiesuserId,
           comment,
         }),
-      });
-  
-      const data = await res.json();
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
       toast.success("Comment posted successfully!");
-  
-     
+
       setComments(prev => ({
         ...prev,
         [postId]: "",
       }));
-  
-      // ✅ Refresh server-rendered data (like updated comments)
+
+      // Refresh UI
       router.refresh();
-      fetchCommunity() 
-    } catch (err) {
-      console.error("Failed to post comment:", err);
-    } finally {
-      setLoading(false);
+      fetchCommunity();
+    } else {
+      toast.error(data.message || "Failed to post comment");
     }
-  };
+  } catch (err) {
+    console.error("Failed to post comment:", err);
+    toast.error("Error occurred while posting comment");
+  } finally {
+    setLoading(false);
+  }
+};
   
 
   const handleReplyToggle = (commentId) => {
@@ -314,35 +292,55 @@ const districtId = PostData?.id;
     }));
   };
   
-  const handleReply = async (postId, commentId, parentUserId) => {
-    const reply = replyTexts[commentId];
-    if (!reply?.trim()) return;
-  
-    try {
-      const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment-reply", {
+ const handleReply = async (postId, commentId, parentUserId) => {
+  const cookiesuserId = Cookies.get("userId"); // Check login
+  const userName = Cookies.get("userName");
+
+  if (!cookiesuserId) {
+    toast.error("Please login first!"); // Red toast if not logged in
+    return;
+  }
+
+  const reply = replyTexts[commentId];
+  if (!reply?.trim()) return;
+
+  setLoading(true);
+
+  try {
+    const res = await fetch(
+      "https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment-reply",
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           postId,
           postCommentId: commentId,
           parentUserId,
-          userId,
-          reply
+          userId: cookiesuserId,
+          reply,
         }),
-      });
-  
-      const data = await res.json();
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
       toast.success("Reply posted successfully!");
-  
+
       setReplyTexts(prev => ({ ...prev, [commentId]: "" }));
       setShowReplyInput(prev => ({ ...prev, [commentId]: false }));
-      router.refresh(); 
-      fetchCommunity() 
-    } catch (error) {
-      console.error("Reply failed:", error);
+
+      fetchCommunity(); // Refresh posts/comments
+    } else {
+      toast.error(data.message || "Failed to post reply");
     }
-  };
-  
+  } catch (error) {
+    console.error("Reply failed:", error);
+    toast.error("Error occurred while posting reply");
+  } finally {
+    setLoading(false);
+  }
+};
 
     // Display the posts
     const fetchCommunity = async () => {
@@ -366,13 +364,6 @@ const districtId = PostData?.id;
     }, [districtId]);
 
 
-
-     // Check if current user already liked the post
-    //  useEffect(() => {
-    //   if (locationData?.like?.some((like) => like.user.id == userId)) {
-    //     setLiked(true);
-    //   }
-    // }, [locationData?.like, userId]);
 
   const handleLike = async (postId) => {
     try {
