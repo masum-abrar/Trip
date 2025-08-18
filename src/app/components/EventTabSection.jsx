@@ -170,7 +170,7 @@ const handlePost = async () => {
   formData.append("description", newPost.text);
   formData.append("type", "event");
   formData.append("eventStartDate", newPost.startDate || "");
-  formData.append("evenetEndDate", newPost.endDate || "");
+  formData.append("eventEndDate", newPost.endDate || "");
   formData.append("isActive", "true");
   formData.append("slug", "");
 
@@ -700,7 +700,7 @@ const handleDeleteReply = async (replyId, postId, postCommentId, parentUserId) =
 {/* End Date - Pushed to Extreme Right */}
 <div className="flex items-center gap-1 sm:gap-2 bg-red-100 text-red-700 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm ml-auto">
 <FaCalendarAlt className="text-red-500 text-sm sm:text-base" />
-<span className="font-medium">End: {post.evenetEndDate}</span>
+<span className="font-medium">End: {post.eventEndDate}</span>
 </div>
 </div>
 

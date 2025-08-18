@@ -22,11 +22,13 @@ import { useRouter } from "next/navigation"; // ✅ correct for App Router
 //   { id: 4, title: "Patuartek", subDistict:"Ukhia", district: "CoxsBazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg", eyeCount: "620k", dotCount: "394k", heartCount: "166k" },
 // ];
 
-const PlaceDetails = ({ params }) => {
+const PlaceDetails = ({params}) => {
   const resolvedParams = use(params)
   const slug = resolvedParams.slug;
  
   const cookiesuserId = Cookies.get("userId");
+
+  
 
   // State for Modal & Rating
   const [isModalOpen, setModalOpen] = useState(false);
@@ -41,6 +43,8 @@ const PlaceDetails = ({ params }) => {
  
   const [place, setPlace] = useState(null);
   const [community, setCommunity] = useState(null);
+    const [isJoined, setIsJoined] = useState(false);
+
   
 
   // State for Active Tab
@@ -54,6 +58,10 @@ const PlaceDetails = ({ params }) => {
      const [lists, setLists] = useState([]);
 
      const [events, setEvents] = useState([]);
+
+      // user data
+  // const [currentUserId, setCurrentUserId] = useState(null); // ✅ different naam
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
 
 //new code for review 
@@ -68,6 +76,73 @@ const PlaceDetails = ({ params }) => {
     likes: 0,
     user: ["User"],
   });
+
+
+
+
+
+  //  const handleJoin = async () => {
+  //   if (!isLoggedIn) {
+  //     toast.error("Please login to join the community!");
+  //     return;
+  //   }
+
+  //   if (!community?.id) return;
+
+  //   try {
+  //     if (isJoined) {
+  //       // leave
+  //       const response = await fetch(
+  //         "https://parjatak-backend.vercel.app/api/v1/customer/delete-district-follower",
+  //         {
+  //           method: "DELETE",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify({ userId, districtId: community.id }),
+  //         }
+  //       );
+
+  //       const data = await response.json();
+  //       if (data.success) {
+  //         toast.success(`You have successfully left "${community?.name}"!`);
+  //         const updatedFollowers = community.follower.filter(
+  //           (follower) => follower.user.id !== userId
+  //         );
+  //         setCommunity({ ...community, follower: updatedFollowers });
+  //         setIsJoined(false);
+  //       } else {
+  //         toast.error(data.message || "Failed to leave.");
+  //       }
+  //     } else {
+  //       // join
+  //       const response = await fetch(
+  //         "https://parjatak-backend.vercel.app/api/v1/customer/create-district-follower",
+  //         {
+  //           method: "POST",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify({ userId, districtId: community.id }),
+  //         }
+  //       );
+
+  //       const data = await response.json();
+  //       if (data.success) {
+  //         toast.success(`You have successfully joined "${community?.name}"!`);
+  //         const updatedFollowers = [
+  //           ...community.follower,
+  //           { user: { id: userId } },
+  //         ];
+  //         setCommunity({ ...community, follower: updatedFollowers });
+  //         setIsJoined(true);
+  //       } else {
+  //         toast.error(data.message || "Failed to join.");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to join/leave community:", error);
+  //     toast.error("Something went wrong!");
+  //   }
+  // };
+
+  
 
   const handleReviewSubmit = async () => {
   try {
@@ -488,11 +563,98 @@ useEffect(() => {
   setLoading(false);
 };
 
+      
+//JOIN
+
+ useEffect(() => {
+    if (community?.follower && userId) {
+      const joined = community.follower.some(
+        (follower) => follower.user.id === userId
+      );
+      setIsJoined(joined);
+    }
+  }, [community, userId]);
 
 
-      
-      
+ const handleJoin = async () => {
+
+     const userId = Cookies.get("userId");
+
+    // Login check
+    if (!userId) {
+      toast.error("You need to log in first to join community.");
+      setTimeout(() => {
+        // router.push("/login");
+      }, 2000);
+      return;
+    }
+
+    if (!community?.id) return;
+
+    try {
+      if (isJoined) {
+        // leave
+        const response = await fetch(
+          "https://parjatak-backend.vercel.app/api/v1/customer/delete-district-follower",
+          {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, districtId: community.id }),
+          }
+        );
+
+        const data = await response.json();
+        if (data.success) {
+          toast.success(`You have successfully left "${community?.name}"!`);
+          const updatedFollowers = community.follower.filter(
+            (follower) => follower.user.id !== userId
+          );
+          setCommunity({ ...community, follower: updatedFollowers });
+          setIsJoined(false);
+          setTimeout(() => {
+        // router.push("/login");
+      }, 2000);
+        } else {
+          toast.error(data.message || "Failed to leave.");
+          setTimeout(() => {
+        // router.push("/login");
+      }, 2000);
+        }
+      } else {
+        // join
+        const response = await fetch(
+          "https://parjatak-backend.vercel.app/api/v1/customer/create-district-follower",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, districtId: community.id }),
+          }
+        );
+
+        const data = await response.json();
+        if (data.success) {
+          toast.success(`You have successfully joined "${community?.name}"!`);
+          const updatedFollowers = [
+            ...community.follower,
+            { user: { id: userId } },
+          ];
+          setCommunity({ ...community, follower: updatedFollowers });
+          setIsJoined(true);
+
+          setTimeout(() => {
+        // router.push("/login");
+      }, 2000);
+        } else {
+          toast.error(data.message || "Failed to join.");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to join/leave community:", error);
+      toast.error("Something went wrong!");
+    }
+  };
      
+
 
 
 
@@ -593,7 +755,7 @@ useEffect(() => {
   </button>
 </div>
 
-<div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
+{/* <div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
  <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
  {place && place.district ? (
   <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
@@ -606,7 +768,35 @@ useEffect(() => {
   <button className="bg-[#8cc163] text-white px-12 lg:px-10  py-2  lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 transform hover:scale-110 hover:bg-[#6fb936] hover:shadow-lg">
     Join
   </button>
-</div>
+</div> */}
+
+
+
+    <div className="mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50 backdrop-blur-lg bg-opacity-30">
+      <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
+        {place && place.district ? (
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
+            {place.district.name}{" "}
+            <span className="text-[#8cc163]">Community</span>
+          </h1>
+        ) : (
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-400">
+            Loading Community...
+          </h1>
+        )}
+      </Link>
+
+      <button
+        onClick={handleJoin}
+        className={`px-12 lg:px-10 py-2 lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 transform hover:scale-110 ${
+          isJoined
+            ? "bg-gray-400 text-white cursor-not-allowed"
+            : "bg-[#8cc163] text-white hover:bg-[#6fb936] hover:shadow-lg"
+        }`}
+      >
+        {isJoined ? "Joined" : "Join"}
+      </button>
+    </div>
 
     {/* <DescriptionBox description={place.description} /> */}
 
