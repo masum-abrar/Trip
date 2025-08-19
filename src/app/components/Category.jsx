@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { FaHeart, FaComment } from "react-icons/fa";
 
 const Category = () => {
   const [divisions, setDivisions] = useState([]);
@@ -15,6 +14,8 @@ const Category = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(6);
+
+  const [modalMessage, setModalMessage] = useState(null); // ✅ string | null lagbe na
 
   // Fetch Divisions
   useEffect(() => {
@@ -39,16 +40,26 @@ const Category = () => {
   const handleSearch = async () => {
     try {
       setLoading(true);
+      setModalMessage("Searching places...");
       const res = await fetch(
         `https://parjatak-backend.vercel.app/api/v1/customer/category-places?divisionId=${divisionId}&districtId=${districtId}&limit=6&page=1`
       );
       const data = await res.json();
-      setPosts(data.data || []); // এখানে places assign করছো
+
+      setPosts(data.data || []);
       setPage(1);
-      setHasMore(data.data.length >= 6);
+      setHasMore(data.data?.length >= 6);
       setLoading(false);
+
+      if (!data.data || data.data.length === 0) {
+        setModalMessage("No place found!");
+      } else {
+        setModalMessage(null);
+      }
     } catch (error) {
       console.error("Failed to fetch places:", error);
+      setModalMessage("Something went wrong!");
+      setLoading(false);
     }
   };
 
@@ -73,7 +84,7 @@ const Category = () => {
       const data = await res.json();
       setPosts((prev) => [...prev, ...(data.data || [])]);
       setPage(nextPage);
-      setHasMore(data.data.length >= 6);
+      setHasMore(data.data?.length >= 6);
     } catch (error) {
       console.error("Failed to load more places:", error);
     }
@@ -86,7 +97,7 @@ const Category = () => {
 
         {/* Division Dropdown */}
         <select
-          className="bg-[#FCF0DC] text-black rounded-md p-2 w-full md:w-auto"
+          className="bg-[#FCF0DC] text-black rounded-md p-2 w-full md:w-auto max-h-40 overflow-y-auto"
           value={divisionId}
           onChange={(e) => {
             setDivisionId(e.target.value);
@@ -103,7 +114,7 @@ const Category = () => {
 
         {/* District Dropdown */}
         <select
-          className="bg-[#FCF0DC] text-black rounded-md p-2 w-full md:w-auto"
+          className="bg-[#FCF0DC] text-black rounded-md p-2 w-full md:w-auto max-h-40 overflow-y-auto"
           value={districtId}
           onChange={(e) => setDistrictId(e.target.value)}
           disabled={!divisionId}
@@ -172,6 +183,21 @@ const Category = () => {
           >
             See More
           </button>
+        </div>
+      )}
+
+      {/* Modal */}
+      {modalMessage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
+            <p className="text-lg font-semibold text-gray-800">{modalMessage}</p>
+            <button
+              onClick={() => setModalMessage(null)}
+              className="mt-4 px-4 py-2 bg-[#8cc163] text-white rounded-md hover:bg-gray-900 transition duration-300"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>

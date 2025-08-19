@@ -5,6 +5,8 @@ import Navbar from '@/app/components/Navbar'
 import { motion } from "framer-motion";
 import Cookies from "js-cookie";
 import { FaPlus } from "react-icons/fa";
+import Footer from '../../components/Footer';
+
 import { Swiper, SwiperSlide } from "swiper/react";
 import  { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -616,29 +618,38 @@ const handleSubmit = async (e) => {
           </div>
         )}
         
-        {/* Diary Section */}
-        {activeTab === 'diary' && (
-           <div className="p-6">
-        
-           {/* Diary Entries */}
-           <h2 className="text-3xl font-bold text-gray-800 mt-12 mb-4 border-b-2 border-gray-300 pb-2 text-center">Diary Entries</h2>
-           <div className="space-y-4">
-             {diaryList.map((diary) => (
-               <div key={diary.id} className="bg-white rounded shadow-md overflow-hidden">
-                 <img
-                   className="w-full h-48 object-cover"
-                   src={diary.place?.images?.[0]?.image || "https://via.placeholder.com/300x200"}
-                   alt={diary.place?.name || "Diary Image"}
-                 />
-                 <div className="p-6">
-                   <h3 className="text-xl font-semibold text-gray-700">{diary.title}</h3>
-                   <p className="text-gray-600">{diary.description}</p>
-                 </div>
-               </div>
-             ))}
-           </div>
-         </div>
-        )}
+      {/* Diary Section */}
+{activeTab === 'diary' && (
+  <div className="p-6">
+    {/* Diary Entries */}
+    <h2 className="text-3xl font-bold text-gray-800 mt-12 mb-4 border-b-2 border-gray-300 pb-2 text-center">
+      Diary Entries
+    </h2>
+
+    {diaryList.length > 0 ? (
+      <div className="space-y-4">
+        {diaryList.map((diary) => (
+          <div key={diary.id} className="bg-white rounded shadow-md overflow-hidden">
+            <img
+              className="w-full h-48 object-cover"
+              src={diary.place?.images?.[0]?.image || "https://via.placeholder.com/300x200"}
+              alt={diary.place?.name || "Diary Image"}
+            />
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-gray-700">{diary.title}</h3>
+              <p className="text-gray-600">{diary.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p className="text-center text-gray-500 text-lg mt-8">
+        No diary entries found.
+      </p>
+    )}
+  </div>
+)}
+
         
         {/* Reviews Section */}
         {activeTab === 'reviews' && (
@@ -949,6 +960,8 @@ const handleSubmit = async (e) => {
                   )}
                 </div>
       </div>
+
+      {/* Footer */} <div className="w-full"> <Footer /> </div>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
     </div>
   );

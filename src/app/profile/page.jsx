@@ -471,8 +471,8 @@ useEffect(() => {
     fetchUserData();
   }, [userIdFromCookie]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  // if (loading) return <div>Loading...</div>;
+  // if (error) return <div>{error}</div>;
 
   // Destructure the user data
   const { billingAddress, following , followers ,  } = userData || {};
@@ -506,10 +506,33 @@ useEffect(() => {
 
 
   return (
+
+
     <div className="bg-white text-gray-900 min-h-screen">
-      <div className="shadow-lg w-full">
+
+   
+{/* Loading Modal */}
+{loading && (
+  <div className="fixed inset-0 z-50 flex flex-col justify-center items-center bg-black/40 backdrop-blur-sm">
+    <div className="relative w-32 h-32 flex justify-center items-center">
+      {/* Bouncing Circles */}
+      <div className="absolute w-8 h-8 bg-green-500 rounded-full animate-bounce delay-150"></div>
+      <div className="absolute w-8 h-8 bg-green-400 rounded-full animate-bounce delay-300"></div>
+      <div className="absolute w-8 h-8 bg-green-300 rounded-full animate-bounce delay-450"></div>
+    </div>
+    <p className="mt-6 text-white text-xl font-semibold animate-pulse text-center">
+      Loading Profile...
+    </p>
+   
+  </div>
+)}
+
+
+      <div className="shadow-lg w-full z-40 relative">
         <Navbar />
       </div>
+
+
 
       {/* Main Container */}
       <div className="container mx-auto px-4 py-8 max-w-[1120px]">
@@ -858,10 +881,9 @@ useEffect(() => {
                 </div>
               </div>
             )}
-
-            {/* Activity Section */}
-            {activeTab === 'activity' && (
-  <div>
+{/* Activity Section */}
+{activeTab === 'activity' && (
+  <div className="min-h-[400px]"> {/* min-h adjust করতে পারেন */}
     <h2 className="text-xl font-bold mb-4 border-b">Recent Activity</h2>
 
     {/* Activity List */}
@@ -869,12 +891,14 @@ useEffect(() => {
       {activities?.length === 0 ? (
         <p>No recent activity found.</p>
       ) : (
-        activities?.filter(item => item.type === "activity").map((activity) => (
-          <div key={activity?.id} className="border-b py-3">
-            <p className="text-gray-800">{activity?.message}</p>
-            <p className="text-xs text-gray-500">{new Date(activity?.createdAt).toLocaleString()}</p>
-          </div>
-        ))
+        activities
+          ?.filter(item => item.type === "activity")
+          .map((activity) => (
+            <div key={activity?.id} className="border-b py-3">
+              <p className="text-gray-800">{activity?.message}</p>
+              <p className="text-xs text-gray-500">{new Date(activity?.createdAt).toLocaleString()}</p>
+            </div>
+          ))
       )}
     </div>
   </div>

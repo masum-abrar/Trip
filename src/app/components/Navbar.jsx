@@ -1,29 +1,24 @@
 "use client";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { IoSearchOutline } from "react-icons/io5";
-import { FaPlus } from "react-icons/fa6";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
 import logo from "../../../public/Trip_LoGo.png";
 import Link from "next/link";
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Cookies from "js-cookie";
 
 const Navbar = ({ href, children }) => {
-
   const pathname = usePathname();
   const isActive = pathname === href;
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
-  const [selectedMovie, setSelectedMovie] = useState(null);
   const [userName, setUserName] = useState(null);
   const [districts, setDistricts] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobileCommunityOpen, setIsMobileCommunityOpen] = useState(false);
 
   useEffect(() => {
     const name = Cookies.get("userName");
@@ -74,7 +69,7 @@ const Navbar = ({ href, children }) => {
         {/* Navbar Center - Large Screens */}
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1 space-x-4 flex items-center">
-            {[ 
+            {[
               { name: "Home", href: "/" },
               { name: "List", href: "/list" },
             ].map((item) => (
@@ -127,12 +122,15 @@ const Navbar = ({ href, children }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="absolute left-0 mt-3 w-56 h-96 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50"
+                    className="absolute left-0 mt-3 w-56 max-h-72 bg-white bg-opacity-95 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-auto z-50"
                   >
                     {districts.map((district, index) => (
                       <li key={district.id || index}>
                         <Link
-                          href={`/district/${district.slug?.toLowerCase() || district.name.toLowerCase()}`}
+                          href={`/district/${
+                            district.slug?.toLowerCase() ||
+                            district.name.toLowerCase()
+                          }`}
                           className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
                         >
                           {district.name}
@@ -154,7 +152,9 @@ const Navbar = ({ href, children }) => {
                 <button className="relative px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md transition-all duration-300 overflow-hidden group">
                   <span className="absolute inset-0 border-2 border-[#8cc163] rounded-lg animate-border-run"></span>
                   <span className="absolute inset-0 bg-[#8cc163] scale-x-0 origin-left transition-transform duration-300 ease-out group-hover:scale-x-100"></span>
-                  <span className="relative z-10 group-hover:text-white transition-all duration-300">Login</span>
+                  <span className="relative z-10 group-hover:text-white transition-all duration-300">
+                    Login
+                  </span>
                 </button>
               </Link>
               <Link href="/signup">
@@ -167,7 +167,9 @@ const Navbar = ({ href, children }) => {
 
           {userName && (
             <div className="flex items-center gap-2">
-              <span className="text-black font-medium hidden md:inline">Hi, {userName}</span>
+              <span className="text-black font-medium hidden md:inline">
+                Hi, {userName}
+              </span>
               <div className="relative">
                 <FiUser
                   className="text-2xl text-black cursor-pointer"
@@ -176,14 +178,25 @@ const Navbar = ({ href, children }) => {
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
                     <ul className="py-2 text-black">
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Hi, {userName}</li>
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        Hi, {userName}
+                      </li>
                       <Link href="/profile">
-                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                          Profile
+                        </li>
                       </Link>
                       <Link href="/">
-                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Home</li>
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                          Home
+                        </li>
                       </Link>
-                      <li onClick={handleLogout} className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600">Logout</li>
+                      <li
+                        onClick={handleLogout}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600"
+                      >
+                        Logout
+                      </li>
                     </ul>
                   </div>
                 )}
@@ -195,37 +208,66 @@ const Navbar = ({ href, children }) => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="bg-white text-black lg:hidden p-4 space-y-2">
+        <div className="bg-white text-black lg:hidden p-4 space-y-2 shadow-md">
           <ul className="space-y-1">
-            <Link href="/"><li><a className="text-black hover:text-gray-600">Home</a></li></Link>
-            <Link href="/profile"><li><a className="text-black hover:text-gray-600">PROFILE</a></li></Link>
-            <Link href="/list"><li><a className="text-black hover:text-gray-600">LIST</a></li></Link>
+            <Link href="/">
+              <li>
+                <a className="text-black hover:text-gray-600">Home</a>
+              </li>
+            </Link>
+            <Link href="/profile">
+              <li>
+                <a className="text-black hover:text-gray-600">PROFILE</a>
+              </li>
+            </Link>
+            <Link href="/list">
+              <li>
+                <a className="text-black hover:text-gray-600">LIST</a>
+              </li>
+            </Link>
 
             {userName && (
               <Link href="/notification">
-                <li><a className="text-black hover:text-gray-600">Notification</a></li>
+                <li>
+                  <a className="text-black hover:text-gray-600">Notification</a>
+                </li>
               </Link>
             )}
 
             {/* Communities dropdown mobile */}
-            <li className="relative group list-none">
-              <button className="flex items-center gap-1 text-lg font-medium transition-all rounded-md text-gray-800">
-                Communities <ChevronDown size={16} />
+            <li className="relative list-none">
+              <button
+                onClick={() =>
+                  setIsMobileCommunityOpen(!isMobileCommunityOpen)
+                }
+                className="flex items-center gap-1 text-lg font-medium transition-all rounded-md text-gray-800"
+              >
+                Communities{" "}
+                <ChevronDown
+                  size={16}
+                  className={`${
+                    isMobileCommunityOpen ? "rotate-180" : ""
+                  } transition-transform`}
+                />
               </button>
               <AnimatePresence>
-                {districts.length > 0 && (
+                {isMobileCommunityOpen && districts.length > 0 && (
                   <motion.ul
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="mt-3 w-56 h-96 bg-white bg-opacity-80 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg overflow-y-scroll z-50 absolute"
+                    className="mt-2 w-full max-h-60 bg-white border border-gray-200 shadow-lg rounded-lg overflow-y-auto z-50 relative"
                   >
                     {districts.map((district, index) => (
                       <li key={district.id || index}>
                         <Link
-                          href={`/district/${district.slug?.toLowerCase() || district.name.toLowerCase()}`}
+                          href={`/district/${
+                            district.slug?.toLowerCase() ||
+                            district.name.toLowerCase()
+                          }`}
                           className="block px-4 py-2 text-gray-700 hover:bg-[#8cc163] hover:text-white transition-all"
+                          onClick={() => setIsMobileCommunityOpen(false)}
                         >
                           {district.name}
                         </Link>
@@ -240,11 +282,24 @@ const Navbar = ({ href, children }) => {
           <div className="flex space-x-4 mt-2">
             {!userName ? (
               <>
-                <Link href="/login"><button className="relative px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md">Login</button></Link>
-                <Link href="/signup"><button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg">Sign Up</button></Link>
+                <Link href="/login">
+                  <button className="relative px-6 py-2 rounded-lg text-[#8cc163] font-semibold bg-transparent border-2 border-[#8cc163] shadow-md">
+                    Login
+                  </button>
+                </Link>
+                <Link href="/signup">
+                  <button className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg">
+                    Sign Up
+                  </button>
+                </Link>
               </>
             ) : (
-              <button onClick={handleLogout} className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg">Logout</button>
+              <button
+                onClick={handleLogout}
+                className="relative px-6 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-[#8cc163] to-[#008f1a] shadow-lg"
+              >
+                Logout
+              </button>
             )}
           </div>
         </div>
