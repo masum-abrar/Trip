@@ -761,7 +761,7 @@ useEffect(() => {
 
       {userData?.follower?.length > 0 ? (
         userData?.follower?.map((f, index) => (
-      <Link key={index} href={`/userprofile/${f?.otherUser?.id}`}>
+      <Link key={index} href={`/userprofile/${f?.meUser?.id}`}>
       <div className="flex items-center gap-3 mb-4 border-b pb-2 cursor-pointer">
         <img
           src={f?.otherUser?.image || "https://via.placeholder.com/40"}
@@ -769,7 +769,7 @@ useEffect(() => {
           className="w-10 h-10 rounded-full object-cover"
         />
         <div>
-          <p className="font-medium">{f?.meUser?.fullname || f?.me?.name || "User"}</p>
+          <p className="font-medium">{f?.meUser?.fullname || f?.meUser?.name || "User"}</p>
         </div>
       </div>
     </Link>
