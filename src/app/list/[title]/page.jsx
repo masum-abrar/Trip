@@ -10,16 +10,20 @@ const Page = ({ params }) => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [placeDetails, setPlaceDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [sectionLoading, setSectionLoading] = useState(true); // ✅ New State for loader
 
   // Section fetch
   useEffect(() => {
     const fetchSectionData = async () => {
       try {
+        setSectionLoading(true);
         const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/lists/${params.title}`);
         const data = await res.json();
         setSection(data.data);
       } catch (error) {
         console.error(error);
+      } finally {
+        setSectionLoading(false);
       }
     };
     fetchSectionData();
@@ -46,7 +50,19 @@ const Page = ({ params }) => {
     fetchPlaceDetails();
   }, [selectedPlace]);
 
-  if (!section) return <div>Loading...</div>;
+  // ✅ Animated Loader Component
+  const Loader = () => (
+    <div className="flex items-center justify-center min-h-[80vh]">
+      <div className="w-16 h-16 border-4 border-green-500 border-dashed rounded-full animate-spin"></div>
+      <span className="ml-4 text-lg md:text-xl font-semibold text-gray-700 animate-pulse">
+        Loading visited places...
+      </span>
+    </div>
+  );
+
+  if (sectionLoading) return <Loader />; // ✅ Show loader while fetching section
+
+  if (!section) return <div>No data found!</div>;
 
   const places = section.listPlace || [];
 
@@ -124,7 +140,7 @@ const Page = ({ params }) => {
               </button>
 
               {loading && (
-                <div className="text-center py-20 text-lg md:text-xl">
+                <div className="text-center py-20 text-lg md:text-xl animate-pulse">
                   Preparing your place details... ⏳
                 </div>
               )}
@@ -176,12 +192,10 @@ const Page = ({ params }) => {
         )}
 
         {/* Footer */}
-         <div className="w-full">
-           <Footer />
-         </div>
+        <div className="w-full">
+          <Footer />
+        </div>
       </div>
-
-       
     </div>
   );
 };

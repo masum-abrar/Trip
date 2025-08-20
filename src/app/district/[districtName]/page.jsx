@@ -10,6 +10,7 @@ import PlaceTabSec from '@/app/components/PlaceTabSec';
 import Cookies from "js-cookie";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Footer from "@/app/components/Footer"; // ✅ Footer import
 
 const DistrictPage = ({ params }) => {
   const resolvedParams = use(params);
@@ -146,6 +147,9 @@ const DistrictPage = ({ params }) => {
         {activeTab === 'Events' && <EventTabSection PostData={community} fetchCommunity={fetchCommunity} />}
         {activeTab === 'Places' && <PlaceTabSec PlaceData={community} />}
       </div>
+
+      {/* ✅ Footer Added */}
+      <Footer />
 
       <ToastContainer
         position="top-right"

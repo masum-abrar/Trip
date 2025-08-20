@@ -44,7 +44,7 @@ const Carousel = () => {
     {
       id: 1,
       image:
-        'https://wallpapers.com/images/hd/ahsan-manzil-museum-in-dhaka-nw0sfyt8x4ibglxq.jpg',
+        'https://i.pinimg.com/736x/92/5b/77/925b777aa608935f5f26ff0074eb672b.jpg',
       title: 'Dhaka',
       description:
         'Discover Dhaka, the bustling capital of Bangladesh, where vibrant markets, rich history, and warm hospitality blend to create an unforgettable journey.',
@@ -52,19 +52,29 @@ const Carousel = () => {
     {
       id: 2,
       image:
-        'https://images.unsplash.com/photo-1619177383949-f03975e50b19?fm=jpg&q=60&w=3000',
-      title: 'Coxs Bazar',
+        'https://t4.ftcdn.net/jpg/02/13/57/63/360_F_213576368_kLr4oB8dvm7AY2Yj0NOXJwH0CY8hHPEr.jpg',
+      title: 'Chattogram',
       description:
-        'Coxs Bazar Beach is the main attraction of the town with an unbroken length of 150 km, also termed the longest natural unbroken sea beach in the world.',
+        'Chattogram, the main port city of Bangladesh, is often called the commercial capital of the country. Surrounded by hills, sea, and rivers, it beautifully blends nature with industry.',
     },
     {
       id: 3,
       image:
-        'https://live.staticflickr.com/4852/31056385007_f81c1aebbb_b.jpg',
+        'https://t4.ftcdn.net/jpg/06/95/32/19/360_F_695321901_3WWpN79doL9Ao0wrEJyqKzsoIwjP9US2.jpg',
       title: 'Sylhet',
       description:
         'Sylhet sits on the River Surma’s banks in northeastern Bengal, known for its mountain views and wooden houses.',
     },
+{
+        id: 4,
+      image:
+        'https://indiahood.in/wp-content/uploads/2025/05/Madhyamgram.jpg',
+      title: 'Rajshahi',
+      description:
+        'Rajshahi, known as the “Silk City” and the “Education City” of Bangladesh, is famous for its silk, mangoes, and historical sites. It is a peaceful city by the Padma River with rich cultural heritage.',
+    },
+
+    
   ];
 
   return (
