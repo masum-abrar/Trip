@@ -108,7 +108,7 @@ const PlaceTabSec = ({ PlaceData }) => {
 
     try {
       const res = await fetch(
-        "https://parjatak-backend.vercel.app/api/v1/places",
+        "https://parjatak-core.vercel.app/api/v1/places",
         { method: "POST", body: formData }
       );
       const data = await res.json();

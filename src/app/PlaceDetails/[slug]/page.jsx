@@ -1055,7 +1055,7 @@ useEffect(() => {
 
 
       <div className="flex justify-center mt-10">
-        {[ 'Reviews', 'Events', 'Discussion' ].map((tab) => (
+        {[ 'Reviews', ].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -1073,7 +1073,7 @@ useEffect(() => {
         )} */}
 
 
-           {activeTab === 'Events' && (
+           {/* {activeTab === 'Events' && (
             <div className="max-w-3xl mx-auto mt-6">
           <EventTabSection
             hidePlaceSelection={true}
@@ -1085,13 +1085,13 @@ useEffect(() => {
 
           </div>
         
-        )}
+        )} */}
 
-         {activeTab === 'Discussion' && (
+         {/* {activeTab === 'Discussion' && (
          <div className="max-w-3xl mx-auto mt-6">
         <DiscussTabSection hidePlaceSelection={true} locationData={community} />
           </div>
-        )}
+        )} */}
          {activeTab === 'Reviews' && (
          <div className="max-w-3xl mx-auto mt-6">
        <ReviewsTabSection  locationData={place}/>
