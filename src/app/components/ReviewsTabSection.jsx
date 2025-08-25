@@ -193,12 +193,22 @@ const ReviewsTabSection = ({ locationData }) => {
         {locationData?.review?.map((review, index) => (
           <div key={index} className="bg-white p-4 rounded-lg shadow-md">
             <div className="flex items-center space-x-3">
-              <Avatar />
+               <Link
+                  href={`/userprofile/${review.user.id}`}
+                  className="text-blue-500 hover:underline"
+                >
+             <img
+                src={review?.user?.image || "/default-avatar.png"}
+                alt={review?.user?.name || "User Avatar"}     
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              </Link>
               <div>
                 <Link
                   href={`/userprofile/${review.user.id}`}
                   className="text-blue-500 hover:underline"
                 >
+                  
                   <h3 className="font-semibold text-gray-900">
                     {review.user.name || "Anonymous"}
                   </h3>

@@ -843,14 +843,14 @@ useEffect(() => {
             >
               Bucket list
             </li>
-            <li
+            {/* <li
               className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                 activeTab === 'events' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
               }`}
               onClick={() => handleTabClick('events')}
             >
               Events
-            </li>
+            </li> */}
           </ul>
         </div>
 
@@ -1073,7 +1073,7 @@ useEffect(() => {
 )}
 
 {/* Events Section */}
-{activeTab === 'events' && (
+{/* {activeTab === 'events' && (
   <div className="p-6">
     <h2 className="text-3xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2 text-center">Upcoming Events</h2>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1100,7 +1100,7 @@ useEffect(() => {
       </div>
     </div>
   </div>
-)}
+)} */}
 
 
 

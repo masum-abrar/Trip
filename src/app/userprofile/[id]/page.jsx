@@ -535,14 +535,14 @@ const handleSubmit = async (e) => {
                     >
                       Bucket list
                     </li>
-                    <li
+                    {/* <li
                       className={`text-lg font-semibold cursor-pointer hover:text-blue-600 ${
                         activeTab === 'events' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
                       }`}
                       onClick={() => handleTabClick('events')}
                     >
                       Events
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
         
