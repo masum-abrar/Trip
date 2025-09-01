@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Navbar from '@/app/components/Navbar'
 import { motion } from "framer-motion";
 import Cookies from "js-cookie";
@@ -36,13 +36,19 @@ const UserProfile = () => {
     const [diaryList, setDiaryList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
      const [userId, setUserId] = useState("");
-    //  const [isFollowing, setIsFollowing] = useState(false); 
+    //  const [isFollowing, setIsFollowing] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false); 
      const cookiesUserId = Cookies.get("userId");
      const [showFollowers, setShowFollowers] = useState(false);
      const [showFollowing, setShowFollowing] = useState(false);
 
+    const router = useRouter();
 
-
+     useEffect(()=>{
+      if(cookiesUserId && cookiesUserId === id) {
+        router.push("/profile");
+      }
+     },[id])
 
     //  useEffect(() => {
     //   const checkIfFollowing = async () => {
@@ -60,12 +66,22 @@ const UserProfile = () => {
     
     //   checkIfFollowing();
     // }, []);
+
+    useEffect(()=>{
+      console.log(user);
+    },[id])
     
-    const isFollowing = user?.follower?.some(
-      (f) => f.userId === id && f.parentUserId === cookiesUserId
-    );
+    // const isFollowing = user?.follower?.some(
+    //   (f) => f.userId === id && f.parentUserId === cookiesUserId
+    // );
 
     const handleFollowToggle = async () => {
+
+      if(isFollowing){
+        setIsFollowing(false);
+      }else{
+        setIsFollowing(true);
+      }
 
        if (!cookiesUserId) {
     toast.error("You need to login first to follow someone.");
@@ -74,9 +90,9 @@ const UserProfile = () => {
     }, 2000);
     return;
   }
-      const isFollowing = user?.follower?.some(
-        (f) => f.userId === id && f.parentUserId === cookiesUserId
-      );
+      // const isFollowing = user?.follower?.some(
+      //   (f) => f.userId === id && f.parentUserId === cookiesUserId
+      // );
       try {
         const res = await fetch('https://parjatak-backend.vercel.app/api/v1/customer/create-followers', {
           method: 'POST',
@@ -202,6 +218,11 @@ const handleSubmit = async (e) => {
         const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/users/${id}`);
         const data = await response.json();
         setUser(data.data);
+
+        // console.log(data?.data);
+        setIsFollowing(data?.data?.follower?.some(
+          (f) => f?.meUser?.id === cookiesUserId
+        ))
       } catch (error) {
         console.error("Failed to fetch user:", error);
       }

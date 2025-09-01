@@ -23,6 +23,8 @@ const Notification = () => {
           .filter(item => item.type === "notification")
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // newest first
         setNotifications(notificationsOnly);
+
+        // console.log({notificationsOnly});
       } catch (error) {
         console.error('Error fetching notifications:', error);
       } finally {
@@ -100,8 +102,8 @@ const Notification = () => {
                     const time = new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
 
                     return (
-                      <Link   key={notification.post?.id}
-  href={`/PostDetails/${notification.post?.id}`} 
+                      <Link   key={notification?.id}
+  href={notification?.link?.includes("post/") ? `/PostDetails/${notification?.link?.split("/")[2]}` : `${notification?.link}`} 
   className="block">
                         <div
                           onClick={() => handleMarkAsRead(notification.id)}

@@ -22,6 +22,8 @@ function App() {
   const [filteredSections, setFilteredSections] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const userId = Cookies.get("userId"); 
+  const [isLikeId, setIsLikeId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // List fetch
   const fetchLists = async () => {
@@ -49,6 +51,12 @@ function App() {
   }, []);
 
   const handleLike = async (listId) => {
+    setIsLoading(true);
+    // if(isLikeId === null){
+    //   setIsLikeId(listId);
+    // }else{
+    //   setIsLikeId(null);
+    // }
     const oldSections = [...sections];
     try {
       const sectionIndex = sections.findIndex((s) => s.id === listId);
@@ -83,6 +91,10 @@ function App() {
 
       const data = await res.json();
 
+      await fetchLists();
+
+      // setIsLikeId(0);
+
       if (!data.success) {
         setSections([...sections]);
         console.error("Server error:", data.message);
@@ -90,6 +102,8 @@ function App() {
     } catch (error) {
       console.error("Like error:", error);
       setSections([...sections]);
+    }finally {
+      setIsLoading(false);
     }
   };
 
@@ -256,20 +270,22 @@ function App() {
               )}
 
               {/* Like Button */}
+              {isLoading ? <div className="spinner_loader"></div> : 
               <button
-                onClick={() => handleLike(section.id )}
+                onClick={() => handleLike(section.id)}
                 className="flex items-center gap-2 bg-white border border-gray-300 hover:border-red-400 transition-all px-4 py-2 rounded-full shadow-sm hover:shadow-md mt-4"
               >
                 <Heart
                   size={20}
                   className={`transition-all ${
-                    section.like?.some((like) => like.userId === userId)
+                    (section.like?.some((like) => like.userId === userId))
                       ? "text-red-500 fill-red-500 scale-110"
                       : "text-gray-500"
                   }`}
                 />
                 <span className="text-gray-700 font-medium">{section?.like?.length}</span>
               </button>
+              }
 
               {/* Description */}
               <p className="text-gray-600 max-w-6xl">{section.description}</p>
