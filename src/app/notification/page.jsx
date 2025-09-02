@@ -21,10 +21,10 @@ const Notification = () => {
         const result = await response.json();
         const notificationsOnly = result.data
           .filter(item => item.type === "notification")
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // newest first
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setNotifications(notificationsOnly);
 
-        // console.log({notificationsOnly});
+       
       } catch (error) {
         console.error('Error fetching notifications:', error);
       } finally {
