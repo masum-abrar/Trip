@@ -49,9 +49,9 @@ const Navbar = ({ href, children }) => {
   }, []);
 
   return (
-    <div className="container max-w-5xl mx-auto">
+    <div className="container max-w-5xl mx-auto ">
       {/* Navbar */}
-      <div className="navbar bg-white text-black px-4">
+      <div className="navbar bg-white text-black px-4 ">
         {/* Navbar Start */}
         <div className="navbar-start flex items-center">
           <button

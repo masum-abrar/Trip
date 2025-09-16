@@ -14,6 +14,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import  { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { toast, ToastContainer } from 'react-toastify';
 
 function App() {
   const [sections, setSections] = useState([]);
@@ -51,6 +52,10 @@ function App() {
   }, []);
 
   const handleLike = async (listId) => {
+     if (!userId) {
+    toast.error("Please login to like.");
+    return;
+  }
     setIsLoading(true);
     // if(isLikeId === null){
     //   setIsLikeId(listId);
@@ -108,6 +113,10 @@ function App() {
   };
 
   const handleCommentPost = async (listId) => {
+    if (!userId) {
+    toast.error("Please login to comment.");
+    return;
+  }
     if (newComments[listId]?.trim()) {
       try {
         await fetch('https://parjatak-backend.vercel.app/api/v1/customer/create-list-review', {
@@ -344,6 +353,7 @@ function App() {
 
       {/* Footer */}
       <Footer />
+       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }
