@@ -181,6 +181,7 @@ const Navbar = ({ href, children }) => {
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         Hi, {userName}
                       </li>
+                      
                       <Link href="/profile">
                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                           Profile
@@ -215,14 +216,16 @@ const Navbar = ({ href, children }) => {
                 <a className="text-black hover:text-gray-600">Home</a>
               </li>
             </Link>
+             {userName && (
             <Link href="/profile">
               <li>
-                <a className="text-black hover:text-gray-600">PROFILE</a>
+                <a className="text-black hover:text-gray-600">Profile</a>
               </li>
             </Link>
+             )}
             <Link href="/list">
               <li>
-                <a className="text-black hover:text-gray-600">LIST</a>
+                <a className="text-black hover:text-gray-600">List</a>
               </li>
             </Link>
 
