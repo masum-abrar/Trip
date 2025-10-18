@@ -191,8 +191,15 @@ useEffect(() => {
   }
 }, [userId]);
 
+
+
 const handleSubmit = async (e) => {
   e.preventDefault();
+
+  if (!title.trim() || !description.trim()) {
+    toast.warn("Please fill in all fields");
+    return;
+  }
 
   const payload = {
     userId: cookiesuserId,
@@ -201,21 +208,42 @@ const handleSubmit = async (e) => {
     isActive: privacy === "Public" ? "true" : "false",
   };
 
+  setLoading(true);
+
   try {
     const result = await createBucketList(payload);
     toast.success("List created successfully!");
-    setIsModalOpen(false); // Close modal
+    
+    // ✅ Instantly add new list to UI without reload
+    const newList = {
+      id: result.data?.id || Date.now(), // Use API response ID or temporary ID
+      title: title,
+      description: description,
+      slug: result.data?.slug || title.toLowerCase().replace(/\s+/g, '-'),
+      isActive: privacy === "Public" ? "true" : "false",
+      listPlace: [], // Empty array for new list
+      createdAt: new Date().toISOString(),
+    };
+
+    // Add new list to the beginning of the array
+    setLists([newList, ...lists]);
+
+    // Close modal and reset form
+    setIsModalOpen(false);
     setTitle("");
     setDescription("");
+    setPrivacy("Public");
+    
   } catch (error) {
     console.error("Failed to create bucket list:", error.message);
 
-    // Check for the "already exists" error and show appropriate toast
     if (error.message.includes("already exists")) {
       toast.error("Bucket list with this name already exists. Please change the name.");
     } else {
       toast.error("Failed to create bucket list. Please try again.");
     }
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -1192,101 +1220,112 @@ useEffect(() => {
 
  {/* First Row - Best Camping Spots */}
 
-{lists.map((spot, index) => (
-  <div key={index} className="mb-8">
-    {/* List Title with Share */}
-    <div className="flex items-center justify-between mb-2">
-      <Link href={`/list/${spot.slug}`}>
-        <h2 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2">
-          {spot.title}
-        </h2>
-      </Link>
+{lists.length > 0 ? (
+  lists.map((spot, index) => (
+    <div key={spot.id || index} className="mb-8">
+      {/* List Title with Share */}
+      <div className="flex items-center justify-between mb-2">
+        <Link href={`/list/${spot.slug}`}>
+          <h2 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2 hover:text-[#8cc163] transition-colors">
+            {spot.title}
+          </h2>
+        </Link>
 
-      <div className="flex items-center gap-2">
-        {/* Copy Link */}
-        <button
-          onClick={() => {
-            if (typeof window !== "undefined") {
-              const shareUrl = `${window.location.origin}/list/${spot.slug}`;
-              navigator.clipboard.writeText(shareUrl);
-              toast.success("Link copied to clipboard!");
-            }
-          }}
-          className="text-green-500 p-2 rounded hover:bg-green-100 transition"
-        >
-          <FaLink />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Copy Link */}
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                const shareUrl = `${window.location.origin}/list/${spot.slug}`;
+                navigator.clipboard.writeText(shareUrl);
+                toast.success("Link copied to clipboard!");
+              }
+            }}
+            className="text-green-500 p-2 rounded hover:bg-green-100 transition"
+            title="Copy Link"
+          >
+            <FaLink />
+          </button>
 
-        {/* Facebook Share */}
-        <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/list/${spot.slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-700 p-2 rounded hover:bg-blue-100 transition"
-        >
-          <FaFacebookF />
-        </a>
+          {/* Facebook Share */}
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=${typeof window !== "undefined" ? window.location.origin : ""}/list/${spot.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-700 p-2 rounded hover:bg-blue-100 transition"
+            title="Share on Facebook"
+          >
+            <FaFacebookF />
+          </a>
 
-        {/* Instagram (copy text for post) */}
-        <button
-          onClick={() => {
-            const instaText = `Check out my visited places: ${window.location.origin}/list/${spot.slug}`;
-            navigator.clipboard.writeText(instaText);
-            toast.success("Text copied for Instagram!");
-          }}
-          className="text-pink-500 p-2 rounded hover:bg-pink-100 transition"
-        >
-          <FaInstagram />
-        </button>
+          {/* Instagram (copy text for post) */}
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                const instaText = `Check out my visited places: ${window.location.origin}/list/${spot.slug}`;
+                navigator.clipboard.writeText(instaText);
+                toast.success("Text copied for Instagram!");
+              }
+            }}
+            className="text-pink-500 p-2 rounded hover:bg-pink-100 transition"
+            title="Copy for Instagram"
+          >
+            <FaInstagram />
+          </button>
 
-        {/* WhatsApp Share */}
-        <a
-          href={`https://api.whatsapp.com/send?text=Check out my visited places: ${window.location.origin}/list/${spot.slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-green-600 p-2 rounded hover:bg-green-100 transition"
-        >
-          <FaWhatsapp />
-        </a>
+          {/* WhatsApp Share */}
+          <a
+            href={`https://api.whatsapp.com/send?text=Check out my visited places: ${typeof window !== "undefined" ? window.location.origin : ""}/list/${spot.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-600 p-2 rounded hover:bg-green-100 transition"
+            title="Share on WhatsApp"
+          >
+            <FaWhatsapp />
+          </a>
+        </div>
       </div>
+
+      {/* Swiper for places */}
+      {spot.listPlace && spot.listPlace.length > 0 ? (
+        <Swiper
+          spaceBetween={20}
+          slidesPerView={2}
+          breakpoints={{
+            640: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+            1024: { slidesPerView: 4 },
+          }}
+        >
+          {spot.listPlace.map((listPlaceItem, idx) => (
+            <SwiperSlide key={idx} className="w-[250px]">
+              <Link href={`/PlaceDetails/${listPlaceItem.place?.slug}`}>
+                <div className="w-full h-[200px] bg-green-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+                  <img
+                    src={listPlaceItem.place?.images?.[0]?.image || "/placeholder.jpg"}
+                    alt={listPlaceItem.place?.name || "Place Image"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <p className="text-center mt-2 font-medium text-gray-700 hover:text-[#8cc163] transition-colors">
+                  {listPlaceItem.place?.name}
+                </p>
+              </Link>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      ) : (
+        <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
+          <p className="text-gray-500">No Places Added Yet</p>
+        </div>
+      )}
     </div>
-
-    {/* Swiper for places */}
-    {spot.listPlace.length > 0 ? (
-      <Swiper
-        spaceBetween={20}
-        slidesPerView={2}
-        breakpoints={{
-          640: { slidesPerView: 2 },
-          768: { slidesPerView: 3 },
-          1024: { slidesPerView: 4 },
-        }}
-      >
-        {spot.listPlace.map((listPlaceItem, idx) => (
-          <SwiperSlide key={idx} className="w-[250px]">
-            {/* ✅ Correct Place Link */}
-            <Link href={`/PlaceDetails/${listPlaceItem.place?.slug}`}>
-              <div className="w-full h-[200px] bg-green-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
-                <img
-                  src={listPlaceItem.place?.images?.[0]?.image || "/placeholder.jpg"}
-                  alt={listPlaceItem.place?.name || "Place Image"}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <p className="text-center mt-2 font-medium text-gray-700">
-                {listPlaceItem.place?.name}
-              </p>
-            </Link>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    ) : (
-      <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
-        <p>No Places Added</p>
-      </div>
-    )}
+  ))
+) : (
+  <div className="text-center py-12">
+    <p className="text-gray-500 text-lg">No lists created yet. Create your first list!</p>
   </div>
-))}
+)}
 
 
 
@@ -1298,45 +1337,66 @@ useEffect(() => {
 
 
  {/* Modal */}
- {isModalOpen && (
-   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-     <div className="bg-white p-8 rounded-lg w-[600px]">
-       <h2 className="text-2xl font-bold mb-4">Create New List</h2>
-       <form onSubmit={handleSubmit}>
-  <label className="block mb-2">Title:</label>
-  <input
-    type="text"
-    value={title}
-    onChange={(e) => setTitle(e.target.value)}
-    className="w-full border px-3 py-2 rounded mb-3 bg-white"
-    placeholder="Enter Title"
-  />
+{isModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-lg w-[600px] max-h-[90vh] overflow-y-auto">
+      <h2 className="text-2xl font-bold mb-4">Create New List</h2>
+      <form onSubmit={handleSubmit}>
+        <label className="block mb-2 font-medium">Title:</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          disabled={loading}
+          className="w-full border px-3 py-2 rounded mb-3 bg-white disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#8cc163]"
+          placeholder="Enter Title"
+          required
+        />
 
-  <label className="block mb-2">Description:</label>
-  <textarea
-    value={description}
-    onChange={(e) => setDescription(e.target.value)}
-    className="w-full border px-3 py-2 rounded mb-3 bg-white"
-    placeholder="Enter description"
-  />
+        <label className="block mb-2 font-medium">Description:</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          disabled={loading}
+          className="w-full border px-3 py-2 rounded mb-3 bg-white min-h-[100px] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#8cc163]"
+          placeholder="Enter description"
+          required
+        />
 
-  <div className="flex justify-end gap-2 mt-3">
-    <button
-      type="button"
-      onClick={() => setIsModalOpen(false)}
-      className="px-4 py-2 bg-gray-300 rounded"
-    >
-      Cancel
-    </button>
-    <button type="submit" className="px-4 py-2 bg-[#8cc163] text-white rounded">
-      Save list
-    </button>
+        <div className="flex justify-end gap-2 mt-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (!loading) {
+                setIsModalOpen(false);
+                setTitle("");
+                setDescription("");
+              }
+            }}
+            disabled={loading}
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="px-4 py-2 bg-[#8cc163] text-white rounded hover:bg-[#7ab052] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
+          >
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Saving...</span>
+              </div>
+            ) : (
+              "Save list"
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-</form>
-
-     </div>
-   </div>
- )}
+)}
 </div>
 )}
 
