@@ -1,19 +1,28 @@
-'use client'
+"use client";
 import Navbar from "@/app/components/Navbar";
-import React, { useState ,useEffect, use} from "react";
-import { Dialog, DialogContent, DialogTitle ,IconButton,TextField ,Button , Avatar, DialogActions } from "@mui/material"; // Using Material UI for Modal
-import { FaStar, FaRegStar,FaImage } from "react-icons/fa"; // Star rating icons
+import React, { useState, useEffect, use } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  TextField,
+  Button,
+  Avatar,
+  DialogActions,
+} from "@mui/material"; // Using Material UI for Modal
+import { FaStar, FaRegStar, FaImage } from "react-icons/fa"; // Star rating icons
 import DiscussTabSection from "@/app/components/DiscussionTabSection";
 import EventTabSection from "@/app/components/EventTabSection";
 import ReviewsTabSection from "@/app/components/ReviewsTabSection";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { motion } from "framer-motion";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+// import { toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
+// import { ToastContainer } from 'react-toastify';
+import { toast, Toaster } from "sonner";
 import { useRouter } from "next/navigation"; // ✅ correct for App Router
-
 
 // const places = [
 //   { id: 1, title: "Jaflong", district: "Sylhet",  subDistict:"Moulobibazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-2-1024x585.jpg", eyeCount: "990k", dotCount: "194k", heartCount: "366k" },
@@ -22,13 +31,11 @@ import { useRouter } from "next/navigation"; // ✅ correct for App Router
 //   { id: 4, title: "Patuartek", subDistict:"Ukhia", district: "CoxsBazar",  description: "Nestled along the southeastern coastline of Bangladesh, Cox’s Bazar is a breathtaking paradise famous for its 120 km long unbroken golden sand beach, making it the longest natural sea beach in the world. Known for its serene ocean views, rolling waves, and mesmerizing sunsets, this coastal town attracts millions of tourists every year. Whether you are a nature lover, an adventure seeker, or someone looking for a peaceful retreat, Cox’s Bazar offers something for everyone.", image: "https://tripjive.com/wp-content/uploads/2024/09/Bangladesh-tourist-spots-1-1024x585.jpg", eyeCount: "620k", dotCount: "394k", heartCount: "166k" },
 // ];
 
-const PlaceDetails = ({params}) => {
-  const resolvedParams = use(params)
+const PlaceDetails = ({ params }) => {
+  const resolvedParams = use(params);
   const slug = resolvedParams.slug;
- 
-  const cookiesuserId = Cookies.get("userId");
 
-  
+  const cookiesuserId = Cookies.get("userId");
 
   // State for Modal & Rating
   const [isModalOpen, setModalOpen] = useState(false);
@@ -37,36 +44,36 @@ const PlaceDetails = ({params}) => {
 
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
-  
+
   const [expanded, setExpanded] = useState(false);
   const [image, setImage] = useState(null);
- 
+
   const [place, setPlace] = useState(null);
   const [community, setCommunity] = useState(null);
-    const [isJoined, setIsJoined] = useState(false);
-
-  
+  const [isJoined, setIsJoined] = useState(false);
 
   // State for Active Tab
-  const [activeTab, setActiveTab] = useState('Reviews');
+  const [activeTab, setActiveTab] = useState("Reviews");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [privacy, setPrivacy] = useState("Public");
   const [spotModalOpen, setSpotModalOpen] = useState(false);
-   const [selectedList, setSelectedList] = useState("");
-     const [lists, setLists] = useState([]);
+  const [selectedList, setSelectedList] = useState("");
+  const [lists, setLists] = useState([]);
 
-     const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState([]);
 
-      // user data
+  // user data
   // const [currentUserId, setCurrentUserId] = useState(null); // ✅ different naam
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
 
-//new code for review 
+  const [spotLoading, setSpotLoading] = useState(false);
+  const [listsLoading, setListsLoading] = useState(false);
+  const [bucketLoading, setBucketLoading] = useState(false);
+  //new code for review
 
- const [newReview, setNewReview] = useState({
+  const [newReview, setNewReview] = useState({
     rating: 0,
     comment: "",
     privacy: "Public",
@@ -76,10 +83,6 @@ const PlaceDetails = ({params}) => {
     likes: 0,
     user: ["User"],
   });
-
-
-
-
 
   //  const handleJoin = async () => {
   //   if (!isLoggedIn) {
@@ -142,114 +145,112 @@ const PlaceDetails = ({params}) => {
   //   }
   // };
 
-  
-
   const handleReviewSubmit = async () => {
-  try {
-    const userId = Cookies.get("userId");
+    try {
+      const userId = Cookies.get("userId");
 
-    // Login check
-    if (!userId) {
-      toast.error("You need to log in first to add a diary.");
-      setTimeout(() => {
-        router.push("/login");
-      }, 3000);
-      return;
-    }
-
-    // Validation: check required fields
-    if (!newReview.comment?.trim()) {
-      toast.error("Please write a comment for your diary.");
-      return;
-    }
-    if (!newReview.rating || newReview.rating < 1) {
-      toast.error("Please select a rating.");
-      return;
-    }
-    if (!newReview.date) {
-      toast.error("Please select a date.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("placeId", place?.id);
-    formData.append("userId", userId);
-    formData.append("rating", newReview.rating);
-    formData.append("comment", newReview.comment);
-    formData.append("date", newReview.date);
-
-    if (newReview.images?.length > 0) {
-      newReview.images.forEach((file) => formData.append("images", file));
-    }
-
-    const res = await fetch(
-      "https://parjatak-backend.vercel.app/api/v1/customer/create-place-review",
-      {
-        method: "POST",
-        body: formData,
+      // Login check
+      if (!userId) {
+        toast.error("You need to log in first to add a diary.");
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+        return;
       }
-    );
 
-    if (!res.ok) throw new Error("Failed to submit review");
+      // Validation: check required fields
+      if (!newReview.comment?.trim()) {
+        toast.error("Please write a comment for your diary.");
+        return;
+      }
+      if (!newReview.rating || newReview.rating < 1) {
+        toast.error("Please select a rating.");
+        return;
+      }
+      if (!newReview.date) {
+        toast.error("Please select a date.");
+        return;
+      }
 
-    toast.success("✅ Diary has been created!");
-    setModalOpen(false);
-    setNewReview({ rating: 0, comment: "", date: "", images: [] }); // Reset form
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to submit review");
-  }
-};
+      const formData = new FormData();
+      formData.append("placeId", place?.id);
+      formData.append("userId", userId);
+      formData.append("rating", newReview.rating);
+      formData.append("comment", newReview.comment);
+      formData.append("date", newReview.date);
 
-      const handleDeleteReview = async (reviewId) => {
-        const userId = Cookies.get("userId"); // Current user's ID
-        const accessToken = Cookies.get("token"); // JWT Token
-    
-        if (!userId || !accessToken) {
-          toast.error("User not authenticated!");
-          return;
+      if (newReview.images?.length > 0) {
+        newReview.images.forEach((file) => formData.append("images", file));
+      }
+
+      const res = await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/customer/create-place-review",
+        {
+          method: "POST",
+          body: formData,
         }
-    
-        try {
-          const response = await fetch(
-            `https://parjatak-backend.vercel.app/api/v1/customer/delete-place-review/${reviewId}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
-    
-          const data = await response.json();
-    
-          if (data.success) {
-            toast.success("Review deleted successfully!");
-            // Optionally, update the state to reflect the deletion (e.g., remove the review from the list)
-            // For example: setLocationData(prevData => ({ ...prevData, review: prevData.review.filter(r => r.id !== reviewId) }));
-          } else {
-            toast.error(data.message || "Failed to delete review");
-          }
-        } catch (error) {
-          console.error("Error deleting review:", error);
-          toast.error("An error occurred while deleting the review.");
+      );
+
+      if (!res.ok) throw new Error("Failed to submit review");
+
+      toast.success("✅ Diary has been created!");
+      setModalOpen(false);
+      setNewReview({ rating: 0, comment: "", date: "", images: [] }); // Reset form
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to submit review");
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    const userId = Cookies.get("userId"); // Current user's ID
+    const accessToken = Cookies.get("token"); // JWT Token
+
+    if (!userId || !accessToken) {
+      toast.error("User not authenticated!");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://parjatak-backend.vercel.app/api/v1/customer/delete-place-review/${reviewId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
-      };
+      );
 
+      const data = await response.json();
 
- 
+      if (data.success) {
+        toast.success("Review deleted successfully!");
+        // Optionally, update the state to reflect the deletion (e.g., remove the review from the list)
+        // For example: setLocationData(prevData => ({ ...prevData, review: prevData.review.filter(r => r.id !== reviewId) }));
+      } else {
+        toast.error(data.message || "Failed to delete review");
+      }
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      toast.error("An error occurred while deleting the review.");
+    }
+  };
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPlace = async () => {
       try {
-        const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`);
-       
+        const response = await fetch(
+          `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
+        );
+
         const data = await response.json();
         setPlace(data.data);
       } catch (err) {
-        console.error('Failed to fetch place:', err);
+        console.error("Failed to fetch place:", err);
       } finally {
         setLoading(false);
       }
@@ -260,11 +261,10 @@ const PlaceDetails = ({params}) => {
     }
   }, [slug]);
 
-   const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // ensure client-only rendering
   useEffect(() => setMounted(true), []);
-
 
   //   const fetchPlace = async () => {
   //   try {
@@ -286,287 +286,340 @@ const PlaceDetails = ({params}) => {
   //   }
   // }, [slug]);
 
-
   // fetch place details
-const fetchPlace = async () => {
-  try {
-    const response = await fetch(
-      `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
-    );
-    const data = await response.json();
-    setPlace(data.data);
+  const fetchPlace = async () => {
+    try {
+      const response = await fetch(
+        `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
+      );
+      const data = await response.json();
+      setPlace(data.data);
 
-    // 🔹 fetch only events
-    setEvents(data?.data?.post?.filter((p) => p?.type === "event") || []);
-  } catch (err) {
-    console.error("Failed to fetch place or events:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+      // 🔹 fetch only events
+      setEvents(data?.data?.post?.filter((p) => p?.type === "event") || []);
+    } catch (err) {
+      console.error("Failed to fetch place or events:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// fetch when slug
-useEffect(() => {
-  if (slug) {
-    fetchPlace();
-  }
-}, [slug]);
+  // fetch when slug
+  useEffect(() => {
+    if (slug) {
+      fetchPlace();
+    }
+  }, [slug]);
 
-// if (!mounted || loading) return <p>Loading...</p>;
-// if (!place) return <p>No place data found</p>;
+  // if (!mounted || loading) return <p>Loading...</p>;
+  // if (!place) return <p>No place data found</p>;
 
+  // // fetch place details
+  //   const fetchPlace = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
+  //       );
+  //       const data = await response.json();
+  //       setPlace(data.data);
 
+  //       // 🔹 fetch only events for this place
+  //       const placeEvents = data.data.post?.filter((p) => p.type === "event") || [];
+  //       setEvents(placeEvents);
+  //     } catch (err) {
+  //       console.error("Failed to fetch place or events:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-// // fetch place details
-//   const fetchPlace = async () => {
-//     try {
-//       const response = await fetch(
-//         `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
-//       );
-//       const data = await response.json();
-//       setPlace(data.data);
+  //   // fetch when slug changes
+  //   useEffect(() => {
+  //     if (slug) {
+  //       fetchPlace();
+  //     }
+  //   }, [slug]);
 
-//       // 🔹 fetch only events for this place
-//       const placeEvents = data.data.post?.filter((p) => p.type === "event") || [];
-//       setEvents(placeEvents);
-//     } catch (err) {
-//       console.error("Failed to fetch place or events:", err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   // fetch when slug changes
-//   useEffect(() => {
-//     if (slug) {
-//       fetchPlace();
-//     }
-//   }, [slug]);
-
-//   if (!mounted || loading) return <p>Loading...</p>;
-//   if (!place) return <p>No place data found</p>;
+  //   if (!mounted || loading) return <p>Loading...</p>;
+  //   if (!place) return <p>No place data found</p>;
 
   const districtName = place?.district?.slug;
-    useEffect(() => {
-      const fetchCommunity = async () => {
-        // Get the district name from the place object
-        if (!districtName) return; // Exit if district name is not available
-        try {
-          const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts/${districtName}`);
-          const data = await response.json();
-          setCommunity(data.data); 
-        } catch (error) {
-          console.error('Failed to fetch community:', error);
-        }
-      };
-  
-      if (districtName) {
-        fetchCommunity();
-      }
-    }, [districtName]);
-
-    const handleSave = async () => {
-      if (!cookiesuserId) {
-        toast.error("You need to log in first to add a diary.");
-        setTimeout(() => {
-          router.push("/login");
-        }, 3000);
-        return;
-      }
-      const payload = {
-        userId: cookiesuserId,
-        placeId :place?.id,
-        title,
-        description,
-        targetDate: date,
-        isActive: privacy === "Public" ? "true" : "false",
-      };
-  
+  useEffect(() => {
+    const fetchCommunity = async () => {
+      // Get the district name from the place object
+      if (!districtName) return; // Exit if district name is not available
       try {
-        const res = await fetch("https://parjatak-backend.vercel.app/api/v1/diaries", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-  
-        const data = await res.json();
-       toast.success("Diary added successfully!");
-        
-        setModalOpen(false); // Close modal after saving
+        const response = await fetch(
+          `https://parjatak-backend.vercel.app/api/v1/customer/districts/${districtName}`
+        );
+        const data = await response.json();
+        setCommunity(data.data);
       } catch (error) {
-        console.error("Failed to save diary:", error);
+        console.error("Failed to fetch community:", error);
       }
     };
 
-    const handleSaveBucketList = async () => {
-      if (!cookiesuserId) {
-        toast.error("You need to log in first to add to bucket list.");
-        setTimeout(() => {
-          router.push("/login");
-        }, 3000);
-        return;
-      }
-      const payload = {
-        userId: cookiesuserId,
-        placeId :place?.id,
-        title,
-        description,
-        targetDate: date,
-        isActive: privacy === "Public" ? "true" : "false",
-       
-      };
-    
-      try {
-        const res = await fetch("https://parjatak-backend.vercel.app/api/v1/bucketLists", {
+    if (districtName) {
+      fetchCommunity();
+    }
+  }, [districtName]);
+
+  const handleSave = async () => {
+    if (!cookiesuserId) {
+      toast.error("You need to log in first to add a diary.");
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
+      return;
+    }
+    const payload = {
+      userId: cookiesuserId,
+      placeId: place?.id,
+      title,
+      description,
+      targetDate: date,
+      isActive: privacy === "Public" ? "true" : "false",
+    };
+
+    try {
+      const res = await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/diaries",
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
-        });
-    
-        const data = await res.json();
-        console.log("Bucket added:", data);
-        if (res.ok) {
-          toast.success("Added to Bucket List!");
-          setBucketModalOpen(false);
-        } else {
-          toast.error(data.message || "Something went wrong");
         }
-      } catch (err) {
-        console.error(err);
-        toast.error("Network error!");
-      }
-    };
-    
+      );
 
-     // Fetch lists function
-      const fetchLists = async () => {
-        try {
-          const response = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/lists");
-          const data = await response.json();
-          const userLists = data.data.filter((list) => list.user.id === cookiesuserId);
-          setLists(userLists);
-        } catch (error) {
-          console.error("Error fetching lists:", error);
-        }
-      };
-    
-      // Fetch on modal open
-      useEffect(() => {
-        if (spotModalOpen) {
-        
-          fetchLists();
-        }
-      }, [spotModalOpen]);
+      const data = await res.json();
+      toast.success("Diary added successfully!");
 
+      setModalOpen(false); // Close modal after saving
+    } catch (error) {
+      console.error("Failed to save diary:", error);
+    }
+  };
 
-      const handleSpotSubmit = async () => {
-       
-        if (!cookiesuserId) {
-          toast.error("You need to log first in to add a spot.");
-          
-          setTimeout(() => {
-            router.push("/login");
-          }, 3000); 
-        
-          return;
-        }
-        
-        const payload = {
-          userId : cookiesuserId,
-          listId: selectedList,
-          placeId: place?.id,
-          isActive: true,
-        };
-    
-        try {
-          const response = await fetch("https://parjatak-backend.vercel.app/api/v1/add-lists-places", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
-    
-          if (response.ok) {
-           toast.success("Spot added to list!");
-            setSpotModalOpen(false);
-            
-            setSelectedList("");
-          } else {
-            alert("Failed to add spot!");
-          }
-        } catch (error) {
-          console.error("Error posting spot:", error);
-          alert("Something went wrong!");
-        }
-      };
-
-      const [visited, setVisited] = useState(false);
-      const placeId = place?.id;
-      const userId = Cookies.get("userId");
-      const hasVisited = place?.visitor?.some(v => v.userId === userId);
-
-
- const router = useRouter(); // Add this at top of component
-
- const handleVisitToggle = async () => {
+const handleSaveBucketList = async () => {
   if (!cookiesuserId) {
-    toast.error("You need to log in first to mark as visited.");
-    
+    toast.error("You need to log in first to add to bucket list.");
     setTimeout(() => {
       router.push("/login");
-    }, 3000); 
-  
+    }, 2000);
     return;
   }
-  if (!placeId || !userId) return;
-  setLoading(true);
-  
 
-  const payload = { placeId, userId };
-
-  try {
-    const hasVisited = place.visitor.some(v => v.userId === userId);
-
-    if (!hasVisited) {
-      await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-visitor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    
-      place.visitor.push({ userId }); // ✅ manually add visitor
-      setVisited(true);
-    } else {
-      await fetch("https://parjatak-backend.vercel.app/api/v1/customer/delete-visitor", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    
-      place.visitor = place.visitor.filter(v => v.userId !== userId); // ✅ manually remove visitor
-      setVisited(false);
-    }
-    
-
-    // Soft reload to reflect updated visitor data
-    router.refresh();
-
-  } catch (err) {
-    console.error("Visitor toggle failed", err);
+  // Validation
+  if (!title.trim()) {
+    toast.warning("Please enter a title");
+    return;
+  }
+  if (!description.trim()) {
+    toast.warning("Please enter a description");
+    return;
+  }
+  if (!date) {
+    toast.warning("Please select a target date");
+    return;
   }
 
-  setLoading(false);
+  const payload = {
+    userId: cookiesuserId,
+    placeId: place?.id,
+    title,
+    description,
+    targetDate: date,
+    isActive: privacy === "Public" ? "true" : "false",
+  };
+
+  setBucketLoading(true);
+
+  try {
+    const res = await fetch(
+      "https://parjatak-backend.vercel.app/api/v1/bucketLists",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await res.json();
+    console.log("Bucket added:", data);
+    
+    if (res.ok) {
+      toast.success("Added to Bucket List!", {
+        duration: 1500,
+      });
+      
+      // Close modal and reset form
+      setBucketModalOpen(false);
+      setTitle("");
+      setDescription("");
+      setDate("");
+      setPrivacy("Public");
+    } else {
+      toast.error(data.message || "Something went wrong");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Network error!");
+  } finally {
+    setBucketLoading(false);
+  }
 };
 
-      
-//JOIN
+  // Fetch lists function
+  const fetchLists = async () => {
+    setListsLoading(true); // ✅ Start loading
+    try {
+      const response = await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/customer/lists"
+      );
+      const data = await response.json();
+      const userLists = data.data.filter(
+        (list) => list.user.id === cookiesuserId
+      );
+      setLists(userLists);
+    } catch (error) {
+      console.error("Error fetching lists:", error);
+      toast.error("Failed to load lists");
+      setLists([]); // Set empty array on error
+    } finally {
+      setListsLoading(false); // ✅ Stop loading
+    }
+  };
 
- useEffect(() => {
+  // Fetch on modal open
+  useEffect(() => {
+    if (spotModalOpen) {
+      fetchLists();
+    }
+  }, [spotModalOpen]);
+
+  const handleSpotSubmit = async () => {
+    if (!cookiesuserId) {
+      toast.error("You need to log in first to add a spot.");
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+      return;
+    }
+
+    if (!selectedList) {
+      toast.warning("Please select a list");
+      return;
+    }
+
+    const payload = {
+      userId: cookiesuserId,
+      listId: selectedList,
+      placeId: place?.id,
+      isActive: true,
+    };
+
+    setSpotLoading(true);
+
+    try {
+      const response = await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/add-lists-places",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Spot added to list successfully!", {
+          duration: 1500,
+        });
+
+        // Immediately close modal
+        setSpotModalOpen(false);
+        setSelectedList("");
+      } else {
+        toast.error(data.message || "Failed to add spot!");
+      }
+    } catch (error) {
+      console.error("Error posting spot:", error);
+      toast.error("Something went wrong!");
+    } finally {
+      setSpotLoading(false);
+    }
+  };
+
+  const [visited, setVisited] = useState(false);
+  const placeId = place?.id;
+  const userId = Cookies.get("userId");
+  const hasVisited = place?.visitor?.some((v) => v.userId === userId);
+
+  const router = useRouter(); // Add this at top of component
+
+  const handleVisitToggle = async () => {
+    if (!cookiesuserId) {
+      toast.error("You need to log in first to mark as visited.");
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
+
+      return;
+    }
+    if (!placeId || !userId) return;
+    setLoading(true);
+
+    const payload = { placeId, userId };
+
+    try {
+      const hasVisited = place.visitor.some((v) => v.userId === userId);
+
+      if (!hasVisited) {
+        await fetch(
+          "https://parjatak-backend.vercel.app/api/v1/customer/create-visitor",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        place.visitor.push({ userId }); // ✅ manually add visitor
+        setVisited(true);
+      } else {
+        await fetch(
+          "https://parjatak-backend.vercel.app/api/v1/customer/delete-visitor",
+          {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        place.visitor = place.visitor.filter((v) => v.userId !== userId); // ✅ manually remove visitor
+        setVisited(false);
+      }
+
+      // Soft reload to reflect updated visitor data
+      router.refresh();
+    } catch (err) {
+      console.error("Visitor toggle failed", err);
+    }
+
+    setLoading(false);
+  };
+
+  //JOIN
+
+  useEffect(() => {
     if (community?.follower && userId) {
       const joined = community.follower.some(
         (follower) => follower.user.id === userId
@@ -575,10 +628,8 @@ useEffect(() => {
     }
   }, [community, userId]);
 
-
- const handleJoin = async () => {
-
-     const userId = Cookies.get("userId");
+  const handleJoin = async () => {
+    const userId = Cookies.get("userId");
 
     // Login check
     if (!userId) {
@@ -612,13 +663,13 @@ useEffect(() => {
           setCommunity({ ...community, follower: updatedFollowers });
           setIsJoined(false);
           setTimeout(() => {
-        // router.push("/login");
-      }, 2000);
+            // router.push("/login");
+          }, 2000);
         } else {
           toast.error(data.message || "Failed to leave.");
           setTimeout(() => {
-        // router.push("/login");
-      }, 2000);
+            // router.push("/login");
+          }, 2000);
         }
       } else {
         // join
@@ -642,8 +693,8 @@ useEffect(() => {
           setIsJoined(true);
 
           setTimeout(() => {
-        // router.push("/login");
-      }, 2000);
+            // router.push("/login");
+          }, 2000);
         } else {
           toast.error(data.message || "Failed to join.");
         }
@@ -653,10 +704,6 @@ useEffect(() => {
       toast.error("Something went wrong!");
     }
   };
-     
-
-
-
 
   return (
     <div className="bg-white">
@@ -667,95 +714,117 @@ useEffect(() => {
 
       {/* Place Details Section */}
       <div className=" flex flex-col items-center justify-center pt-12 p-6">
-      {/* <h1 className="hidden">{place.title}</h1>  */}
-      <div className="relative w-full max-w-6xl mx-auto group">
-  {/* Background Image with Overlay */}
-  <div className="relative w-full h-[400px] overflow-hidden rounded-lg shadow-lg">
-    <img
-      src={place?.images[0]?.image || place?.image}
-      alt={place?.title}
-      className="w-full h-full object-cover"
-    />
-    {/* Gradient Overlay (Hidden on Hover) */}
-    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 opacity-100 group-hover:opacity-0"></div>
+        {/* <h1 className="hidden">{place.title}</h1>  */}
+        <div className="relative w-full max-w-6xl mx-auto group">
+          {/* Background Image with Overlay */}
+          <div className="relative w-full h-[400px] overflow-hidden rounded-lg shadow-lg">
+            <img
+              src={place?.images[0]?.image || place?.image}
+              alt={place?.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Gradient Overlay (Hidden on Hover) */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 opacity-100 group-hover:opacity-0"></div>
 
-    {/* Place Name & Stats Overlay */}
-    <div className="absolute bottom-6 left-6 text-white transition-opacity duration-300 ">
-      <h1 className="text-3xl md:text-4xl font-extrabold">{place?.name}</h1>
-      {place && place.district ? (
-  <h1 className="text-base font-normal mt-2">{place.district.name}</h1>
-) : (
-  <h1 className="text-base font-normal mt-2 text-gray-400">Loading district...</h1>
-)}
-      <div className="flex space-x-4 mt-2 text-lg font-medium">
-        <span className="flex items-center space-x-1">
-          👁 <span>{place?.viewCount}</span>
-        </span>
-        <span className="flex items-center space-x-1">
-          💬 <span>{place?.dotCount}</span>
-        </span>
-        <span className="flex items-center space-x-1">
-          ❤️ <span>{place?.heartCount}</span>
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
-
+            {/* Place Name & Stats Overlay */}
+            <div className="absolute bottom-6 left-6 text-white transition-opacity duration-300 ">
+              <h1 className="text-3xl md:text-4xl font-extrabold">
+                {place?.name}
+              </h1>
+              {place && place.district ? (
+                <h1 className="text-base font-normal mt-2">
+                  {place.district.name}
+                </h1>
+              ) : (
+                <h1 className="text-base font-normal mt-2 text-gray-400">
+                  Loading Place...
+                </h1>
+              )}
+              <div className="flex space-x-4 mt-2 text-lg font-medium">
+                <span className="flex items-center space-x-1">
+                  👁 <span>{place?.viewCount}</span>
+                </span>
+                <span className="flex items-center space-x-1">
+                  💬 <span>{place?.dotCount}</span>
+                </span>
+                <span className="flex items-center space-x-1">
+                  ❤️ <span>{place?.heartCount}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Buttons Section */}
         <div className="flex flex-wrap gap-3 mt-6">
-  {[
-    { icon: "📖", text: "Add to Diary", onClick: () => setModalOpen(true) },
-    { icon: "📌", text: "Add to Bucket List", onClick: () => setBucketModalOpen(true) },
-    { icon: "📂", text: "Add to List", onClick: () => setSpotModalOpen(true) },
-    { icon: "🚶", text: place?.visitor ? `${place.visitor.length}` : "Loading..." },
+          {[
+            {
+              icon: "📖",
+              text: "Add to Diary",
+              onClick: () => setModalOpen(true),
+            },
+            {
+              icon: "📌",
+              text: "Add to Bucket List",
+              onClick: () => setBucketModalOpen(true),
+            },
+            {
+              icon: "📂",
+              text: "Add to List",
+              onClick: () => setSpotModalOpen(true),
+            },
+            {
+              icon: "🚶",
+              text: place?.visitor ? `${place.visitor.length}` : "Loading...",
+            },
 
+            {
+              icon: hasVisited ? "✅" : "☑️",
+              text: hasVisited ? "Visited" : "Mark as Visited",
+              onClick: handleVisitToggle,
+            },
+          ].map((button, index) => (
+            <button
+              key={index}
+              onClick={button.onClick}
+              disabled={loading && button.text.includes("Visit")}
+              className={`relative px-6 py-2 text-sm font-medium rounded-full border border-gray-300 text-gray-800 shadow-lg transition-all duration-300 overflow-hidden group ${
+                button.text === "Visited"
+                  ? "bg-green-600 text-white"
+                  : "bg-white text-gray-800"
+              } ${
+                button.text === "Mark as Visited"
+                  ? "bg-white text-gray-800"
+                  : ""
+              }`}
+            >
+              <span className="relative z-10 flex items-center gap-2 transition-colors duration-300 group-hover:text-white">
+                {button.icon} {button.text}
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-900 left-0 w-full h-full scale-0 origin-center transition-transform duration-300 ease-in-out group-hover:scale-100"></span>
+            </button>
+          ))}
+        </div>
 
-    {
-      icon: hasVisited ? "✅" : "☑️",
-      text: hasVisited ? "Visited" : "Mark as Visited",
-      onClick: handleVisitToggle,
-    },
-  ].map((button, index) => (
-    <button
-      key={index}
-      onClick={button.onClick}
-      disabled={loading && button.text.includes("Visit")}
-      className={`relative px-6 py-2 text-sm font-medium rounded-full border border-gray-300 text-gray-800 shadow-lg transition-all duration-300 overflow-hidden group ${
-        button.text === "Visited" ? "bg-green-600 text-white" : "bg-white text-gray-800"
-      } ${button.text === "Mark as Visited" ? "bg-white text-gray-800" : ""
-      }`}
-    >
-      <span className="relative z-10 flex items-center gap-2 transition-colors duration-300 group-hover:text-white">
-        {button.icon} {button.text}
-      </span>
-      <span className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-900 left-0 w-full h-full scale-0 origin-center transition-transform duration-300 ease-in-out group-hover:scale-100"></span>
-    </button>
-  ))}
-</div>
-
-
-
-{/* Description */}
-<div 
-  className="mt-4 p-5 max-w-4xl mx-auto bg-white text-black text-base leading-relaxed rounded-xl shadow-lg border  
+        {/* Description */}
+        <div
+          className="mt-4 p-5 max-w-4xl mx-auto bg-white text-black text-base leading-relaxed rounded-xl shadow-lg border  
              backdrop-blur-lg bg-opacity-30 hover:shadow-blue-500/50 transition-all"
->
-  <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
-    {place?.description}
-  </p>
+        >
+          <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
+            {place?.description}
+          </p>
 
-  {/* Read More / Less Button */}
-  <button 
-    onClick={() => setExpanded(!expanded)} 
-    className="mt-3 text-sm font-semibold text-black hover:text-gray-400 transition"
-  >
-    {expanded ? "Read Less ▲" : "Read More ▼"}
-  </button>
-</div>
+          {/* Read More / Less Button */}
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="mt-3 text-sm font-semibold text-black hover:text-gray-400 transition"
+          >
+            {expanded ? "Read Less ▲" : "Read More ▼"}
+          </button>
+        </div>
 
-{/* <div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
+        {/* <div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
  <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
  {place && place.district ? (
   <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
@@ -770,42 +839,42 @@ useEffect(() => {
   </button>
 </div> */}
 
+        <div className="mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50 backdrop-blur-lg bg-opacity-30">
+          <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
+            {place && place.district ? (
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
+                {place.district.name}{" "}
+                <span className="text-[#8cc163]">Community</span>
+              </h1>
+            ) : (
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-400">
+                Loading Community...
+              </h1>
+            )}
+          </Link>
 
+          <button
+            onClick={handleJoin}
+            className={`px-12 lg:px-10 py-2 lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 transform hover:scale-110 ${
+              isJoined
+                ? "bg-gray-400 text-white cursor-not-allowed"
+                : "bg-[#8cc163] text-white hover:bg-[#6fb936] hover:shadow-lg"
+            }`}
+          >
+            {isJoined ? "Joined" : "Join"}
+          </button>
+        </div>
 
-    <div className="mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50 backdrop-blur-lg bg-opacity-30">
-      <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
-        {place && place.district ? (
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
-            {place.district.name}{" "}
-            <span className="text-[#8cc163]">Community</span>
-          </h1>
-        ) : (
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-400">
-            Loading Community...
-          </h1>
-        )}
-      </Link>
-
-      <button
-        onClick={handleJoin}
-        className={`px-12 lg:px-10 py-2 lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 transform hover:scale-110 ${
-          isJoined
-            ? "bg-gray-400 text-white cursor-not-allowed"
-            : "bg-[#8cc163] text-white hover:bg-[#6fb936] hover:shadow-lg"
-        }`}
-      >
-        {isJoined ? "Joined" : "Join"}
-      </button>
-    </div>
-
-    {/* <DescriptionBox description={place.description} /> */}
-
-
+        {/* <DescriptionBox description={place.description} /> */}
       </div>
 
       {/* Modal for Adding to Diary */}
-      <Dialog className="max-w-[500px] mx-auto p-6" open={isModalOpen} onClose={() => setModalOpen(false)}>
- <DialogTitle className="text-center">Add Your Diary</DialogTitle>
+      <Dialog
+        className="max-w-[500px] mx-auto p-6"
+        open={isModalOpen}
+        onClose={() => setModalOpen(false)}
+      >
+        <DialogTitle className="text-center">Add Your Diary</DialogTitle>
         <DialogContent>
           {/* Star Rating */}
           <div className="flex space-x-1">
@@ -913,153 +982,255 @@ useEffect(() => {
             ✅ Submit
           </button>
         </DialogActions>
-</Dialog>
+      </Dialog>
 
-  {/* Modal for Adding to BucketList */}
+      {/* Modal for Adding to BucketList */}
 
-{isBucketModalOpen && (
+     {isBucketModalOpen && (
   <Dialog
     className="max-w-[500px] mx-auto p-6"
     open={isBucketModalOpen}
-    onClose={() => setBucketModalOpen(false)}
+    onClose={() => {
+      if (!bucketLoading) {
+        setBucketModalOpen(false);
+        setTitle("");
+        setDescription("");
+        setDate("");
+        setPrivacy("Public");
+      }
+    }}
   >
-    <DialogTitle className="text-center font-bold text-gray-900">📌 Add to Bucket List</DialogTitle>
-  <DialogContent className="lg:w-[350px]">
+    <DialogTitle className="text-center font-bold text-gray-900">
+      📌 Add to Bucket List
+    </DialogTitle>
+    <DialogContent className="lg:w-[350px]">
+      {/* Title */}
+      <div className="mt-3">
+        <label className="font-semibold text-gray-800">
+          Title <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          disabled={bucketLoading}
+          className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+          placeholder="Enter title..."
+          required
+        />
+      </div>
 
-    {/* Title */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Title:</label>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        placeholder="Enter title..."
-      />
-    </div>
+      {/* Description */}
+      <div className="mt-3">
+        <label className="font-semibold text-gray-800">
+          Description <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          disabled={bucketLoading}
+          className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none min-h-[80px] disabled:opacity-50 disabled:cursor-not-allowed"
+          placeholder="Write description..."
+          required
+        />
+      </div>
 
-    {/* Description */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Description:</label>
-      <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        placeholder="Write description..."
-      />
-    </div>
+      {/* Date */}
+      <div className="mt-3">
+        <label className="font-semibold text-gray-800">
+          Target Date <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          disabled={bucketLoading}
+          min={new Date().toISOString().split('T')[0]} // Can't select past dates
+          className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+          required
+        />
+      </div>
 
-    {/* Date */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Target Date:</label>
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
-      />
-    </div>
+      {/* Privacy */}
+      <div className="mt-3">
+        <label className="font-semibold text-gray-800">Privacy:</label>
+        <select
+          value={privacy}
+          onChange={(e) => setPrivacy(e.target.value)}
+          disabled={bucketLoading}
+          className="w-full px-4 py-2 border rounded-md shadow-sm bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <option value="Public">🌍 Public</option>
+          <option value="Private">🔒 Private</option>
+        </select>
+      </div>
 
-    {/* Privacy */}
-    <div className="mt-3">
-      <label className="font-semibold text-gray-800">Privacy:</label>
-      <select
-        value={privacy}
-        onChange={(e) => setPrivacy(e.target.value)}
-        className="w-full px-4 py-2 border rounded-md shadow-sm bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-      >
-        <option value="Public">🌍 Public</option>
-        <option value="Private">🔒 Private</option>
-      </select>
-    </div>
+      {/* Selected Place Info */}
+      <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <p className="text-sm text-gray-700">
+          <span className="font-semibold">Place:</span> {place?.name || "Loading..."}
+        </p>
+      </div>
 
-   
-
-    {/* Save & Cancel */}
-    <div className="flex justify-end mt-4">
-      <button onClick={() => setBucketModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
-        Cancel
-      </button>
-      <button onClick={handleSaveBucketList} className="px-4 py-2 ml-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340]">
-        Save
-      </button>
-    </div>
-  </DialogContent>
+      {/* Save & Cancel */}
+      <div className="flex justify-end gap-2 mt-4">
+        <button
+          onClick={() => {
+            if (!bucketLoading) {
+              setBucketModalOpen(false);
+              setTitle("");
+              setDescription("");
+              setDate("");
+              setPrivacy("Public");
+            }
+          }}
+          disabled={bucketLoading}
+          className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSaveBucketList}
+          disabled={bucketLoading || !title.trim() || !description.trim() || !date}
+          className="px-4 py-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
+        >
+          {bucketLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Saving...</span>
+            </div>
+          ) : (
+            "Save"
+          )}
+        </button>
+      </div>
+    </DialogContent>
   </Dialog>
 )}
 
-
-
-  {spotModalOpen && (
+      {spotModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <motion.div 
-            className="bg-white p-6 rounded-lg w-11/12 md:w-1/3"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+          <motion.div
+            className="bg-white p-6 rounded-lg w-11/12 md:w-1/2 lg:w-1/3 max-h-[90vh] overflow-y-auto"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
           >
-           
-            <h2 className="text-xl font-bold mb-4 text-black">Add Spot to List</h2>
-            <p className="text-red-600 text-sm mb-4">
-    If you haven't created any list yet, please go to your profile and create one first.
-  </p>
-            {/* <div className="mb-4">
-              <label className="block mb-1">Select Place</label>
-              <select
-                value={selectedPlace}
-                onChange={(e) => setSelectedPlace(e.target.value)}
-                className="w-full border p-2 rounded"
-              >
-                <option value="">Select a Place</option>
-                {places.map((place) => (
-                  <option key={place.id} value={place.id}>
-                    {place.name}
-                  </option>
-                ))}
-              </select>
-            </div> */}
+            <h2 className="text-xl font-bold mb-4 text-black">
+              Add Spot to List
+            </h2>
+
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm flex items-start gap-2">
+                <span className="text-red-500 font-bold">ℹ️</span>
+                <span>
+                  If you haven't created any list yet, please go to your{" "}
+                  <Link
+                    href="/profile"
+                    className="font-semibold underline hover:text-red-700"
+                  >
+                    profile
+                  </Link>{" "}
+                  and create one first.
+                </span>
+              </p>
+            </div>
 
             <div className="mb-4">
-              <label className="block mb-1 text-black">Select List</label>
-              <select
-                value={selectedList}
-                onChange={(e) => setSelectedList(e.target.value)}
-                className="w-full border p-2 rounded bg-white text-black"
-              >
-                <option value="">Select a List</option>
-                {lists.map((list) => (
-                  <option key={list.id} value={list.id}>
-                    {list.title}
+              <label className="block mb-2 text-black font-medium">
+                Select List <span className="text-red-500">*</span>
+              </label>
+
+              {listsLoading ? (
+                <div className="w-full border border-gray-300 p-3 rounded bg-gray-50 flex items-center justify-center">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Loading lists...</span>
+                  </div>
+                </div>
+              ) : (
+                <select
+                  value={selectedList}
+                  onChange={(e) => setSelectedList(e.target.value)}
+                  disabled={spotLoading || lists.length === 0}
+                  className="w-full border border-gray-300 p-2 rounded bg-white text-black disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                >
+                  <option value="">
+                    {lists.length === 0
+                      ? "No lists available"
+                      : "Select a List"}
                   </option>
-                ))}
-              </select>
+                  {lists.map((list) => (
+                    <option key={list.id} value={list.id}>
+                      {list.title}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {!listsLoading && lists.length === 0 && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Create a list from your profile first
+                </p>
+              )}
+            </div>
+
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-700">
+                <span className="font-semibold">Selected Place:</span>{" "}
+                {place?.name || "No place selected"}
+              </p>
             </div>
 
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setSpotModalOpen(false)}
-                className="px-4 py-2 bg-gray-500 rounded hover:bg-gray-400"
+                onClick={() => {
+                  if (!spotLoading) {
+                    setSpotModalOpen(false);
+                    setSelectedList("");
+                  }
+                }}
+                disabled={spotLoading || listsLoading}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSpotSubmit}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                disabled={
+                  spotLoading ||
+                  !selectedList ||
+                  lists.length === 0 ||
+                  listsLoading
+                }
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
               >
-                Submit
+                {spotLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Adding...</span>
+                  </div>
+                ) : (
+                  "Submit"
+                )}
               </button>
             </div>
           </motion.div>
         </div>
       )}
 
-
-
       <div className="flex justify-center mt-10">
-        {[ 'Reviews', ].map((tab) => (
+        {["Reviews"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2 mx-2 rounded-full transition-all duration-300 ${activeTab === tab ? 'bg-[#8cc163] text-white' : 'bg-gray-200 text-gray-700'}`}
+            className={`px-6 py-2 mx-2 rounded-full transition-all duration-300 ${
+              activeTab === tab
+                ? "bg-[#8cc163] text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
           >
             {tab}
           </button>
@@ -1072,8 +1243,7 @@ useEffect(() => {
           </div>
         )} */}
 
-
-           {/* {activeTab === 'Events' && (
+      {/* {activeTab === 'Events' && (
             <div className="max-w-3xl mx-auto mt-6">
           <EventTabSection
             hidePlaceSelection={true}
@@ -1087,18 +1257,18 @@ useEffect(() => {
         
         )} */}
 
-         {/* {activeTab === 'Discussion' && (
+      {/* {activeTab === 'Discussion' && (
          <div className="max-w-3xl mx-auto mt-6">
         <DiscussTabSection hidePlaceSelection={true} locationData={community} />
           </div>
         )} */}
-         {activeTab === 'Reviews' && (
-         <div className="max-w-3xl mx-auto mt-6">
-       <ReviewsTabSection  locationData={place}/>
-          </div>
-        )}
-
-        <ToastContainer
+      {activeTab === "Reviews" && (
+        <div className="max-w-3xl mx-auto mt-6">
+          <ReviewsTabSection locationData={place} />
+        </div>
+      )}
+      <Toaster position="top-right" richColors closeButton duration={2000} />
+      {/* <ToastContainer
           position="top-right"
           autoClose={3000}
           hideProgressBar={false}
@@ -1107,7 +1277,7 @@ useEffect(() => {
           rtl={false}
           pauseOnFocusLoss
           draggable
-         />
+         /> */}
     </div>
   );
 };
