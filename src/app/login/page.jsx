@@ -9,6 +9,7 @@ import Cookies from "js-cookie";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -17,6 +18,7 @@ const LoginPage = () => {
     }
 
     const payload = { email, password };
+    setLoading(true);
 
     try {
       const res = await fetch("https://parjatak-backend.vercel.app/api/v1/auth/login", {
@@ -32,9 +34,11 @@ const LoginPage = () => {
       console.log("User Data:", data?.data);
       console.log("Access Token:", data?.accessToken || data?.token || data?.data?.accessToken);
       const token = data?.accessToken || data?.token || data?.data?.accessToken;
-if (token) {
-  Cookies.set("token", token, { expires: 7 });
-}
+      
+      if (token) {
+        Cookies.set("token", token, { expires: 7 });
+      }
+      
       if (res.ok) {
         toast.success("Login successful!");
 
@@ -47,10 +51,12 @@ if (token) {
         }, 1500);
       } else {
         toast.error(data.message || "Login failed");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Something went wrong");
+      setLoading(false);
     }
   };
 
@@ -79,21 +85,31 @@ if (token) {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              disabled={loading}
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black disabled:opacity-50"
             />
             <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black"
+              disabled={loading}
+              className="w-full p-2 border rounded mb-4 bg-[#FCF0DC] text-black disabled:opacity-50"
             />
 
             <button
               onClick={handleLogin}
-              className="w-full p-2 bg-[#8cc163] text-white rounded"
+              disabled={loading}
+              className="w-full p-2 bg-[#8cc163] text-white rounded hover:bg-[#7ab052] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              Login
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Logging in...</span>
+                </div>
+              ) : (
+                "Login"
+              )}
             </button>
 
             <p className="mt-4 text-sm text-black">
@@ -107,17 +123,14 @@ if (token) {
               </motion.span>
             </p>
             <p className="text-sm mt-8 text-center text-black">
- <span className="font-bold text-black"> Forgot your password?</span> Please email us at{" "}
-  <a href="mailto:support@parjatak.com" className="text-[#8cc163] underline">
-    support@parjatak.com
-  </a>{" "}
-  from your registered email address, mentioning your username.
-</p>
-
+              <span className="font-bold text-black">Forgot your password?</span> Please email us at{" "}
+              <a href="mailto:support@parjatak.com" className="text-[#8cc163] underline">
+                support@parjatak.com
+              </a>{" "}
+              from your registered email address, mentioning your username.
+            </p>
           </motion.div>
-        
         </div>
-      
       </motion.div>
 
       {/* Toast Container */}
