@@ -810,18 +810,31 @@ const handleSaveBucketList = async () => {
         <div
           className="mt-4 p-5 max-w-4xl mx-auto bg-white text-black text-base leading-relaxed rounded-xl shadow-lg border  
              backdrop-blur-lg bg-opacity-30 hover:shadow-blue-500/50 transition-all"
+          aria-busy={loading}
         >
-          <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
-            {place?.description}
-          </p>
+          {loading ? (
+            <div className="animate-pulse space-y-2" role="status" aria-label="Loading description">
+              <div className="h-4 bg-gray-200 rounded w-11/12"></div>
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            </div>
+          ) : (
+            <>
+              <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
+                {place?.description}
+              </p>
 
-          {/* Read More / Less Button */}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="mt-3 text-sm font-semibold text-black hover:text-gray-400 transition"
-          >
-            {expanded ? "Read Less ▲" : "Read More ▼"}
-          </button>
+              {/* Read More / Less Button */}
+              {place?.description ? (
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  className="mt-3 text-sm font-semibold text-black hover:text-gray-400 transition"
+                >
+                  {expanded ? "Read Less ▲" : "Read More ▼"}
+                </button>
+              ) : null}
+            </>
+          )}
         </div>
 
         {/* <div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
