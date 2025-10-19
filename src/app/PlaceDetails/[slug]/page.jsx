@@ -61,7 +61,7 @@ const PlaceDetails = ({ params }) => {
   const [spotModalOpen, setSpotModalOpen] = useState(false);
   const [selectedList, setSelectedList] = useState("");
   const [lists, setLists] = useState([]);
-
+ const [reviews, setReviews] = useState([]);
   const [events, setEvents] = useState([]);
 
   // user data
@@ -71,6 +71,8 @@ const PlaceDetails = ({ params }) => {
   const [spotLoading, setSpotLoading] = useState(false);
   const [listsLoading, setListsLoading] = useState(false);
   const [bucketLoading, setBucketLoading] = useState(false);
+  const [diaryLoading, setDiaryLoading] = useState(false);
+  const [joinLoading, setJoinLoading] = useState(false);
   //new code for review
 
   const [newReview, setNewReview] = useState({
@@ -145,32 +147,32 @@ const PlaceDetails = ({ params }) => {
   //   }
   // };
 
-  const handleReviewSubmit = async () => {
+const handleReviewSubmit = async () => {
     try {
       const userId = Cookies.get("userId");
 
-      // Login check
       if (!userId) {
         toast.error("You need to log in first to add a diary.");
         setTimeout(() => {
           router.push("/login");
-        }, 3000);
+        }, 2000);
         return;
       }
 
-      // Validation: check required fields
       if (!newReview.comment?.trim()) {
-        toast.error("Please write a comment for your diary.");
+        toast.warning("Please write a comment for your diary.");
         return;
       }
       if (!newReview.rating || newReview.rating < 1) {
-        toast.error("Please select a rating.");
+        toast.warning("Please select a rating.");
         return;
       }
       if (!newReview.date) {
-        toast.error("Please select a date.");
+        toast.warning("Please select a date.");
         return;
       }
+
+      setDiaryLoading(true);
 
       const formData = new FormData();
       formData.append("placeId", place?.id);
@@ -193,12 +195,40 @@ const PlaceDetails = ({ params }) => {
 
       if (!res.ok) throw new Error("Failed to submit review");
 
-      toast.success("✅ Diary has been created!");
+      const data = await res.json();
+
+      toast.success("✅ Diary has been created!", {
+        duration: 1500,
+      });
+
+      // ✅ Instantly add new review to parent state
+      const newReviewData = {
+        id: data.data?.id || Date.now(),
+        user: {
+          id: userId,
+          name: Cookies.get("userName") || "You",
+          image: data.data?.user?.image || "/default-avatar.png",
+        },
+        rating: newReview.rating,
+        comment: newReview.comment,
+        date: newReview.date,
+        images: data.data?.images || newReview.images.map((file, idx) => ({
+          id: idx,
+          image: URL.createObjectURL(file),
+        })),
+        likes: 0,
+        replies: [],
+      };
+
+      setReviews([newReviewData, ...reviews]); // ✅ Update parent reviews state
+
       setModalOpen(false);
-      setNewReview({ rating: 0, comment: "", date: "", images: [] }); // Reset form
+      setNewReview({ rating: 0, comment: "", date: "", images: [] });
     } catch (error) {
       console.error(error);
       toast.error("Failed to submit review");
+    } finally {
+      setDiaryLoading(false);
     }
   };
 
@@ -242,19 +272,20 @@ const PlaceDetails = ({ params }) => {
 
   useEffect(() => {
     const fetchPlace = async () => {
-      try {
-        const response = await fetch(
-          `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
-        );
-
-        const data = await response.json();
-        setPlace(data.data);
-      } catch (err) {
-        console.error("Failed to fetch place:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    try {
+      const response = await fetch(
+        `https://parjatak-backend.vercel.app/api/v1/customer/places/${slug}`
+      );
+      const data = await response.json();
+      setPlace(data.data);
+      setReviews(data.data?.review || []); // ✅ Set reviews in parent
+      setEvents(data?.data?.post?.filter((p) => p?.type === "event") || []);
+    } catch (err) {
+      console.error("Failed to fetch place or events:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     if (slug) {
       fetchPlace();
@@ -628,82 +659,83 @@ const handleSaveBucketList = async () => {
     }
   }, [community, userId]);
 
-  const handleJoin = async () => {
-    const userId = Cookies.get("userId");
+const handleJoin = async () => {
+  const userId = Cookies.get("userId");
 
-    // Login check
-    if (!userId) {
-      toast.error("You need to log in first to join community.");
-      setTimeout(() => {
-        // router.push("/login");
-      }, 2000);
-      return;
-    }
+  if (!userId) {
+    toast.error("You need to log in first to join community.");
+    setTimeout(() => {
+      router.push("/login");
+    }, 2000);
+    return;
+  }
 
-    if (!community?.id) return;
+  if (!community?.id) return;
 
-    try {
-      if (isJoined) {
-        // leave
-        const response = await fetch(
-          "https://parjatak-backend.vercel.app/api/v1/customer/delete-district-follower",
-          {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, districtId: community.id }),
-          }
-        );
+  setJoinLoading(true); // ✅ Start loading
 
-        const data = await response.json();
-        if (data.success) {
-          toast.success(`You have successfully left "${community?.name}"!`);
-          const updatedFollowers = community.follower.filter(
-            (follower) => follower.user.id !== userId
-          );
-          setCommunity({ ...community, follower: updatedFollowers });
-          setIsJoined(false);
-          setTimeout(() => {
-            // router.push("/login");
-          }, 2000);
-        } else {
-          toast.error(data.message || "Failed to leave.");
-          setTimeout(() => {
-            // router.push("/login");
-          }, 2000);
+  try {
+    if (isJoined) {
+      // Leave community
+      const response = await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/customer/delete-district-follower",
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, districtId: community.id }),
         }
+      );
+
+      const data = await response.json();
+      
+      if (data.success) {
+        toast.success(`You have successfully left "${community?.name}"!`, {
+          duration: 1500,
+        });
+        
+        const updatedFollowers = community.follower.filter(
+          (follower) => follower.user.id !== userId
+        );
+        setCommunity({ ...community, follower: updatedFollowers });
+        setIsJoined(false);
       } else {
-        // join
-        const response = await fetch(
-          "https://parjatak-backend.vercel.app/api/v1/customer/create-district-follower",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, districtId: community.id }),
-          }
-        );
-
-        const data = await response.json();
-        if (data.success) {
-          toast.success(`You have successfully joined "${community?.name}"!`);
-          const updatedFollowers = [
-            ...community.follower,
-            { user: { id: userId } },
-          ];
-          setCommunity({ ...community, follower: updatedFollowers });
-          setIsJoined(true);
-
-          setTimeout(() => {
-            // router.push("/login");
-          }, 2000);
-        } else {
-          toast.error(data.message || "Failed to join.");
-        }
+        toast.error(data.message || "Failed to leave.");
       }
-    } catch (error) {
-      console.error("Failed to join/leave community:", error);
-      toast.error("Something went wrong!");
+    } else {
+      // Join community
+      const response = await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/customer/create-district-follower",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, districtId: community.id }),
+        }
+      );
+
+      const data = await response.json();
+      
+      if (data.success) {
+        toast.success(`You have successfully joined "${community?.name}"!`, {
+          duration: 1500,
+        });
+        
+        const updatedFollowers = [
+          ...community.follower,
+          { user: { id: userId } },
+        ];
+        setCommunity({ ...community, follower: updatedFollowers });
+        setIsJoined(true);
+      } else {
+        toast.error(data.message || "Failed to join.");
+      }
     }
-  };
+  } catch (error) {
+    console.error("Failed to join/leave community:", error);
+    toast.error("Something went wrong!");
+  } finally {
+    setJoinLoading(false); // ✅ Stop loading
+  }
+};
 
   return (
     <div className="bg-white">
@@ -807,22 +839,28 @@ const handleSaveBucketList = async () => {
         </div>
 
         {/* Description */}
-        <div
-          className="mt-4 p-5 max-w-4xl mx-auto bg-white text-black text-base leading-relaxed rounded-xl shadow-lg border  
-             backdrop-blur-lg bg-opacity-30 hover:shadow-blue-500/50 transition-all"
-        >
-          <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
-            {place?.description}
-          </p>
+       <div
+  className="mt-4 p-5 max-w-4xl mx-auto bg-white text-black text-base leading-relaxed rounded-xl shadow-lg border  
+    backdrop-blur-lg bg-opacity-30 hover:shadow-blue-500/50 transition-all"
+>
+  {loading ? (
+    <p className="text-gray-500 italic text-center">Loading description...</p>
+  ) : (
+    <>
+      <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
+        {place?.description}
+      </p>
 
-          {/* Read More / Less Button */}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="mt-3 text-sm font-semibold text-black hover:text-gray-400 transition"
-          >
-            {expanded ? "Read Less ▲" : "Read More ▼"}
-          </button>
-        </div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="mt-3 text-sm font-semibold text-black hover:text-gray-400 transition"
+      >
+        {expanded ? "Read Less ▲" : "Read More ▼"}
+      </button>
+    </>
+  )}
+</div>
+
 
         {/* <div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
  <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
@@ -839,150 +877,203 @@ const handleSaveBucketList = async () => {
   </button>
 </div> */}
 
-        <div className="mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50 backdrop-blur-lg bg-opacity-30">
-          <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
-            {place && place.district ? (
-              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
-                {place.district.name}{" "}
-                <span className="text-[#8cc163]">Community</span>
-              </h1>
-            ) : (
-              <h1 className="text-2xl lg:text-3xl font-bold text-gray-400">
-                Loading Community...
-              </h1>
-            )}
-          </Link>
+       <div className="mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50 backdrop-blur-lg bg-opacity-30">
+  <Link href={`/district/${place?.district?.name.toLowerCase()}`}>
+    {place && place.district ? (
+      <div>
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 transition-all duration-300 group-hover:text-[#8cc163]">
+          {place.district.name}{" "}
+          <span className="text-[#8cc163]">Community</span>
+        </h1>
+        {/* ✅ Show follower count */}
+        <p className="text-sm text-gray-600 mt-1">
+          {community?.follower?.length || 0} members
+        </p>
+      </div>
+    ) : (
+      <h1 className="text-2xl lg:text-3xl font-bold text-gray-400">
+        Loading Community...
+      </h1>
+    )}
+  </Link>
 
-          <button
-            onClick={handleJoin}
-            className={`px-12 lg:px-10 py-2 lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 transform hover:scale-110 ${
-              isJoined
-                ? "bg-gray-400 text-white cursor-not-allowed"
-                : "bg-[#8cc163] text-white hover:bg-[#6fb936] hover:shadow-lg"
-            }`}
-          >
-            {isJoined ? "Joined" : "Join"}
-          </button>
-        </div>
+  <button
+    onClick={handleJoin}
+    disabled={joinLoading || !community?.id}
+    className={`relative px-12 lg:px-10 py-2 lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 overflow-hidden  ${
+      joinLoading
+        ? "cursor-wait bg-gray-400"
+        : isJoined
+        ? "bg-red-500 hover:bg-red-600 hover:shadow-lg hover:scale-110"
+        : "bg-[#8cc163] hover:bg-[#6fb936] hover:shadow-lg hover:scale-110"
+    } text-white disabled:opacity-70 disabled:transform-none disabled:cursor-not-allowed`}
+  >
+    <span className="flex items-center justify-center gap-2">
+      {joinLoading ? (
+        <>
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-base lg:text-xl">
+            {isJoined ? "Leaving..." : "Joining..."}
+          </span>
+        </>
+      ) : (
+        <span>{isJoined ? "Leave" : "Join"}</span>
+      )}
+    </span>
+  </button>
+</div>
 
         {/* <DescriptionBox description={place.description} /> */}
       </div>
 
       {/* Modal for Adding to Diary */}
-      <Dialog
-        className="max-w-[500px] mx-auto p-6"
-        open={isModalOpen}
-        onClose={() => setModalOpen(false)}
+     <Dialog 
+  className="max-w-[500px] mx-auto p-6" 
+  open={isModalOpen} 
+  onClose={() => {
+    if (!diaryLoading) {
+      setModalOpen(false);
+      setNewReview({ rating: 0, comment: "", date: "", images: [] });
+    }
+  }}
+>
+  <DialogTitle className="text-center">Add Your Diary</DialogTitle>
+  <DialogContent>
+    {/* Star Rating */}
+    <div className="flex space-x-1">
+      {[...Array(10)].map((_, index) => (
+        <IconButton
+          key={index}
+          onClick={() =>
+            setNewReview({ ...newReview, rating: index + 1 })
+          }
+          disabled={diaryLoading}
+        >
+          {index < newReview.rating ? (
+            <FaStar className="text-yellow-500 text-xl" />
+          ) : (
+            <FaRegStar className="text-gray-300 text-sm" />
+          )}
+        </IconButton>
+      ))}
+    </div>
+
+    {/* Review Input */}
+    <TextField
+      multiline
+      rows={3}
+      fullWidth
+      margin="normal"
+      variant="outlined"
+      label="Write your review..."
+      className="bg-white"
+      value={newReview.comment}
+      onChange={(e) =>
+        setNewReview({ ...newReview, comment: e.target.value })
+      }
+      disabled={diaryLoading}
+      required
+    />
+
+    {/* Date */}
+    <div className="mt-3">
+      <label className="font-semibold text-gray-800">
+        Date <span className="text-red-500">*</span>
+      </label>
+      <input
+        type="date"
+        value={newReview.date}
+        onChange={(e) =>
+          setNewReview({ ...newReview, date: e.target.value })
+        }
+        disabled={diaryLoading}
+        max={new Date().toISOString().split("T")[0]}
+        className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+        required
+      />
+    </div>
+
+    {/* Image Upload */}
+    <div className="mt-3">
+      <Button
+        sx={{
+          backgroundColor: "#8cc163",
+          color: "white",
+          "&:hover": {
+            backgroundColor: "#7aad58",
+          },
+        }}
+        component="label"
+        startIcon={<FaImage />}
+        disabled={diaryLoading}
       >
-        <DialogTitle className="text-center">Add Your Diary</DialogTitle>
-        <DialogContent>
-          {/* Star Rating */}
-          <div className="flex space-x-1">
-            {[...Array(10)].map((_, index) => (
-              <IconButton
-                key={index}
-                onClick={() =>
-                  setNewReview({ ...newReview, rating: index + 1 })
-                }
-              >
-                {index < newReview.rating ? (
-                  <FaStar className="text-yellow-500 text-xl" />
-                ) : (
-                  <FaRegStar className="text-gray-300 text-sm" />
-                )}
-              </IconButton>
-            ))}
-          </div>
+        Upload Images
+        <input
+          type="file"
+          hidden
+          multiple
+          accept="image/*"
+          onChange={(e) =>
+            setNewReview({
+              ...newReview,
+              images: [...e.target.files].slice(0, 7),
+            })
+          }
+          disabled={diaryLoading}
+        />
+      </Button>
 
-          {/* Review Input */}
-          <TextField
-            multiline
-            rows={3}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            label="Write your review..."
-            className="bg-white"
-            value={newReview.comment}
-            onChange={(e) =>
-              setNewReview({ ...newReview, comment: e.target.value })
-            }
-          />
-          {/* Date */}
-          <div className="mt-3">
-            <label className="font-semibold text-gray-800">Date:</label>
-            <input
-              type="date"
-              value={newReview.date}
-              onChange={(e) =>
-                setNewReview({ ...newReview, date: e.target.value })
-              }
-              className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
-              required
-            />
-          </div>
+      <p className="text-xs text-gray-500 mt-1">Max 7 images</p>
 
-          {/* Image Upload */}
-          <div className="mt-3">
-            <Button
-              sx={{
-                backgroundColor: "#8cc163",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#7aad58",
-                },
-              }}
-              component="label"
-              startIcon={<FaImage />}
+      {/* Preview Selected Images */}
+      {newReview.images?.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {newReview.images.map((file, index) => (
+            <div
+              key={index}
+              className="w-20 h-20 border rounded overflow-hidden"
             >
-              Upload Images
-              <input
-                type="file"
-                hidden
-                multiple
-                accept="image/*"
-                onChange={(e) =>
-                  setNewReview({
-                    ...newReview,
-                    images: [...e.target.files].slice(0, 7),
-                  })
-                }
+              <img
+                src={URL.createObjectURL(file)}
+                alt={`preview-${index}`}
+                className="w-full h-full object-cover"
               />
-            </Button>
-
-            <p className="text-xs text-gray-500 mt-1">Max 7 images</p>
-
-            {/* Preview Selected Images */}
-            {newReview.images?.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {newReview.images.map((file, index) => (
-                  <div
-                    key={index}
-                    className="w-20 h-20 border rounded overflow-hidden"
-                  >
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={`preview-${index}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalOpen(false)} color="secondary">
-            Cancel
-          </Button>
-          <button
-            onClick={handleReviewSubmit}
-            className="bg-[#8cc163] px-4 py-2 text-white rounded-md"
-          >
-            ✅ Submit
-          </button>
-        </DialogActions>
-      </Dialog>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </DialogContent>
+  
+  <DialogActions>
+    <Button 
+      onClick={() => {
+        if (!diaryLoading) {
+          setModalOpen(false);
+          setNewReview({ rating: 0, comment: "", date: "", images: [] });
+        }
+      }} 
+      color="secondary"
+      disabled={diaryLoading}
+    >
+      Cancel
+    </Button>
+    <button
+      onClick={handleReviewSubmit}
+      disabled={diaryLoading || !newReview.comment.trim() || !newReview.rating || !newReview.date}
+      className="bg-[#8cc163] px-6 py-2 text-white rounded-md hover:bg-[#79c340] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[120px] justify-center"
+    >
+      {diaryLoading ? (
+        <>
+          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span>Submitting...</span>
+        </>
+      ) : (
+        "✅ Submit"
+      )}
+    </button>
+  </DialogActions>
+</Dialog>
 
       {/* Modal for Adding to BucketList */}
 
@@ -1264,7 +1355,11 @@ const handleSaveBucketList = async () => {
         )} */}
       {activeTab === "Reviews" && (
         <div className="max-w-3xl mx-auto mt-6">
-          <ReviewsTabSection locationData={place} />
+          <ReviewsTabSection 
+            locationData={{ ...place, review: reviews }} // ✅ Pass reviews from parent
+            setReviews={setReviews} // ✅ Pass setter for delete
+            isLoading={loading}
+          />
         </div>
       )}
       <Toaster position="top-right" richColors closeButton duration={2000} />
