@@ -41,7 +41,7 @@ const UserProfile = () => {
      const cookiesUserId = Cookies.get("userId");
      const [showFollowers, setShowFollowers] = useState(false);
      const [showFollowing, setShowFollowing] = useState(false);
-
+const [loadingFollow, setLoadingFollow] = useState(false);
     const router = useRouter();
 
      useEffect(()=>{
@@ -75,50 +75,72 @@ const UserProfile = () => {
     //   (f) => f.userId === id && f.parentUserId === cookiesUserId
     // );
 
-    const handleFollowToggle = async () => {
+const handleFollowToggle = async () => {
+  
+  setLoadingFollow(true);
 
-      if(isFollowing){
-        setIsFollowing(false);
-      }else{
-        setIsFollowing(true);
-      }
+  
+  setUser((prevUser) => {
+    const updatedFollowerList = isFollowing
+      ? prevUser.follower.slice(0, -1)
+      : [...prevUser.follower, { meUser: { id: cookiesUserId } }];
+    return { ...prevUser, follower: updatedFollowerList };
+  });
 
-       if (!cookiesUserId) {
+  if (isFollowing) {
+    setIsFollowing(false);
+  } else {
+    setIsFollowing(true);
+  }
+
+  if (!cookiesUserId) {
     toast.error("You need to login first to follow someone.");
     setTimeout(() => {
-      router.push("/login"); // Ensure useRouter() is imported
+      router.push("/login");
     }, 2000);
+    setLoadingFollow(false); 
     return;
   }
-      // const isFollowing = user?.follower?.some(
-      //   (f) => f.userId === id && f.parentUserId === cookiesUserId
-      // );
+
+  try {
+    const res = await fetch('https://parjatak-backend.vercel.app/api/v1/customer/create-followers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: id,
+        parentUserId: cookiesUserId,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      toast.success(data.message);
+
+      
       try {
-        const res = await fetch('https://parjatak-backend.vercel.app/api/v1/customer/create-followers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: id,
-            parentUserId: cookiesUserId,
-          }),
-        });
-    
-        const data = await res.json();
-    
-        if (data.success) {
-          toast.success(data.message);
-          // setIsFollowing((prev) => !prev); 
-        } else {
-          toast.error("Action failed!");
+        const refreshed = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/user/${id}`);
+        const newUser = await refreshed.json();
+        if (newUser?.success) {
+          setUser(newUser.data);
         }
-      } catch (error) {
-        console.error(error);
-        toast.error("Something went wrong!");
+      } catch (err) {
+        console.error("Failed to refresh user data:", err);
       }
-    };
-    
+    } else {
+      toast.error("Action failed!");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong!");
+  } finally {
+  
+    setLoadingFollow(false);
+  }
+};
+
     
 
 const createBucketList = async (payload) => {
@@ -399,14 +421,26 @@ const handleSubmit = async (e) => {
               <h1 className="text-3xl font-bold">{user.name}</h1>
               <p className="text-gray-500 text-sm mt-1">Traveler | Explorer | Nature Enthusiast</p>
            
-              <button 
+             <button
   onClick={handleFollowToggle}
-  className={`mt-3 px-4 py-2 rounded-xl transition-all text-sm font-semibold ${
-    isFollowing ? 'bg-gray-400 text-white hover:bg-gray-600' : 'bg-[#8cc163] text-white hover:bg-green-700'
-  }`}
+  disabled={loadingFollow} 
+  className={`mt-3 px-4 py-2 rounded-xl transition-all text-sm font-semibold flex items-center gap-2
+    ${isFollowing
+      ? 'bg-gray-400 text-white hover:bg-gray-600'
+      : 'bg-[#8cc163] text-white hover:bg-green-700'}
+    ${loadingFollow ? 'opacity-70 cursor-not-allowed' : ''}`}
 >
-  {isFollowing ? "Following" : "Follow"}
+ {loadingFollow ? (
+  <>
+    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+    Updating follow status...
+  </>
+) : (
+  isFollowing ? "Following" : "Follow"
+)}
+
 </button>
+
 
             </div>
           </div>
