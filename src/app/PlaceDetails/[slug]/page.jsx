@@ -811,17 +811,29 @@ const handleSaveBucketList = async () => {
           className="mt-4 p-5 max-w-4xl mx-auto bg-white text-black text-base leading-relaxed rounded-xl shadow-lg border  
              backdrop-blur-lg bg-opacity-30 hover:shadow-blue-500/50 transition-all"
         >
-          <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
-            {place?.description}
-          </p>
+          {loading ? (
+            <div className="space-y-2 animate-pulse">
+              <div className="h-4 bg-gray-200 rounded" />
+              <div className="h-4 bg-gray-200 rounded w-5/6" />
+              <div className="h-4 bg-gray-200 rounded w-4/6" />
+            </div>
+          ) : place?.description ? (
+            <>
+              <p className={expanded ? "line-clamp-none" : "line-clamp-3"}>
+                {place.description}
+              </p>
 
-          {/* Read More / Less Button */}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="mt-3 text-sm font-semibold text-black hover:text-gray-400 transition"
-          >
-            {expanded ? "Read Less ▲" : "Read More ▼"}
-          </button>
+              {/* Read More / Less Button */}
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="mt-3 text-sm font-semibold text-black hover:text-gray-400 transition"
+              >
+                {expanded ? "Read Less ▲" : "Read More ▼"}
+              </button>
+            </>
+          ) : (
+            <p className="text-gray-500">No description available.</p>
+          )}
         </div>
 
         {/* <div className= "mt-8 group flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-blue-500/50  backdrop-blur-lg bg-opacity-30">
