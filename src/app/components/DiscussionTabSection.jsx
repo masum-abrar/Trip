@@ -181,6 +181,7 @@ const DiscussTabSection = ({ hidePlaceSelection, PostData }) => {
       toast.error("Failed to create post");
     } finally {
       setPostLoading(false);
+      fetchCommunity();
     }
   };
 
