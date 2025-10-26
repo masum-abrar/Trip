@@ -144,7 +144,7 @@ const SignUpPage = () => {
           />
 
           {/* Right Side - Sign Up Form */}
-          <motion.div className="w-full md:w-1/2 p-8 flex flex-col items-center justify-center relative overflow-y-auto">
+          <motion.div className="w-full md:w-1/2 p-8 flex flex-col items-center justify-center relative ">
             <h2 className="text-2xl font-bold mb-6 text-black">Sign Up</h2>
 
             <input

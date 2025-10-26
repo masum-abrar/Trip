@@ -19,7 +19,7 @@ const DistrictPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('Discussion');
   const [newPost, setNewPost] = useState({ text: '', images: [], place: '', subdistrict: '' });
   const [loading, setLoading] = useState(false);
-
+const [joinLoading, setJoinLoading] = useState(false);
   const userId = Cookies.get("userId");
   const isLoggedIn = !!userId;
 
@@ -46,7 +46,7 @@ const DistrictPage = ({ params }) => {
     }
 
     if (!community?.id) return;
-
+    setJoinLoading(true);
     try {
       const isAlreadyJoined = community.follower?.some(
         (follower) => follower.user.id === userId
@@ -69,6 +69,7 @@ const DistrictPage = ({ params }) => {
             (follower) => follower.user.id !== userId
           );
           setCommunity({ ...community, follower: updatedFollowers });
+          setJoinLoading(false);
         } else {
           toast.error(data.message || "Failed to leave.");
         }
@@ -87,6 +88,7 @@ const DistrictPage = ({ params }) => {
           toast.success(`You have successfully joined "${community?.name}"!`);
           const updatedFollowers = [...community.follower, { user: { id: userId } }];
           setCommunity({ ...community, follower: updatedFollowers });
+          setJoinLoading(false);
         } else {
           toast.error(data.message || "Failed to join.");
         }
@@ -114,15 +116,30 @@ const DistrictPage = ({ params }) => {
           <h1 className="text-3xl lg:text-4xl font-bold text-white">
             {community?.name?.charAt(0).toUpperCase() + community?.name?.slice(1) || "Loading..."}
           </h1>
-          <button
-            onClick={handleJoin}
-            disabled={loading}
-            className={`${
-              hasJoined ? "bg-gray-400 cursor-not-allowed" : "bg-[#8cc163] hover:bg-[#6fb936] hover:shadow-lg hover:scale-110"
-            } text-white px-6 lg:px-8 py-2 ml-4 rounded-2xl shadow-md text-lg lg:text-xl font-bold transition-all duration-300 transform`}
-          >
-            {hasJoined ? "Joined" : loading ? "Joining..." : "Join"}
-          </button>
+         <button
+    onClick={handleJoin}
+    disabled={joinLoading || !community?.id}
+    className={`relative px-12 lg:px-10 py-2 lg:ml-4 rounded-xl shadow-md text-lg lg:text-2xl font-bold transition-all duration-300 overflow-hidden  ${
+      joinLoading
+        ? "cursor-wait bg-gray-400"
+        : hasJoined
+        ? "bg-red-500 hover:bg-red-600 hover:shadow-lg hover:scale-110"
+        : "bg-[#8cc163] hover:bg-[#6fb936] hover:shadow-lg hover:scale-110"
+    } text-white disabled:opacity-70 disabled:transform-none disabled:cursor-not-allowed`}
+  >
+    <span className="flex items-center justify-center gap-2">
+      {joinLoading ? (
+        <>
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-base lg:text-xl">
+            {hasJoined ? "Leaving..." : "Joining..."}
+          </span>
+        </>
+      ) : (
+        <span>{hasJoined ? "Leave" : "Join"}</span>
+      )}
+    </span>
+  </button>
         </div>
       </div>
 

@@ -59,7 +59,7 @@ const ReviewsTabSection = ({ locationData, setReviews, isLoading }) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-6">
+    <div className="max-w-3xl mx-auto mt-6 p-6 mb-4">
       {/* Reviews List */}
       <div className="space-y-4">
         {/* ✅ Loading State */}

@@ -1,871 +1,413 @@
 'use client';
 
-import { useState,useEffect } from 'react';
-import { FaImage, FaRegHeart, FaHeart, FaUserCircle, FaPaperPlane, FaCalendarAlt ,FaTrash} from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaImage, FaCalendarAlt } from 'react-icons/fa';
+import { toast, Toaster } from 'sonner';
 import Cookies from "js-cookie";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
-import { useRouter } from "next/navigation";
 import Link from 'next/link';
+import { useRouter } from "next/navigation";
+// import { usePostActions } from '@/hooks/usePostActions';
+// import { getUserId, validatePostForm, handleImageUpload } from '@/utils/postUtils';
 
-const EventTabSection = ({ hidePlaceSelection , PostData,events, setEvents  }) => {
+import { getUserId ,validatePostForm, handleImageUpload } from '../utils/utils';
+import PostCard from './PostCard';
+import { usePostActions } from '../hooks/usePostActions';
+import Swal from "sweetalert2";
+const EventTabSection = ({
+  hidePlaceSelection,
+  PostData,
+  events,
+  setEvents,
+}) => {
   const router = useRouter();
-  const [showAllImages, setShowAllImages] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
- const [locationData, setLocationData] = useState(null);
-  const [activeTab, setActiveTab] = useState('Discussion');
-  const [comments, setComments] = useState({});
-  const [userId, setUserId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [showReplyInput, setShowReplyInput] = useState({});
-const [replyTexts, setReplyTexts] = useState({});
-const cookiesuserId = Cookies.get("userId");
-const [liked, setLiked] = useState(false);
- const [places, setPlaces] = useState([]);
-   const [isLoading, setIsLoading] = useState(true);
-   const [visiblePosts, setVisiblePosts] = useState(10);
-   const [showAllCommentsForPost, setShowAllCommentsForPost] = useState({});
-  
-   
+  const [locationData, setLocationData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [visiblePosts, setVisiblePosts] = useState(10);
+  const [places, setPlaces] = useState([]);
+  const [postLoading, setPostLoading] = useState(false);
 
-
-const districtId = PostData?.id;
-  // const [newPost, setNewPost] = useState({ text: '', images: [], place: '', startDate: "", endDate: "", subdistrict: '' });
-  const [posts, setPosts] = useState();
-  const isLiked =
-  Array.isArray(locationData?.like) &&
-  locationData.like.some((like) => like.user?.id === cookiesuserId);
-
- useEffect(() => {
-      const fetchPlaces = async () => {
-        const districtId = PostData?.id;
-        try {
-          const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/places-by-district-id/${districtId}`);
-          const data = await response.json();
-          setPlaces(data.data);
-        } catch (error) {
-          console.error("Failed to fetch places:", error);
-        }
-      };
-      fetchPlaces();
-    }, [districtId]);
-  
-
-  const toggleComments = (postId) => {
-    setPosts(posts.map(post => post.id === postId ? { ...post, showAllComments: !post.showAllComments } : post));
-  };
-
-  const toggleLike = (postId) => {
-    setPosts(posts.map(post =>
-      post.id === postId ? { ...post, liked: !post.liked, likes: post.liked ? post.likes - 1 : post.likes + 1 } : post
-    ));
-  };
-
-  const handleComment = (postId) => {
-    setPosts(posts.map(post => {
-      if (post.id === postId && post.newComment.trim()) {
-        return {
-          ...post,
-          comments: [...post.comments, { id: Date.now(), user: "User", text: post.newComment, replies: [] }],
-          newComment: '',
-        };
-      }
-      return post;
-    }));
-  };
   const [newPost, setNewPost] = useState({
-    
     text: "",
-    divisionId: "",
-    districtId: "",
     placeId: "",
     startDate: "",
     endDate: "",
     images: [],
   });
-   const [divisions, setDivisions] = useState([]);
-     const [districts, setDistricts] = useState([]);
-    //  const [places, setPlaces] = useState([]);
-    const [selectedFiles, setSelectedFiles] = useState([]);
-
-  //new code
-
-     // Handle image change
-     const handleImageChange = (e) => {
-      const files = Array.from(e.target.files);
-      const previewUrls = files.map((file) => URL.createObjectURL(file));
-      setSelectedFiles(files);
-      setNewPost((prev) => ({ ...prev, images: previewUrls }));
-    };
-  
-    const removeImage = (index) => {
-      const newImages = [...newPost.images];
-      const newFiles = [...selectedFiles];
-      newImages.splice(index, 1);
-      newFiles.splice(index, 1);
-      setNewPost({ ...newPost, images: newImages });
-      setSelectedFiles(newFiles);
-    };
-  //   const handlePost = async () => {
-       
-  //       const userId = Cookies.get("userId");
-    
-  //       const formData = new FormData();
-    
-  //       formData.append("userId", userId);
-  //     formData.append("divisionId", PostData.division.id);
-  //     formData.append("districtId", PostData.id); 
-  //     formData.append("placeId", newPost.placeId);
-  //     formData.append("title", newPost.text);
-  //     formData.append("description", newPost.text);
-  //     formData.append("type", "event");
-  //     formData.append("eventStartDate", newPost.startDate || "");
-  //     formData.append("eventEndDate", newPost.endDate || "");
-  //     formData.append("isActive", "true");
-  //       formData.append("slug", "");
-    
-  //       selectedFiles.forEach((file, index) => {
-  //         formData.append(`images`, file);
-  //       });
-    
-  //       try {
-  //         const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
-  //           method: "POST",
-  //           body: formData,
-  //         });
-    
-  //         if (!response.ok) {
-  //           throw new Error(`HTTP error! Status: ${response.status}`);
-  //         }
-    
-  //         const data = await response.json();
-  //         console.log("Post created successfully:", data);
-  //         toast.success("Post has been created");
-  //         router.refresh();
-  //         fetchCommunity() // Refresh the page or fetch new posts
-  //       } catch (error) {
-  //         console.error("Post creation failed:", error);
-  //       }
-  //     }
-
-  //      useEffect(() => {
-  //   const idFromCookie = Cookies.get("userId");
-  //   if (idFromCookie) {
-  //     setUserId(idFromCookie);
-  //   }
-  // }, []);
-const handlePost = async () => {
-  const userId = Cookies.get("userId");
-
-  if (!userId) {
-    toast.error("Please login first"); // red toast
-    return;
-  }
-
-  const formData = new FormData();
-
-  formData.append("userId", userId);
-  formData.append("title", newPost.text);
-  formData.append("description", newPost.text);
-  formData.append("type", "event");
-  formData.append("eventStartDate", newPost.startDate || "");
-  formData.append("eventEndDate", newPost.endDate || "");
-  formData.append("isActive", "true");
-  formData.append("slug", "");
-
-  // Only attach place info if NOT hiding place selection
-  if (!hidePlaceSelection) {
-    formData.append("divisionId", PostData.division?.id || "");
-    formData.append("districtId", PostData.id || "");
-    formData.append("placeId", newPost.placeId || "");
-  }
-
-  // Images
-  selectedFiles.forEach((file) => {
-    formData.append("images", file);
-  });
-
-  try {
-    const response = await fetch("https://parjatak-backend.vercel.app/api/v1/posts", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-    }
-
-    const data = await response.json();
-    console.log("Post created successfully:", data);
-    toast.success("Post has been created");
-
-    // Refresh UI
-    router.refresh();
-    if (typeof fetchCommunity === "function") fetchCommunity();
-    if (typeof fetchPlace === "function") fetchPlace();
-
-  } catch (error) {
-    console.error("Post creation failed:", error);
-    toast.error("Failed to create post"); // red toast on failure
-  }
-};
-
-  const handleCommentChange = (postId, value) => {
-    setComments(prev => ({
-      ...prev,
-      [postId]: value,
-    }));
-  };
-
-const handleCommentSubmit = async (postId) => {
-  const cookiesuserId = Cookies.get("userId"); // check login
-  const userName = Cookies.get("userName");
-
-  if (!cookiesuserId) {
-    toast.error("Please login first!"); // red toast
-    return;
-  }
-
-  const comment = comments[postId];
-  if (!comment?.trim()) return;
-
-  setLoading(true);
-
-  try {
-    const res = await fetch(
-      "https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          postId: postId,
-          parentUserId: null,
-          userId: cookiesuserId,
-          comment,
-        }),
-      }
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      toast.success("Comment posted successfully!");
-
-      setComments(prev => ({
-        ...prev,
-        [postId]: "",
-      }));
-
-      // Refresh UI
-      router.refresh();
-      fetchCommunity();
-    } else {
-      toast.error(data.message || "Failed to post comment");
-    }
-  } catch (err) {
-    console.error("Failed to post comment:", err);
-    toast.error("Error occurred while posting comment");
-  } finally {
-    setLoading(false);
-  }
-};
-  
-
-  const handleReplyToggle = (commentId) => {
-    setShowReplyInput(prev => ({
-      ...prev,
-      [commentId]: !prev[commentId],
-    }));
-  };
-  
-  
- 
-
-  const handleToggleAllComments = (postId) => {
-    setShowAllCommentsForPost(prev => ({
-      ...prev,
-      [postId]: !prev[postId],
-    }));
-  };
-  
- const handleReply = async (postId, commentId, parentUserId) => {
-  const cookiesuserId = Cookies.get("userId"); // Check login
-  const userName = Cookies.get("userName");
-
-  if (!cookiesuserId) {
-    toast.error("Please login first!"); // Red toast if not logged in
-    return;
-  }
-
-  const reply = replyTexts[commentId];
-  if (!reply?.trim()) return;
-
-  setLoading(true);
-
-  try {
-    const res = await fetch(
-      "https://parjatak-backend.vercel.app/api/v1/customer/create-post-comment-reply",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          postId,
-          postCommentId: commentId,
-          parentUserId,
-          userId: cookiesuserId,
-          reply,
-        }),
-      }
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      toast.success("Reply posted successfully!");
-
-      setReplyTexts(prev => ({ ...prev, [commentId]: "" }));
-      setShowReplyInput(prev => ({ ...prev, [commentId]: false }));
-
-      fetchCommunity(); // Refresh posts/comments
-    } else {
-      toast.error(data.message || "Failed to post reply");
-    }
-  } catch (error) {
-    console.error("Reply failed:", error);
-    toast.error("Error occurred while posting reply");
-  } finally {
-    setLoading(false);
-  }
-};
-
-    // Display the posts
-    // const fetchCommunity = async () => {
-    //   try {
-    //     setIsLoading(true);
-    //     const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
-    //     const data = await response.json();
-    //     setLocationData(data.data);
-    //     setIsLoading(false);
-    //   } catch (error) {
-    //     console.error('Failed to fetch community:', error);
-    //   }
-    // };
-    
-
-    // useEffect(() => {
-    
-    
-    //   if (districtId) {
-    //     fetchCommunity();
-    //   }
-    // }, [districtId]);
-
-
-
-    // display the events
-   const fetchCommunity = async () => {
-  try {
-    setIsLoading(true);
-
-    if (events && events.length > 1) {
-      setLocationData(events);
-    } else {
-      const response = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/districts-posts-event/${districtId}`);
-      const data = await response.json();
-      setLocationData(data.data);
-    }
-
-    setIsLoading(false);
-  } catch (error) {
-    console.error('Failed to fetch community:', error);
-    setIsLoading(false);
-  }
-};
-
-useEffect(() => {
-  if (districtId || (events && events.length > 1)) {
-    fetchCommunity();
-  }
-}, [districtId, events]);
-
-
-
-  const handleLike = async (postId) => {
+    const fetchCommunity = async () => {
     try {
-      await fetch("https://parjatak-backend.vercel.app/api/v1/customer/create-post-like", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          postId,
-          userId: cookiesuserId,
-          parentUserId: null,
-        }),
-      });
+      setIsLoading(true);
 
-      // Toggle like state (optional — for instant UI feedback)
-      setLiked((prev) => !prev);
-      
+      if (events && events.length > 1) {
+        setLocationData(events);
+      } else {
+        const response = await fetch(
+          `https://parjatak-backend.vercel.app/api/v1/customer/districts-posts-event/${districtId}`
+        );
+        const data = await response.json();
+        setLocationData(data.data || []);
+      }
     } catch (error) {
-      console.error("Error liking post:", error);
+      console.error('Failed to fetch events:', error);
+      toast.error("Failed to load events");
+    } finally {
+      setIsLoading(false);
     }
   };
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
-const handleUnlike = async (postId, parentUserId) => {
-  try {
-    const res = await fetch("https://parjatak-backend.vercel.app/api/v1/customer/delete-post-like", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        postId: postId,
-        userId: cookiesuserId,
-        parentUserId: parentUserId,
-      }),
-    });
+  const districtId = PostData?.id;
+  const cookiesuserId = getUserId();
 
-    if (!res.ok) {
-      throw new Error("Failed to unlike the post");
+  // ✅ Use custom hook
+ const {
+    loading,
+    deletingId,
+    handleLike,
+    handleComment,
+    handleReply,
+    handleDeleteComment,
+    handleDeleteReply,
+    loadingPost,
+    replyLoading,
+  } = usePostActions(fetchCommunity, router);
+
+  // Fetch Events
+
+
+  useEffect(() => {
+    if (districtId || (events && events.length > 1)) {
+      fetchCommunity();
+    }
+  }, [districtId, events]);
+
+  // Fetch Places
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const response = await fetch(
+          `https://parjatak-backend.vercel.app/api/v1/customer/places-by-district-id/${districtId}`
+        );
+        const data = await response.json();
+        setPlaces(data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch places:", error);
+      }
+    };
+    if (districtId) fetchPlaces();
+  }, [districtId]);
+
+  // Handle Image Upload
+  const handleImageChange = (e) => {
+    const { files, urls } = handleImageUpload(e.target.files, 7);
+    setSelectedFiles(files);
+    setNewPost(prev => ({ ...prev, images: urls }));
+  };
+
+  const removeImage = (index) => {
+    const newImages = [...newPost.images];
+    const newFiles = [...selectedFiles];
+    newImages.splice(index, 1);
+    newFiles.splice(index, 1);
+    setNewPost({ ...newPost, images: newImages });
+    setSelectedFiles(newFiles);
+  };
+
+  // Handle Event Post Creation
+  const handlePost = async () => {
+    if (!cookiesuserId) {
+      toast.error("Please login first!");
+      setTimeout(() => router.push("/login"), 2000);
+      return;
     }
 
-    console.log("Successfully unliked the post");
-  } catch (error) {
-    console.error("Error unliking post:", error);
-  }
-};
+    // ✅ Validate with event dates
+    if (!validatePostForm(newPost.text, newPost.startDate, newPost.endDate, true)) return;
 
-  
-const handleDeleteComment = async (commentId, postId, parentUserId) => {
-  try {
-    const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/delete-post-comment/${commentId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        postId: postId,
-        parentUserId: parentUserId,
-        userId: cookiesuserId,
-      }),
+    setPostLoading(true);
+
+    const formData = new FormData();
+    formData.append("userId", cookiesuserId);
+    formData.append("title", newPost.text);
+    formData.append("description", newPost.text);
+    formData.append("type", "event");
+    formData.append("eventStartDate", newPost.startDate);
+    formData.append("evenetEndDate", newPost.endDate);
+    formData.append("isActive", "true");
+    formData.append("slug", "");
+
+    // Only attach place info if NOT hiding place selection
+    if (!hidePlaceSelection) {
+      formData.append("divisionId", PostData.division?.id || "");
+      formData.append("districtId", PostData.id || "");
+      formData.append("placeId", newPost.placeId || "");
+    }
+
+    selectedFiles.forEach((file) => {
+      formData.append("images", file);
     });
-    if (!res.ok) throw new Error("Failed to delete comment");
 
-    toast.success("Comment deleted successfully");
-    // Update UI after delete korle valo hoy
-    fetchCommunity() 
-  } catch (error) {
-    console.error("Error deleting comment:", error);
-  }
-};
+    try {
+      const response = await fetch(
+        "https://parjatak-backend.vercel.app/api/v1/posts",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-const handleDeleteReply = async (replyId, postId, postCommentId, parentUserId) => {
-  try {
-    const res = await fetch(`https://parjatak-backend.vercel.app/api/v1/customer/delete-post-comment-reply/${replyId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        postId: postId,
-        postCommentId: postCommentId,
-        parentUserId: parentUserId,
-        userId: cookiesuserId,
-      }),
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      toast.success("Event posted successfully!", { duration: 1500 });
+
+      // Reset form
+      setNewPost({ text: "", images: [], placeId: "", startDate: "", endDate: "" });
+      setSelectedFiles([]);
+
+      // Refresh events
+      fetchCommunity();
+      if (typeof setEvents === "function") setEvents([]);
+      router.refresh();
+    } catch (error) {
+      console.error("Post creation failed:", error);
+      toast.error("Failed to create event");
+    } finally {
+      setPostLoading(false);
+    }
+  };
+ const handleDeletePost = async (postId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You want to delete this post?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#8cc163",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      reverseButtons: true,
+      width: "320px",
     });
-    if (!res.ok) throw new Error("Failed to delete reply");
 
-    toast.success("Reply deleted successfully");
-    // Update UI after delete korle valo hoy
-    fetchCommunity() 
-  } catch (error) {
-    console.error("Error deleting reply:", error);
-  }
-};
-  
-  
+    if (result.isConfirmed) {
+      try {
+        // 🔹 প্রথমে UI থেকে Remove করে ফেলি (optimistic update)
+        setLocationData((prev) => prev.filter((post) => post.id !== postId));
+
+        const res = await fetch(
+          `https://parjatak-backend.vercel.app/api/v1/posts/${postId}`,
+          { method: "DELETE" }
+        );
+
+        if (!res.ok) throw new Error("Failed to delete post");
+
+        toast.success("Post deleted successfully!", { duration: 1500 });
+      } catch (error) {
+        console.error("Error deleting post:", error);
+        toast.error("Failed to delete post");
+
+        // ❗ যদি delete fail করে, আবার আগেরটা restore করো
+        fetchCommunity();
+      }
+    }
+  };
   return (
     <div>
-        <div className="space-y-6">
-          {/* Post Input Section */}
-          <form
-  onSubmit={(e) => {
-    e.preventDefault();
-    handlePost(); // your existing post handler
-  }}
-  className="bg-white shadow-md rounded-xl p-4"
->
-  <textarea
-    className="w-full p-3 border text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-    placeholder="What's on your mind?"
-    value={newPost.text}
-    onChange={(e) => setNewPost({ ...newPost, text: e.target.value })}
-  ></textarea>
+      <Toaster position="top-right" richColors closeButton />
 
-  {/* Start Date & End Date */}
-  <div className="flex flex-col lg:flex-row gap-4 mt-3">
-    {/* Start Date */}
-    <div className="w-full">
-      <label className="block text-gray-700 mb-1">Start Date</label>
-      <div className="relative">
-        <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-        <input
-          type="date"
-          className="w-full p-2 pl-10 border bg-white text-black rounded-md focus:ring-2 focus:ring-blue-400"
-          value={newPost.startDate}
-          onChange={(e) => setNewPost({ ...newPost, startDate: e.target.value })}
-        />
-      </div>
-    </div>
-
-    {/* End Date */}
-    <div className="w-full">
-      <label className="block text-gray-700 mb-1">End Date</label>
-      <div className="relative">
-        <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-        <input
-          type="date"
-          className="w-full p-2 pl-10 border bg-white text-black rounded-md focus:ring-2 focus:ring-blue-400"
-          value={newPost.endDate}
-          onChange={(e) => setNewPost({ ...newPost, endDate: e.target.value })}
-        />
-      </div>
-    </div>
-  </div>
-
-  {/* Image Upload and Place Selection */}
-  <div className="flex items-center justify-center gap-4 mt-6">
-    {/* Image Upload */}
-    <label className="cursor-pointer">
-      <FaImage className="text-xl text-gray-600 hover:text-blue-500" />
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={handleImageChange}
-      />
-    </label>
-
-    {/* Place Selection */}
-    {!hidePlaceSelection && (
-      <select
-      value={newPost.placeId}
-      onChange={(e) => setNewPost({ ...newPost, placeId: e.target.value })}
-      className="border bg-white p-2 text-black rounded-md"
-    >
-      <option value="">Select Place</option>
-      {places?.map((place) => (
-        <option key={place.id} value={place.id}>
-          {place.name}
-        </option>
-      ))}
-    </select>
-    )}
-
-    {/* Submit Button */}
-    <button
-      type="submit"
-      className="bg-[#8cc163] text-white px-6 py-2 rounded-lg hover:bg-[#39c252]"
-    >
-      Post
-    </button>
-  </div>
-
-  {/* Image Preview */}
-  <div className="mt-3 grid grid-cols-3 gap-2">
-    {newPost.images.map((image, index) => (
-      <div key={index} className="relative">
-        <img src={image} alt={`Selected ${index}`} className="w-full h-20 object-cover rounded-md" />
-        <button
-          type="button"
-          onClick={() => removeImage(index)}
-          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
+      <div className="space-y-6">
+        {/* Event Input Section */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handlePost();
+          }}
+          className="bg-white shadow-md rounded-xl p-4"
         >
-          ✕
-        </button>
-      </div>
-    ))}
-  </div>
-</form>
+          <textarea
+            className="w-full p-3 border text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8cc163] disabled:opacity-50"
+            placeholder="What's your event about?"
+            value={newPost.text}
+            onChange={(e) => setNewPost({ ...newPost, text: e.target.value })}
+            disabled={postLoading}
+            required
+          ></textarea>
 
-          
-      
-          {/* Posts Display */}
-          {isLoading ? (
-  <div className="bg-white shadow-md rounded-xl p-4 animate-pulse">
-    {/* Skeleton for User Info */}
-    <div className="flex items-center justify-between mb-2">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-        <div className="w-24 h-4 bg-gray-300 rounded-md"></div>
-      </div>
-
-      <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-    </div>
-
-    {/* Skeleton for Post Title */}
-    <div className="w-full h-6 bg-gray-300 rounded-md mb-4"></div>
-
-    {/* Skeleton for Images */}
-    <div className="grid grid-cols-2 gap-2">
-      {[1, 2, 3, 4].map((_, index) => (
-        <div key={index} className="w-full h-40 bg-gray-300 rounded-md"></div>
-      ))}
-    </div>
-
-    {/* Skeleton for Like Button */}
-    <div className="w-20 h-6 bg-gray-300 rounded-md mt-2"></div>
-
-    {/* Skeleton for Comment Section */}
-    <div className="w-full h-6 bg-gray-300 rounded-md mt-2"></div>
-  </div>
-) : (
-  // Render actual post content when not loading
-  locationData?.slice(0, visiblePosts).map((post) => (
-    <div key={post.id} className="bg-white shadow-md rounded-xl p-4">
-    <Link href={`/userprofile/${post.userId}`} className="flex items-center space-x-2 mb-2">
-   <div className="flex items-center gap-2">
-      <FaUserCircle className="text-2xl text-gray-600" />
-      <span className="font-semibold text-gray-800">{post?.user?.name}</span>
-    </div>
-   </Link>
-
-  
-  {/* Display Multiple Images */}
-  {post.images && post.images.length >= 0 && (
-<div className={`mt-2 ${post.images.length === 1 ? "grid grid-cols-1" : "grid grid-cols-2"} gap-2 relative`}>
-{post.images.slice(0, 4).map((imgObj, index) => (
-  <div key={index} className="relative">
-    <img 
-      src={imgObj.image} 
-      alt="Post" 
-      className={`w-full ${post.images.length === 1 ? "h-56" : "h-40"} object-cover rounded-md cursor-pointer`}
-      onClick={() => setSelectedImage(imgObj.image)} // Click to preview
-    />
-
-    {/* Overlay if there are more than 4 images */}
-    {index === 3 && post.images.length > 4 && (
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-md cursor-pointer"
-        onClick={() => setShowAllImages(post.id)}
-      >
-        <span className="text-white text-lg font-semibold">+{post.images.length - 4}</span>
-      </div>
-    )}
-  </div>
-))}
-</div>
-)}
-
-{/* Single Image Preview Modal */}
-{selectedImage && (
-<div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-<div className="relative bg-white p-4 rounded-lg max-w-2xl w-full">
-  <button onClick={() => setSelectedImage(null)} className="absolute top-4 right-4 text-white text-2xl">❌</button>
-  <img src={selectedImage} alt="Preview" className="w-full max-h-[80vh] object-contain rounded-md" />
-</div>
-</div>
-)}
-
-{/* Show All Images Modal */}
-{showAllImages === post.id && (
-<div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-<div className="bg-white p-4 rounded-lg max-w-4xl w-full relative">
-  <button onClick={() => setShowAllImages(null)} className="absolute top-4 right-4 text-black text-4xl">❌</button>
-  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-    {post.images.map((imgObj, index) => (
-      <img 
-        key={index} 
-        src={imgObj.image} 
-        alt="Post" 
-        className="w-full h-40 object-cover rounded-md cursor-pointer"
-        onClick={() => setSelectedImage(imgObj.image)} // Click to preview any image
-      />
-    ))}
-  </div>
-</div>
-</div>
-)}
-  
-  
-          <p className="mt-2 text-gray-800">{post.title}</p>
-
-          <div className="flex justify-between items-center text-gray-700 mt-4 mb-4">
-{/* Start Date */}
-<div className="flex items-center gap-1 sm:gap-2 bg-green-100 text-green-700 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm">
-<FaCalendarAlt className="text-green-500 text-sm sm:text-base" />
-<span className="font-medium">Start: {post.eventStartDate}</span>
-</div>
-
-{/* End Date - Pushed to Extreme Right */}
-<div className="flex items-center gap-1 sm:gap-2 bg-red-100 text-red-700 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm ml-auto">
-<FaCalendarAlt className="text-red-500 text-sm sm:text-base" />
-<span className="font-medium">End: {post.eventEndDate}</span>
-</div>
-</div>
-
-
-
-          {/* Like Button */}
-          <button className="flex items-center gap-1 text-black mt-2">
-{post.like.some(like => like.user?.id === cookiesuserId) ? (
-<FaHeart 
-  className="text-red-500 cursor-pointer"
-  onClick={() => handleUnlike(post.id, post.user?.id)}
-/>
-) : (
-<FaRegHeart 
-  className="cursor-pointer"
-  onClick={() => handleLike(post.id)}
-/>
-)}
-
-{post.like.length}
-</button>
-
-
-
-  
-         
-  
-          {/* Add Comment Input */}
-          <div className="flex items-center gap-2 mt-2">
-        <input
-          type="text"
-          value={comments[post.id] || ""}
-          onChange={(e) => handleCommentChange(post.id, e.target.value)}
-          placeholder="Write a comment..."
-          className="flex-1 w-36 p-2 border rounded-md text-black focus:ring-2 focus:ring-blue-400 bg-white"
-        />
-        <button
-          onClick={() => handleCommentSubmit(post.id)}
-          disabled={loading || !userId}
-          className="bg-[#8cc163] text-white px-4 py-1 rounded-md"
-        >
-          {loading ? "Posting..." : "Comment"}
-        </button>
-      </div>
-      {/* Display Comments */}
-    
- <div>
-  {(post.comment.slice(0, showAllCommentsForPost[post.id] ? post.comment.length : 2)).map((comment) => (
-    <div key={comment.id} className="flex flex-col gap-1 mt-2 ml-4 bg-gray-100 p-2 rounded-md">
-      
-      <div className="flex justify-between items-center mb-2">
-        <Link href={`/userprofile/${comment.user.id}`} className="flex items-center space-x-2">
-          <div className="flex items-center gap-2">
-            <FaUserCircle className="text-xl text-gray-600" />
-            <span className="font-semibold text-gray-800">{comment.user.name}</span>
-          </div>
-        </Link>
-
-        {/* Comment Delete Icon */}
-        {(comment.user.id === cookiesuserId || post.userId === cookiesuserId) && (
-  <FaTrash
-    className="text-red-500 cursor-pointer text-sm"
-    onClick={() => handleDeleteComment(comment.id, post.id, comment.user.id)}
-  />
-)}
-
-      </div>
-
-      <div className="flex justify-between items-center">
-        <p className="text-gray-700 ml-7">{comment.comment}</p>
-
-        {/* Reply Button */}
-        <button
-          onClick={() => handleReplyToggle(comment.id)}
-          className="text-blue-500 text-sm mr-3"
-        >
-          Reply
-        </button>
-      </div>
-
-      {/* Replies Section */}
-      {comment.reply?.length > 0 && (
-        <div className="mt-2">
-          {comment.reply.map((reply) => (
-            <div key={reply.id} className="flex flex-col gap-1 mt-1 bg-white p-2 rounded-md border-l-4 border-[#8cc163] w-full">
-              <div className="flex justify-between items-center">
-                <Link href={`/userprofile/${reply.user.id}`} className="flex items-center space-x-2 mb-2">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={reply.user?.image || "https://cdn-icons-png.flaticon.com/512/9368/9368192.png"}
-                      alt={reply.user?.name}
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                    <span className="text-sm font-medium text-gray-800">{reply.user?.name}</span>
-                  </div>
-                </Link>
-
-                {/* Reply Delete Icon */}
-                {(reply.user.id === cookiesuserId || post.userId === cookiesuserId) && (
-  <FaTrash
-    className="text-red-500 cursor-pointer text-sm mr-2"
-    onClick={() => handleDeleteReply(reply.id, post.id, comment.id, reply.user.id)}
-  />
-)}
-
+          {/* Start Date & End Date */}
+          <div className="flex flex-col lg:flex-row gap-4 mt-3">
+            <div className="w-full">
+              <label className="block text-gray-700 mb-1 font-medium">
+                Start Date <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <input
+                  type="date"
+                  className="w-full p-2 pl-10 border bg-white text-black rounded-md focus:ring-2 focus:ring-[#8cc163] disabled:opacity-50"
+                  value={newPost.startDate}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, startDate: e.target.value })
+                  }
+                  disabled={postLoading}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
+                />
               </div>
-
-              <p className="ml-7 text-sm text-gray-700">{reply.reply}</p>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Reply Input Box */}
-      {showReplyInput[comment.id] && (
-        <div className="flex items-center gap-2 mt-1 ml-7">
-          <input
-            type="text"
-            placeholder="Write a reply..."
-            className="border p-1 rounded-md flex-1 text-black"
-            value={replyTexts[comment.id] || ''}
-            onChange={(e) => setReplyTexts({ ...replyTexts, [comment.id]: e.target.value })}
-          />
-          <FaPaperPlane
-            className="text-[#8cc163] cursor-pointer"
-            onClick={() => handleReply(post.id, comment.id, comment.user.id)}
-          />
-        </div>
-      )}
+            <div className="w-full">
+              <label className="block text-gray-700 mb-1 font-medium">
+                End Date <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <input
+                  type="date"
+                  className="w-full p-2 pl-10 border bg-white text-black rounded-md focus:ring-2 focus:ring-[#8cc163] disabled:opacity-50"
+                  value={newPost.endDate}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, endDate: e.target.value })
+                  }
+                  disabled={postLoading}
+                  min={newPost.startDate || new Date().toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+            </div>
+          </div>
 
+          {/* Image Upload and Place Selection */}
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <label className="cursor-pointer">
+              <FaImage className="text-xl text-gray-600 hover:text-[#8cc163]" />
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageChange}
+                disabled={postLoading}
+              />
+            </label>
+
+            {!hidePlaceSelection && (
+              <select
+                value={newPost.placeId}
+                onChange={(e) =>
+                  setNewPost({ ...newPost, placeId: e.target.value })
+                }
+                disabled={postLoading}
+                className="border bg-white p-2 text-black rounded-md disabled:opacity-50"
+              >
+                <option value="">Select Place</option>
+                {places?.map((place) => (
+                  <option key={place.id} value={place.id}>
+                    {place.name}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <button
+              type="submit"
+              disabled={postLoading}
+              className="bg-[#8cc163] text-white px-6 py-2 rounded-lg hover:bg-[#79c340] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[120px] justify-center"
+            >
+              {postLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Posting...</span>
+                </>
+              ) : (
+                "Post Event"
+              )}
+            </button>
+          </div>
+
+          {/* Preview Images */}
+          {newPost.images.length > 0 && (
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {newPost.images.map((image, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={image}
+                    alt={`Selected ${index}`}
+                    className="w-full h-20 object-cover rounded-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    disabled={postLoading}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs hover:bg-red-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </form>
+
+        {/* Events Display */}
+        {isLoading ? (
+          // Skeleton Loader
+          <div className="bg-white shadow-md rounded-xl p-4 animate-pulse">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                <div className="w-32 h-4 bg-gray-300 rounded-md"></div>
+              </div>
+            </div>
+            <div className="w-full h-6 bg-gray-300 rounded-md mb-4"></div>
+            <div className="grid grid-cols-2 gap-2">
+              {[1, 2, 3, 4].map((_, index) => (
+                <div key={index} className="w-full h-40 bg-gray-300 rounded-md"></div>
+              ))}
+            </div>
+            <div className="flex gap-2 mt-4">
+              <div className="w-32 h-8 bg-gray-300 rounded-md"></div>
+              <div className="w-32 h-8 bg-gray-300 rounded-md"></div>
+            </div>
+          </div>
+        ) : locationData?.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <p className="text-gray-500 text-lg">No events yet. Create the first event!</p>
+          </div>
+        ) : (
+          locationData?.slice(0, visiblePosts).map((post) => (
+            <PostCard
+              post={post}
+              onLike={handleLike}
+              onComment={handleComment}
+              onReply={handleReply}
+              onDeleteComment={handleDeleteComment}
+              onDeleteReply={handleDeleteReply}
+              onDeletePost={handleDeletePost}
+              showDate={true}
+              loading={loading}
+              deletingId={deletingId}
+              loadingPost={loadingPost}
+              replyLoading={replyLoading}
+            />
+          ))
+        )}
+
+        {/* See More Button */}
+        {!isLoading && visiblePosts < locationData?.length && (
+          <div className="text-center mt-4">
+            <button
+              onClick={() => setVisiblePosts(visiblePosts + 10)}
+              className="px-6 py-2 bg-[#8cc163] text-white rounded-md hover:bg-[#79c340] transition"
+            >
+              See More
+            </button>
+          </div>
+        )}
+      </div>
     </div>
-  ))}
+  );
+};
 
-  {/* Only show the button if there are more than 2 comments */}
-  {post.comment.length > 2 && (
-    <button
-      onClick={() => handleToggleAllComments(post.id)}
-      className="ml-4 text-blue-600 text-sm mt-1"
-    >
-      {showAllCommentsForPost[post.id] ? "Show Less" : "View All Comments"}
-    </button>
-  )}
-</div>
-
-
-        </div>
-  ))
-)}
-
-        </div>
-
-        <ToastContainer position="top-right" autoClose={3000} />
-        {visiblePosts < locationData?.length && (
-  <div className="text-center mt-4">
-    <button
-      onClick={() => setVisiblePosts(visiblePosts + 10)}
-      className="px-4 py-2 bg-[#8cc163] text-white rounded-md"
-    >
-      See More
-    </button>
-  </div>
-)}
-
-    </div>
-  )
-}
-
-export default EventTabSection
+export default EventTabSection;

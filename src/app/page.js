@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import AllPlaces from "./components/AllMovies";
 
 import Banner from "./components/Banner";
@@ -15,40 +16,50 @@ import Test from "./components/Test";
 
 export default function Home() {
   return (
-   <div className="bg-white h-full">
-   <div className=" z-50">  
-   <Navbar  />
-   </div >
-   <div className="z-0">
-    <Carousel/>
-   </div>
-   <div className="">
-    <Category/>
-   </div>
-   <div>
-    < AllPlaces/>
-   </div>
-   <div>
-    <PopularPost/>
-   </div>
-   <div> 
-   <CommunitySlider/>
-     </div>
-   {/* <div>
-    <Banner/>
-   </div> */}
-   {/* <div>
-    <Reviews/>
-   </div> */}
-   {/* <div>
-    <Test/>
-   </div> */}
-   <div>
-    <PopularReviews/>
-   </div>
-   <div >
-    <Footer/>
-   </div>
-   </div>
+    <div className="bg-white h-full">
+      <div className="z-50">  
+        <Navbar />
+      </div>
+      
+      <div className="z-0">
+        <Suspense fallback={<div className="h-96 animate-pulse bg-gray-200" />}>
+          <Carousel/>
+        </Suspense>
+      </div>
+      
+      <div>
+        <Suspense fallback={<div className="h-48 animate-pulse bg-gray-100" />}>
+          <Category/>
+        </Suspense>
+      </div>
+      
+      <div>
+        <Suspense fallback={<div className="h-64 animate-pulse bg-gray-100" />}>
+          <AllPlaces/>
+        </Suspense>
+      </div>
+      
+      <div>
+        <Suspense fallback={<div className="h-64 animate-pulse bg-gray-100" />}>
+          <PopularPost/>
+        </Suspense>
+      </div>
+      
+      <div>
+        <Suspense fallback={<div className="h-64 animate-pulse bg-gray-100" />}>
+          <CommunitySlider/>
+        </Suspense>
+      </div>
+      
+      <div>
+        <Suspense fallback={<div className="h-64 animate-pulse bg-gray-100" />}>
+          <PopularReviews/>
+        </Suspense>
+      </div>
+      
+      <div>
+        <Footer/>
+      </div>
+    </div>
   );
 }
